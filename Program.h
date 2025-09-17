@@ -57,7 +57,7 @@ namespace ssge
 
 
 		// Engine systems
-	private:
+	public:
 		// Manages the program window
 		WindowManager* window;
 		// Manages scenes

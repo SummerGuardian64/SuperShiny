@@ -1,32 +1,87 @@
 #include "StepContext.h"
 
-ssge::StepContext::StepContext(ssge::Program& program) : program(&program)
-{
-}
+// We include engine headers here — only the .cpp sees the raw types.
+// Headers remain free of raw public Program* signatures.
+#include "Program.h"
+#include "SceneManager.h"
+#include "Scene.h"
 
-ssge::StepContext::~StepContext()
-{
-}
+namespace ssge {
 
-ssge::StepContext::Program::Program(ssge::Program* actualProgram)
-{
-    this->actualProgram = actualProgram;
-}
+    // -----------------------------
+    // SceneManagerStepContext impl
+    // -----------------------------
+    SceneManagerStepContext::SceneManagerStepContext(
+        ssge::Program* prog
+    )
+        : program(prog)
+        , scenes(prog->scenes)
+    {
+    }
 
-ssge::StepContext::Program::~Program()
-{
-}
+    // Program wrapper
+    SceneManagerStepContext::Program::Program(ssge::Program* p)
+        : actual(p)
+    {
+    }
 
-void ssge::StepContext::Program::exit()
-{
-    actualProgram->requestExit();
-}
+    void SceneManagerStepContext::Program::exit() {
+        if (actual) actual->requestExit();
+    }
 
-ssge::StepContext::InputManager::InputManager(ssge::InputManager* actualInputManager)
-{
-    this->actualInputManager = actualInputManager;
-}
+    // Scenes wrapper
+    SceneManagerStepContext::Scenes::Scenes(ssge::SceneManager* mgr)
+        : actual(mgr)
+    {
+    }
 
-ssge::StepContext::InputManager::~InputManager()
-{
-}
+    void SceneManagerStepContext::Scenes::changeScene(std::unique_ptr<ssge::Scene> newScene) {
+        if (actual) actual->changeScene(std::move(newScene));
+    }
+
+    // Private helper that SceneManager (friend) calls to get a SceneStepContext.
+    // Implemented via the ContextFactory.
+    SceneStepContext SceneManagerStepContext::sceneStepContext() const {
+        return ContextFactory::createSceneStepContext(*this);
+    }
+
+    // -----------------------------
+    // SceneStepContext impl
+    // -----------------------------
+    SceneStepContext::SceneStepContext(ssge::Program* prog, ssge::SceneManager* mgr)
+        : program(prog)
+        , scenes(mgr)
+    {
+    }
+
+    SceneStepContext::Program::Program(ssge::Program* p)
+        : actual(p)
+    {
+    }
+
+    void SceneStepContext::Program::exit() {
+        if (actual) actual->requestExit();
+    }
+
+    SceneStepContext::Scenes::Scenes(ssge::SceneManager* mgr)
+        : actual(mgr)
+    {
+    }
+
+    void SceneStepContext::Scenes::changeScene(std::unique_ptr<ssge::Scene> newScene) {
+        if (actual) actual->changeScene(std::move(newScene));
+    }
+
+    // -----------------------------
+    // ContextFactory impl
+    // -----------------------------
+    SceneStepContext ContextFactory::createSceneStepContext(const SceneManagerStepContext& smctx) {
+        // Access the private internals of the wrappers (friend)
+        ssge::Program* progPtr = smctx.program.actual;
+        ssge::SceneManager* mgrPtr = smctx.scenes.actual;
+
+        // Construct SceneStepContext (private ctor, but this factory is a friend)
+        return SceneStepContext(progPtr, mgrPtr);
+    }
+
+} // namespace ssge

@@ -128,15 +128,15 @@ void ssge::Program::latchInputs()
 void ssge::Program::stepScenes()
 {
     std::cout << "stepScenes()" << std::endl;
-    auto stepContext = StepContext(*this);
-    scenes->step(stepContext);
+    auto context = SceneManagerStepContext(this);
+    scenes->step(context);
 }
 
 void ssge::Program::drawScenes()
 {
     std::cout << "drawScenes()" << std::endl;
-    auto drawContext = DrawContext(*this);
-    scenes->draw(drawContext);
+    //auto context = SceneManagerDrawContext(*this);
+    //scenes->draw(context);
     window->updateWindow();
 }
 

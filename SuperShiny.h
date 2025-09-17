@@ -14,7 +14,8 @@ namespace ssge // Super Shiny Game Engine
 
 	class SceneManager;
 	//class SceneCollection;
-	//class Scene;
+	class Scene;
+	enum class SceneClassID : int;
 	//
 	//class GameWorld;
 	//class GameProgress;
@@ -28,10 +29,10 @@ namespace ssge // Super Shiny Game Engine
 	//// Contexts
 	class StepContext;
 	class DrawContext;
-	//class SceneManagerStepContext;
-	//class SceneManagerDrawContext;
-	//class SceneStepContext;
-	//class SceneDrawContext;
+	class SceneManagerStepContext;
+	class SceneManagerDrawContext;
+	class SceneStepContext;
+	class SceneDrawContext;
 	//class WorldStepContext;
 	//class WorldDrawContext;
 	//class EntityStepContext;
@@ -45,9 +46,9 @@ namespace ssge // Super Shiny Game Engine
 #include "WindowManager.h"
 #include "InputManager.h"
 //#include "ResourceManager.h"
+#include "Scene.h"
 #include "SceneManager.h"
 //#include "SceneCollection.h"
-//#include "Scene.h"
 //#include "GameWorld.h"
 //#include "GameProgress.h"
 //#include "Level.h"
