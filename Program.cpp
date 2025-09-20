@@ -71,6 +71,10 @@ bool ssge::Program::loadInitialResources()
 bool ssge::Program::prepareInitialState()
 {
     std::cout << "prepareInitialState()" << std::endl;
+
+    //TODO: Initialize first scene
+    scenes->changeScene(std::make_unique<GameWorld>());
+
     return true;
 }
 

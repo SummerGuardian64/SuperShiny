@@ -77,23 +77,23 @@ void ssge::SceneManager::draw(SceneManagerDrawContext& context)
 	*/
 }
 
-Scene* ssge::SceneManager::getCurrentScene() const
+ssge::Scene* ssge::SceneManager::getCurrentScene() const
 {
 	return currentScene.get();
 }
 
-SceneClassID ssge::SceneManager::getCurrentSceneClassID() const
+ssge::SceneClassID ssge::SceneManager::getCurrentSceneClassID() const
 {
 	if (!currentScene)
 	{
-		return SceneClassID::None;
+		return ssge::SceneClassID::None;
 	}
 	else return currentScene->getSceneClassID();
 }
 
-Scene* ssge::SceneManager::changeScene(std::unique_ptr<Scene> newScene)
+ssge::Scene* ssge::SceneManager::changeScene(std::unique_ptr<ssge::Scene> newScene)
 {
-	if (Scene* validScene = newScene.get())
+	if (ssge::Scene* validScene = newScene.get())
 	{
 		queuedScene = std::move(newScene);
 		return validScene;
