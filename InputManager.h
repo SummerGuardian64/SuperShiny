@@ -5,7 +5,7 @@ namespace ssge
 {
 	class InputManager // Manages Inputs
 	{
-		friend class Program;
+		friend class Engine;
 	private:
 		InputManager();
 		InputManager(const InputManager& toCopy) = delete;

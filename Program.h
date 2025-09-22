@@ -1,5 +1,6 @@
 #pragma once
 #include "SuperShiny.h"
+#include "SDL.h"
 
 namespace ssge
 {
@@ -27,12 +28,9 @@ namespace ssge
 		// Initializes the program's managers.
 		// Returns true on success, false on failure.
 		bool init();
-		// Loads all necessary resources without which the Program cannot work.
+		// Starts the engine-
 		// Returns true on success, false on failure.
-		bool loadInitialResources();
-		// Prepares the initial state for the first main loop iteration.
-		// Returns true on success, false on failure.
-		bool prepareInitialState();
+		bool startEngine();
 		// Runs an iteration of the main loop.
 		// Returns true if the loop should be continued. Otherwise false.
 		bool mainLoop();
@@ -43,30 +41,13 @@ namespace ssge
 		// Returns true on success, false on failure.
 		bool shutdown();
 
-
-		// Engine flow
-	private:
-		// Handles input events
-		void handleEvents();
-		// Latches inputs
-		void latchInputs();
-		// Steps through all scenes via SceneManager
-		void stepScenes();
-		// Draws all scenes via SceneManager
-		void drawScenes();
-
-
-		// Engine systems
+		// Program systems
 	public:
 		// Manages the program window
 		WindowManager* window;
-		// Manages scenes
-		SceneManager* scenes;
-		// Manages inputs
-		InputManager* inputs;
-		// Manages resources
-		//ResourceManager resources;
-
+		// The game engine core
+		Engine* engine;
+		
 
 		// Program control
 	private:
@@ -78,11 +59,5 @@ namespace ssge
 		// Request exit from the main loop
 		void requestExit();
 
-
-		// Application-specific details
-	private:
-		static const char APPLICATION_TITLE[];
-	public:
-		const char* getApplicationTitle();
 	};
 }

@@ -12,10 +12,11 @@ namespace ssge {
     // SceneManagerStepContext impl
     // -----------------------------
     SceneManagerStepContext::SceneManagerStepContext(
-        ssge::Program* prog
+        ssge::Program* program,
+        ssge::Engine* engine
     )
-        : program(prog)
-        , scenes(prog->scenes)
+        : program(program)
+        , scenes(engine->getSceneManager())
     {
     }
 

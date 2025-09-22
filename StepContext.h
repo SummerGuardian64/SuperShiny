@@ -10,7 +10,7 @@
 
 namespace ssge {
     // Forward engine types (do NOT expose raw Program* publicly)
-    class Program;          // real engine Program (defined elsewhere)
+    class Program;          // real Program (defined elsewhere)
     class SceneManager;     // the manager that owns scenes
     class Scene;            // abstract scene base
 
@@ -29,7 +29,7 @@ namespace ssge {
     // -----------------------
     // SceneManagerStepContext
     // -----------------------
-    // Created *only* by ssge::Program (friend). Exposes safe wrappers as members so
+    // Created *only* by ssge::Engine (friend). Exposes safe wrappers as members so
     // user code can use `ctx.program.exit()` and `ctx.scenes.changeScene(...)`.
     class SceneManagerStepContext {
     public:
@@ -64,8 +64,8 @@ namespace ssge {
         Scenes scenes;
 
     private:
-        // Only ssge::Program constructs this (declared as friend)
-        SceneManagerStepContext(ssge::Program* prog);
+        // Only ssge::Engine constructs this (declared as friend)
+        SceneManagerStepContext(ssge::Program* program, ssge::Engine* engine);
 
         // Provide SceneManager a way to obtain a SceneStepContext, but keep the method private:
         // SceneManager is friend so it can call this.
@@ -80,7 +80,7 @@ namespace ssge {
         SceneManagerStepContext& operator=(SceneManagerStepContext&&) = delete;
 
         // Trusted classes:
-        friend class ::ssge::Program;      // engine may create this
+        friend class ::ssge::Engine;      // engine may create this
         friend class ::ssge::SceneManager; // allowed to call sceneStepContext()
         friend class ::ssge::ContextFactory;
     };

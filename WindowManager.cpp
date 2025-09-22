@@ -4,6 +4,7 @@ ssge::WindowManager::WindowManager()
 {
     window = nullptr;
     windowSurface = nullptr;
+    renderer = nullptr;
 }
 
 ssge::WindowManager::~WindowManager()
@@ -32,17 +33,11 @@ const char* ssge::WindowManager::init(const char* title, int width, int height)
         return SDL_GetError();
     }
 
-    // Obtain window surface
-    windowSurface = SDL_GetWindowSurface(window);
-
-    // See if window surface was obtained
-    if (!windowSurface)
+    // Create renderer for the window
+    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+    
+    if (!renderer)
     {
-        // Destroy the window if the surface couldn't be obtained
-        SDL_DestroyWindow(window);
-        window = nullptr;
-
-        // Return error message
         return SDL_GetError();
     }
 
@@ -60,6 +55,31 @@ SDL_Surface* ssge::WindowManager::getWindowSurface() const
     return windowSurface;
 }
 
+SDL_Renderer* ssge::WindowManager::getRenderer() const
+{
+    return renderer;
+}
+
+SDL_Rect ssge::WindowManager::makeBestFitScale()
+{
+    int virtualWidth = ssge::Game::VIRTUAL_WIDTH;
+    int virtualHeight = ssge::Game::VIRTUAL_HEIGHT;
+    
+    int windowWidth;
+    int windowHeight;
+    SDL_GetWindowSize(getWindow(), &windowWidth, &windowHeight);
+
+    float scaleX = (float)windowWidth / virtualWidth;
+    float scaleY = (float)windowHeight / virtualHeight;
+    float scale = (scaleX < scaleY) ? scaleX : scaleY;
+
+    int dstW = (int)(virtualWidth * scale);
+    int dstH = (int)(virtualHeight * scale);
+    int dstX = (windowWidth - dstW) / 2;
+    int dstY = (windowHeight - dstH) / 2;
+    return SDL_Rect{dstX, dstY, dstW, dstH};
+}
+
 void ssge::WindowManager::updateWindow()
 {
     SDL_UpdateWindowSurface(window);
@@ -67,6 +87,11 @@ void ssge::WindowManager::updateWindow()
 
 void ssge::WindowManager::shutdown()
 {
+    if (renderer)
+    {
+        SDL_DestroyRenderer(renderer);
+        renderer = nullptr;
+    }
     if (window)
     {
         SDL_DestroyWindow(window);

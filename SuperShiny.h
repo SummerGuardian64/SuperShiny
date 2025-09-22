@@ -7,6 +7,9 @@
 namespace ssge // Super Shiny Game Engine
 {
 	class Program;
+	class Engine;
+	class Game;
+
 	//class Factory;
 	class WindowManager;
 	class InputManager;
@@ -57,3 +60,5 @@ namespace ssge // Super Shiny Game Engine
 //#include "LevelLoader.h"
 //#include "Entity.h"
 //#include "Sprite.h"
+#include "Engine.h"
+#include "Game.h"

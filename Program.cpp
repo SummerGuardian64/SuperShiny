@@ -14,31 +14,25 @@ int ssge::Program::run(int argc, char* argv[])
 
 ssge::Program::Program()
 {
+    engine = nullptr;
     window = new WindowManager();
-    scenes = new SceneManager();
-    inputs = new InputManager();
     exitRequested = false;
 }
 
 ssge::Program::~Program()
 {
     delete window;
-    delete scenes;
-    delete inputs;
 }
 
 int ssge::Program::_run(int argc, char* argv[])
 {
     int exitCode = 0;
 
-    if (init()) {
-        if (loadInitialResources()) {
-            if (prepareInitialState()) {
-                while (mainLoop()) {
-                    SDL_Delay(16); // TODO: Replace with proper timing system!
-                }
-            }
-            else { exitCode = -1; }
+    if (init())
+    {
+        if (startEngine())
+        {
+            while (mainLoop()) { ; }
         }
         else { exitCode = -1; }
     }
@@ -56,36 +50,79 @@ bool ssge::Program::init()
     bool success = true;
 
     // Initialize program window
-    if (window->init(getApplicationTitle(), 1280, 720) != nullptr)
+    if (auto error = window->init(ssge::Game::APPLICATION_TITLE, 1280, 720))
+    {
+        std::cout << error << std::endl;
         success = false;
+    }
 
     return success;
 }
 
-bool ssge::Program::loadInitialResources()
+bool ssge::Program::startEngine()
 {
-    std::cout << "loadInitialResources()" << std::endl;
-    return true;
-}
-
-bool ssge::Program::prepareInitialState()
-{
-    std::cout << "prepareInitialState()" << std::endl;
-
-    //TODO: Initialize first scene
-    scenes->changeScene(std::make_unique<GameWorld>());
-
-    return true;
+    engine = new Engine(*this);
+    return engine->init();
 }
 
 bool ssge::Program::mainLoop()
 {
-    std::cout << "mainLoop()" << std::endl;
-    handleEvents();
-    latchInputs();
-    stepScenes();
-    drawScenes();
-    return !wasExitRequested();
+    SDL_Renderer* renderer = window->getRenderer();
+
+    // Create a render target texture for the virtual screen.
+    SDL_Texture* gameScreen =
+        SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET,
+            Game::VIRTUAL_WIDTH, Game::VIRTUAL_HEIGHT);
+    if (!gameScreen) {
+        //errorString.Create("SDL_CreateTexture (gameScreen) error: ", SDL_GetError());
+        return false;
+    }
+
+    bool done = false;
+    Uint32 lastTicks = SDL_GetTicks();
+    while (!done)
+    {
+        SDL_Event event;
+        while (SDL_PollEvent(&event))
+        {
+            switch (event.type)
+            {
+            case SDL_QUIT:
+                done = true;
+                break;
+            default:
+                engine->handle(event);
+                break;
+            }
+        }
+
+        Uint32 currentTicks = SDL_GetTicks();
+        float deltaTime = (currentTicks - lastTicks) / 1000.0f;
+        lastTicks = currentTicks;
+
+        engine->update(deltaTime);
+
+        // Delay to simulate ~50 FPS.
+        SDL_Delay(20);
+
+        // Render the game onto the virtual gameScreen texture.
+        SDL_SetRenderTarget(renderer, gameScreen);
+        engine->render(renderer);
+        SDL_SetRenderTarget(renderer, NULL);
+
+        // Clear the window (black background for letterboxing).
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+        SDL_RenderClear(renderer);
+
+        // Render the gameScreen texture scaled to best fit the window.
+        SDL_Rect fitRect = window->makeBestFitScale();
+        SDL_RenderCopy(renderer, gameScreen, NULL, &fitRect);
+
+        SDL_RenderPresent(renderer);
+    }
+    SDL_DestroyTexture(gameScreen);
+
+    return false;
 }
 
 bool ssge::Program::cleanup()
@@ -100,48 +137,12 @@ bool ssge::Program::shutdown()
 
     // Shut down the program window
     window->shutdown();
+
+    if (engine)
+        engine->shutdown();
+
+    SDL_Quit();
     return true;
-}
-
-void ssge::Program::handleEvents()
-{
-    std::cout << "handleEvents()" << std::endl;
-
-    SDL_Event e;
-    if (SDL_PollEvent(&e))
-    {
-        switch (e.type)
-        {
-        case SDL_KEYDOWN:
-            if (e.key.keysym.sym == SDLK_ESCAPE)
-            {
-                requestExit();
-            }
-            break;
-        default:
-            break;
-        }
-    }
-}
-
-void ssge::Program::latchInputs()
-{
-    std::cout << "latchInputs()" << std::endl;
-}
-
-void ssge::Program::stepScenes()
-{
-    std::cout << "stepScenes()" << std::endl;
-    auto context = SceneManagerStepContext(this);
-    scenes->step(context);
-}
-
-void ssge::Program::drawScenes()
-{
-    std::cout << "drawScenes()" << std::endl;
-    //auto context = SceneManagerDrawContext(*this);
-    //scenes->draw(context);
-    window->updateWindow();
 }
 
 bool ssge::Program::wasExitRequested() const
@@ -152,11 +153,4 @@ bool ssge::Program::wasExitRequested() const
 void ssge::Program::requestExit()
 {
     exitRequested = true;
-}
-
-const char ssge::Program::APPLICATION_TITLE[] = "Your game name here";
-
-const char* ssge::Program::getApplicationTitle()
-{
-    return APPLICATION_TITLE;
 }

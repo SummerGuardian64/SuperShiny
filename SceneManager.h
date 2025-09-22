@@ -7,7 +7,8 @@ namespace ssge
 {
 	class SceneManager // Manages Scenes
 	{
-		friend class Program;
+		//TODO: Refactor to friend class Factory
+		friend class Engine;
 	private:
 		std::unique_ptr<Scene> currentScene;
 		bool paused;
@@ -20,9 +21,10 @@ namespace ssge
 		SceneManager(SceneManager&& toMove) = delete;
 		~SceneManager();
 
+	public:
 		void step(SceneManagerStepContext& context);
 		void draw(SceneManagerDrawContext& context);
-	public:
+
 		Scene* getCurrentScene() const;
 		SceneClassID getCurrentSceneClassID() const;
 		Scene* changeScene(std::unique_ptr<Scene> newScene);

@@ -1,5 +1,6 @@
 #pragma once
 #include "SDL.h"
+#include "SuperShiny.h"
 
 namespace ssge
 {
@@ -14,6 +15,7 @@ namespace ssge
 
 		SDL_Window* window;
 		SDL_Surface* windowSurface;
+		SDL_Renderer* renderer;
 	public:
 		// Initializes the program window with title and size.
 		// Returns error string or nullptr if no error.
@@ -22,6 +24,10 @@ namespace ssge
 		SDL_Window* getWindow() const;
 		// Gets the window surface
 		SDL_Surface* getWindowSurface() const;
+		// Gets the renderer for the window
+		SDL_Renderer* getRenderer() const;
+		// Makes a SDL_Rect with best scaling
+		SDL_Rect makeBestFitScale();
 		// Updates the window
 		void updateWindow();
 		// Shuts down the window
