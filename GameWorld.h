@@ -21,28 +21,15 @@ namespace ssge
     class GameWorld : public Scene
     {
         SDL_FRect confines;
-        //std::vector<std::unique_ptr<PowerupType>> powerupTypes;
-        //void initPowerupTypes();
         bool gameplayOver;
     public:
         GameWorld();
+        Scene& getAsScene();
+        //EntityManager entities;
         //std::unique_ptr<Level> level;
         //HintManager hints;
         bool isGameplayOver() const;
         void finishGameplay();
-        //std::list<std::shared_ptr<Entity>> entities;
-        //std::list<std::shared_ptr<Entity>>::iterator getEntitiesBegin();
-        //std::list<std::shared_ptr<Entity>>::iterator getEntitiesEnd();
-        //std::weak_ptr<Entity> addEntity(std::shared_ptr<Entity> entity);
-        //bool deleteEntity(std::shared_ptr<Entity> entity);
-        //Entity* findEntity(EntityClassID entityClassID);
-        //const Entity* findConstEntity(EntityClassID entityClassID) const;
-        //std::vector<std::weak_ptr<Entity>> findAllEntities(EntityClassID entityClassID);
-        //int countAllEntities() const;
-        //int countAllEntities(EntityClassID entityClassID) const;
-        //void destroyScheduledEntities();
-        //PowerupType* fetchPowerupType(PowerupTypeID powerupTypeID);
-        //void checkBrickCollision(Entity& entity);
         SDL_FRect getConstConfines() const;
         SDL_FRect getConfines();
         void setConfines(SDL_FRect confines);

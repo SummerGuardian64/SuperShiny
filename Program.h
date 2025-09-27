@@ -28,7 +28,7 @@ namespace ssge
 		// Initializes the program's managers.
 		// Returns true on success, false on failure.
 		bool init();
-		// Starts the engine-
+		// Starts the engine.
 		// Returns true on success, false on failure.
 		bool startEngine();
 		// Runs an iteration of the main loop.
@@ -48,16 +48,5 @@ namespace ssge
 		// The game engine core
 		Engine* engine;
 		
-
-		// Program control
-	private:
-		// Has the user requested an exit from the main loop?
-		bool exitRequested;
-	public:
-		// Returns whether exit from the main loop was requested
-		bool wasExitRequested() const;
-		// Request exit from the main loop
-		void requestExit();
-
 	};
 }

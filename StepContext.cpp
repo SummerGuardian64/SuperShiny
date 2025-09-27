@@ -2,87 +2,163 @@
 
 // We include engine headers here — only the .cpp sees the raw types.
 // Headers remain free of raw public Program* signatures.
-#include "Program.h"
+#include "Engine.h"
 #include "SceneManager.h"
+#include "GameWorld.h"
 #include "Scene.h"
 
-namespace ssge {
+using namespace ssge;
 
-    // -----------------------------
-    // SceneManagerStepContext impl
-    // -----------------------------
-    SceneManagerStepContext::SceneManagerStepContext(
-        ssge::Program* program,
-        ssge::Engine* engine
-    )
-        : program(program)
-        , scenes(engine->getSceneManager())
-    {
-    }
+// StepContext impl
 
-    // Program wrapper
-    SceneManagerStepContext::Program::Program(ssge::Program* p)
-        : actual(p)
-    {
-    }
+ssge::StepContext::Engine::Engine(ssge::Engine* actual)
+{
+	this->actual = actual;
+}
 
-    void SceneManagerStepContext::Program::exit() {
-        if (actual) actual->requestExit();
-    }
+void ssge::StepContext::Engine::finish()
+{
+	actual->finish();
+}
 
-    // Scenes wrapper
-    SceneManagerStepContext::Scenes::Scenes(ssge::SceneManager* mgr)
-        : actual(mgr)
-    {
-    }
+ssge::StepContext::Scenes::Scenes(ssge::SceneManager* actual)
+{
+	this->actual = actual;
+}
 
-    void SceneManagerStepContext::Scenes::changeScene(std::unique_ptr<ssge::Scene> newScene) {
-        if (actual) actual->changeScene(std::move(newScene));
-    }
+void ssge::StepContext::Scenes::changeScene(std::unique_ptr<ssge::Scene> newScene)
+{
+	actual->changeScene(std::move(newScene));
+}
 
-    // Private helper that SceneManager (friend) calls to get a SceneStepContext.
-    // Implemented via the ContextFactory.
-    SceneStepContext SceneManagerStepContext::sceneStepContext() const {
-        return ContextFactory::createSceneStepContext(*this);
-    }
+ssge::StepContext::Inputs::Inputs(ssge::InputManager* actual)
+{
+	this->actual = actual;
+}
 
-    // -----------------------------
-    // SceneStepContext impl
-    // -----------------------------
-    SceneStepContext::SceneStepContext(ssge::Program* prog, ssge::SceneManager* mgr)
-        : program(prog)
-        , scenes(mgr)
-    {
-    }
+ssge::StepContext::StepContext(ssge::Engine* actualEngine) 
+	: engine(actualEngine),
+	  scenes(actualEngine->getSceneManager()),
+	  inputs(actualEngine->getInputManager())
+{
+	;
+}
 
-    SceneStepContext::Program::Program(ssge::Program* p)
-        : actual(p)
-    {
-    }
+ssge::Engine* ssge::StepContext::getActualEngine()
+{
+	return engine.actual;
+}
 
-    void SceneStepContext::Program::exit() {
-        if (actual) actual->requestExit();
-    }
+ssge::SceneManager* ssge::StepContext::getActualSceneManager()
+{
+	return scenes.actual;
+}
 
-    SceneStepContext::Scenes::Scenes(ssge::SceneManager* mgr)
-        : actual(mgr)
-    {
-    }
+ssge::InputManager* ssge::StepContext::getActualInputManager()
+{
+	return inputs.actual;
+}
 
-    void SceneStepContext::Scenes::changeScene(std::unique_ptr<ssge::Scene> newScene) {
-        if (actual) actual->changeScene(std::move(newScene));
-    }
+// SceneStepContext impl
 
-    // -----------------------------
-    // ContextFactory impl
-    // -----------------------------
-    SceneStepContext ContextFactory::createSceneStepContext(const SceneManagerStepContext& smctx) {
-        // Access the private internals of the wrappers (friend)
-        ssge::Program* progPtr = smctx.program.actual;
-        ssge::SceneManager* mgrPtr = smctx.scenes.actual;
+ssge::SceneStepContext::SceneStepContext(ssge::Scene& currentScene, ssge::StepContext& stepContext)
+	: engine(stepContext.getActualEngine()),
+	  scenes(stepContext.getActualSceneManager()),
+	  inputs(stepContext.getActualInputManager()),
+	  currentScene(currentScene)
+{
+	;
+}
 
-        // Construct SceneStepContext (private ctor, but this factory is a friend)
-        return SceneStepContext(progPtr, mgrPtr);
-    }
+ssge::SceneStepContext::Engine::Engine(ssge::Engine* actual)
+{
+	this->actual = actual;
+}
 
-} // namespace ssge
+void ssge::SceneStepContext::Engine::finish()
+{
+	actual->finish();
+}
+
+ssge::SceneStepContext::Scenes::Scenes(ssge::SceneManager* actual)
+{
+	this->actual = actual;
+}
+
+void ssge::SceneStepContext::Scenes::changeScene(std::unique_ptr<ssge::Scene> newScene)
+{
+	actual->changeScene(std::move(newScene));
+}
+
+ssge::SceneStepContext::Inputs::Inputs(ssge::InputManager* actual)
+{
+	this->actual = actual;
+}
+
+ssge::Engine* ssge::SceneStepContext::getActualEngine()
+{
+	return engine.actual;
+}
+
+ssge::SceneManager* ssge::SceneStepContext::getActualSceneManager()
+{
+	return scenes.actual;
+}
+
+ssge::InputManager* ssge::SceneStepContext::getActualInputManager()
+{
+	return inputs.actual;
+}
+
+// GameWorldStepContext impl
+
+ssge::GameWorldStepContext::GameWorldStepContext(ssge::GameWorld& currentGameWorld, ssge::SceneStepContext& sceneStepContext)
+	: engine(sceneStepContext.getActualEngine()),
+	scenes(sceneStepContext.getActualSceneManager()),
+	inputs(sceneStepContext.getActualInputManager()),
+	currentScene(currentGameWorld.getAsScene()),
+	world(currentGameWorld)
+{
+	;
+}
+
+ssge::GameWorldStepContext::Engine::Engine(ssge::Engine* actual)
+{
+	this->actual = actual;
+}
+
+void ssge::GameWorldStepContext::Engine::finish()
+{
+	actual->finish();
+}
+
+ssge::GameWorldStepContext::Scenes::Scenes(ssge::SceneManager* actual)
+{
+	this->actual = actual;
+}
+
+void ssge::GameWorldStepContext::Scenes::changeScene(std::unique_ptr<ssge::Scene> newScene)
+{
+	actual->changeScene(std::move(newScene));
+}
+
+ssge::GameWorldStepContext::Inputs::Inputs(ssge::InputManager* actual)
+{
+	this->actual = actual;
+}
+
+ssge::Engine* ssge::GameWorldStepContext::getActualEngine()
+{
+	return engine.actual;
+}
+
+ssge::SceneManager* ssge::GameWorldStepContext::getActualSceneManager()
+{
+	return scenes.actual;
+}
+
+ssge::InputManager* ssge::GameWorldStepContext::getActualInputManager()
+{
+	return inputs.actual;
+}
+

@@ -10,6 +10,11 @@ GameWorld::GameWorld()
     gameplayOver = false;
 }
 
+Scene& ssge::GameWorld::getAsScene()
+{
+    return *this;
+}
+
 bool GameWorld::isGameplayOver() const
 {
 	return false;
@@ -68,10 +73,50 @@ void GameWorld::init(SceneStepContext& context)
 
 void GameWorld::step(SceneStepContext& context)
 {
-    // TODO: entities.step(...)
-    
-    // TODO: game victory/loss criteria check
+    //entities.step();
 
+    //// Step all entities
+    //for (auto& entityPtr : entities)
+    //{
+    //    entityPtr->step(deltaTime);
+    //}
+
+    //// Destroy scheduled entities
+    //destroyScheduledEntities();
+
+    //// TODO: game victory/loss criteria check
+
+    //// If the gameplay isn't over yet, process the game
+    //if (!isGameplayOver())
+    //{
+    //    // If all balls have been destroyed
+    //    if (countAllEntities(EntityClassID::Ball) == 0)
+    //    {
+    //        // That means that player lost a life
+    //        if (!game.progress.loseLife())
+    //        { // If there's remaining lives
+    //            // Give the player another ball
+    //            spawnNewBall();
+
+    //            // Update the hint
+    //            hints.playerLostALife();
+    //        }
+    //        else
+    //        { // If there's no more lives
+    //            // Tell the player they lost
+    //            hints.playerLostAllLives();
+
+    //            // Halt the gameplaay
+    //            finishGameplay();
+
+    //            // Play game over
+    //            game.backgroundMusic.loadGameOverSong(true, false);
+
+    //            // Open the game over screen
+    //            game.menus.openGameOver();
+    //        }
+    //    }
+    //}
     // Here would be the hints
 }
 

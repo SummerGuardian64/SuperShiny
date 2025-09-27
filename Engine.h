@@ -5,7 +5,7 @@ namespace ssge
 {
 	class Engine // The game engine core
 	{
-		friend class Program;
+		friend class Factory;
 	private:
 		Program& program;
 
@@ -35,6 +35,9 @@ namespace ssge
 		ssge::SceneManager* getSceneManager();
 		ssge::InputManager* getInputManager();
 
+		// Engine control from higher levels
+
+		void finish();
 	private:
 		// Manages scenes
 		SceneManager* scenes;
@@ -42,5 +45,7 @@ namespace ssge
 		InputManager* inputs;
 		// Manages resources
 		//ResourceManager resources;
+
+		bool wannaFinish;
 	};
 }

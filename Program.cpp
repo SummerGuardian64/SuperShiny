@@ -16,7 +16,6 @@ ssge::Program::Program()
 {
     engine = nullptr;
     window = new WindowManager();
-    exitRequested = false;
 }
 
 ssge::Program::~Program()
@@ -61,7 +60,7 @@ bool ssge::Program::init()
 
 bool ssge::Program::startEngine()
 {
-    engine = new Engine(*this);
+    engine = Factory::ForProgram::engine(*this);
     return engine->init();
 }
 
@@ -100,7 +99,8 @@ bool ssge::Program::mainLoop()
         float deltaTime = (currentTicks - lastTicks) / 1000.0f;
         lastTicks = currentTicks;
 
-        engine->update(deltaTime);
+        // Update the engine and see if it's done (wants to quit)
+        done |= !engine->update(deltaTime);
 
         // Delay to simulate ~50 FPS.
         SDL_Delay(20);
@@ -143,14 +143,4 @@ bool ssge::Program::shutdown()
 
     SDL_Quit();
     return true;
-}
-
-bool ssge::Program::wasExitRequested() const
-{
-    return exitRequested;
-}
-
-void ssge::Program::requestExit()
-{
-    exitRequested = true;
 }

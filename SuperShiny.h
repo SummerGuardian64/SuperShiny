@@ -10,7 +10,7 @@ namespace ssge // Super Shiny Game Engine
 	class Engine;
 	class Game;
 
-	//class Factory;
+	class Factory;
 	class WindowManager;
 	class InputManager;
 	//class ResourceManager;
@@ -26,26 +26,25 @@ namespace ssge // Super Shiny Game Engine
 	//class Level;
 	//class LevelLoader;
 
-	//class Entity;
+	class EntityManager;
+	class Entity;
 	//class Sprite;
 
 	//// Contexts
 	class StepContext;
 	class DrawContext;
-	class SceneManagerStepContext;
-	class SceneManagerDrawContext;
 	class SceneStepContext;
 	class SceneDrawContext;
-	//class WorldStepContext;
-	//class WorldDrawContext;
+	class GameWorldStepContext;
+	class GameWorldDrawContext;
 	//class EntityStepContext;
 	//class EntityDrawContext;
 	//...
 }
 
 // Header files that belong to Super Shiny Game Engine
+#include "Factory.h"
 #include "Program.h"
-//#include "Factory.h"
 #include "WindowManager.h"
 #include "InputManager.h"
 //#include "ResourceManager.h"
@@ -58,7 +57,8 @@ namespace ssge // Super Shiny Game Engine
 //#include "GameProgress.h"
 //#include "Level.h"
 //#include "LevelLoader.h"
-//#include "Entity.h"
+#include "Entity.h"
 //#include "Sprite.h"
+#include "EntityManager.h"
 #include "Engine.h"
 #include "Game.h"

@@ -13,21 +13,21 @@ ssge::SceneManager::~SceneManager()
 {
 }
 
-void ssge::SceneManager::step(SceneManagerStepContext& context)
+void ssge::SceneManager::step(StepContext& context)
 {
 	std::cout << "SceneManager::step()" << std::endl;
 	if (auto scene = getCurrentScene())
 	{
 		if (!isSceneInitialized())
 		{
-			SceneStepContext context(context.sceneStepContext());
-			scene->init(context);
+			SceneStepContext sceneContext = Factory::ForSceneManager::sceneStepContext(*scene, context);
+			scene->init(sceneContext);
 			sceneInitialized = true;
 		}
 		if (!isPaused() && !queuedScene)
 		{
-			SceneStepContext context(context.sceneStepContext());
-			scene->step(context);
+			SceneStepContext sceneContext = Factory::ForSceneManager::sceneStepContext(*scene, context);
+			scene->step(sceneContext);
 		}
 	}
 
@@ -58,24 +58,24 @@ void ssge::SceneManager::step(SceneManagerStepContext& context)
 	}
 }
 
-void ssge::SceneManager::draw(SceneManagerDrawContext& context)
-{
-	std::cout << "SceneManager::draw()" << std::endl;
-	// Draw current scene
-	if (auto scene = getCurrentScene())
-	{
-		//TODO: Implement rendering
-		//scene->draw(renderTarget);
-	}
-
-	// Draw fader
-	//TODO: Port to SDL2
-	/*
-	auto faderRect = sf::RectangleShape(game.getWindowSizeFloat());
-	faderRect.setFillColor(sf::Color(0, 0, 0, fadeVal));
-	renderTarget.draw(faderRect);
-	*/
-}
+//void ssge::SceneManager::draw(DrawContext& context)
+//{
+//	std::cout << "SceneManager::draw()" << std::endl;
+//	// Draw current scene
+//	if (auto scene = getCurrentScene())
+//	{
+//		//TODO: Implement rendering
+//		//scene->draw(renderTarget);
+//	}
+//
+//	// Draw fader
+//	//TODO: Port to SDL2
+//	/*
+//	auto faderRect = sf::RectangleShape(game.getWindowSizeFloat());
+//	faderRect.setFillColor(sf::Color(0, 0, 0, fadeVal));
+//	renderTarget.draw(faderRect);
+//	*/
+//}
 
 ssge::Scene* ssge::SceneManager::getCurrentScene() const
 {

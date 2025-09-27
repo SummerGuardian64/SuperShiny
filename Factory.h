@@ -17,7 +17,34 @@ namespace ssge
 			ForProgram(const Factory& toCopy) = delete;
 			ForProgram(ForProgram&& toMove) = delete;
 			~ForProgram() = delete;
-
+			static Engine* engine(Program& program);
+		};
+		class ForEngine
+		{
+			friend class ::ssge::Engine;
+			ForEngine() = delete;
+			ForEngine(const ForEngine& toCopy) = delete;
+			ForEngine(ForEngine&& toMove) = delete;
+			~ForEngine() = delete;
+			static ssge::StepContext stepContext(::ssge::Engine* actualEngine);
+		};
+		class ForSceneManager
+		{
+			friend class ::ssge::SceneManager;
+			ForSceneManager() = delete;
+			ForSceneManager(const ForSceneManager& toCopy) = delete;
+			ForSceneManager(ForSceneManager&& toMove) = delete;
+			~ForSceneManager() = delete;
+			static ssge::SceneStepContext sceneStepContext(::ssge::Scene& currentScene, ::ssge::StepContext& stepContext);
+		};
+		class ForGameWorld
+		{
+			friend class ::ssge::GameWorld;
+			ForGameWorld() = delete;
+			ForGameWorld(const ForGameWorld& toCopy) = delete;
+			ForGameWorld(ForGameWorld&& toMove) = delete;
+			~ForGameWorld() = delete;
+			static ssge::GameWorldStepContext gameWorldStepContext(::ssge::GameWorld& currentGameWorld, ::ssge::SceneStepContext& sceneStepContext);
 		};
 	};
 }

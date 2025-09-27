@@ -4,6 +4,7 @@ ssge::Engine::Engine(ssge::Program& program) : program(program)
 {
 	scenes = new SceneManager();
 	inputs = new InputManager();
+	wannaFinish = false;
 }
 
 ssge::Engine::~Engine()
@@ -60,9 +61,9 @@ void ssge::Engine::handle(SDL_Event e)
 
 bool ssge::Engine::update(double deltaTime)
 {
-	auto context = SceneManagerStepContext(&program, this);
+	auto context = Factory::ForEngine::stepContext(this);
 	scenes->step(context);
-	return false;
+	return !wannaFinish;
 }
 
 void ssge::Engine::render(SDL_Renderer* renderer)
@@ -91,4 +92,9 @@ ssge::SceneManager* ssge::Engine::getSceneManager()
 ssge::InputManager* ssge::Engine::getInputManager()
 {
 	return inputs;
+}
+
+void ssge::Engine::finish()
+{
+	wannaFinish = true;
 }

@@ -22,8 +22,8 @@ namespace ssge
 		~SceneManager();
 
 	public:
-		void step(SceneManagerStepContext& context);
-		void draw(SceneManagerDrawContext& context);
+		void step(StepContext& context);
+		//void draw(DrawContext& context);
 
 		Scene* getCurrentScene() const;
 		SceneClassID getCurrentSceneClassID() const;
