@@ -57,9 +57,8 @@ namespace ssge {
         StepContext(const StepContext&) = delete;
         StepContext& operator=(const StepContext&) = delete;
 
-    public:
         // Move exists but is private so only friends can move it into locals if needed (return-from-factory).
-        StepContext(StepContext&&) = default;
+        StepContext(StepContext&&) noexcept = default;
         StepContext& operator=(StepContext&&) = delete;
 
         // Trusted classes:
@@ -110,9 +109,8 @@ namespace ssge {
         SceneStepContext(const SceneStepContext&) = delete;
         SceneStepContext& operator=(const SceneStepContext&) = delete;
 
-    public:
         // Move exists but is private so only friends can move it into locals if needed (return-from-factory).
-        SceneStepContext(SceneStepContext&&) = default;
+        SceneStepContext(SceneStepContext&&) noexcept = default;
         SceneStepContext& operator=(SceneStepContext&&) = delete;
 
         // Trusted classes:
@@ -164,9 +162,8 @@ namespace ssge {
         GameWorldStepContext(const GameWorldStepContext&) = delete;
         GameWorldStepContext& operator=(const GameWorldStepContext&) = delete;
 
-    public:
         // Move exists but is private so only friends can move it into locals if needed (return-from-factory).
-        GameWorldStepContext(GameWorldStepContext&&) = default;
+        GameWorldStepContext(GameWorldStepContext&&) noexcept = default;
         GameWorldStepContext& operator=(GameWorldStepContext&&) = delete;
 
         // Trusted classes:
