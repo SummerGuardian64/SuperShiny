@@ -21,6 +21,11 @@ void ssge::StepContext::Engine::finish()
 	actual->finish();
 }
 
+void ssge::StepContext::Engine::wrapUp()
+{
+	actual->wrapUp();
+}
+
 ssge::StepContext::Scenes::Scenes(ssge::SceneManager* actual)
 {
 	this->actual = actual;
@@ -80,6 +85,11 @@ void ssge::SceneStepContext::Engine::finish()
 	actual->finish();
 }
 
+void ssge::SceneStepContext::Engine::wrapUp()
+{
+	actual->wrapUp();
+}
+
 ssge::SceneStepContext::Scenes::Scenes(ssge::SceneManager* actual)
 {
 	this->actual = actual;
@@ -130,6 +140,11 @@ ssge::GameWorldStepContext::Engine::Engine(ssge::Engine* actual)
 void ssge::GameWorldStepContext::Engine::finish()
 {
 	actual->finish();
+}
+
+void ssge::GameWorldStepContext::Engine::wrapUp()
+{
+	actual->wrapUp();
 }
 
 ssge::GameWorldStepContext::Scenes::Scenes(ssge::SceneManager* actual)

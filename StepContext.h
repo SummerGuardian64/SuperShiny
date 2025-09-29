@@ -23,6 +23,7 @@ namespace ssge {
             friend class StepContext;
         public:
             void finish();
+            void wrapUp();
         };
 
         class Scenes {
@@ -74,6 +75,7 @@ namespace ssge {
             friend class SceneStepContext;
         public:
             void finish();
+            void wrapUp();
         };
 
         class Scenes {
@@ -126,6 +128,7 @@ namespace ssge {
             friend class GameWorldStepContext;
         public:
             void finish();
+            void wrapUp();
         };
 
         class Scenes {

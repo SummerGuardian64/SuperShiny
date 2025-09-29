@@ -48,8 +48,16 @@ bool ssge::Program::init()
     std::cout << "initSDL" << std::endl;
     bool success = true;
 
+    // Initialize SDL
+    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_EVENTS | SDL_INIT_AUDIO |
+        SDL_INIT_JOYSTICK | SDL_INIT_HAPTIC) != 0)
+    {
+        std::cout << "SDL_Init error: ", SDL_GetError();
+        success = false;
+    }
+
     // Initialize program window
-    if (auto error = window->init(ssge::Game::APPLICATION_TITLE, 1280, 720))
+    else if (auto error = window->init(ssge::Game::APPLICATION_TITLE, 1280, 720))
     {
         std::cout << error << std::endl;
         success = false;
@@ -68,10 +76,13 @@ bool ssge::Program::mainLoop()
 {
     SDL_Renderer* renderer = window->getRenderer();
 
+    int virtualWidth = Game::VIRTUAL_WIDTH;
+    int virtualHeight = Game::VIRTUAL_HEIGHT;
+
     // Create a render target texture for the virtual screen.
     SDL_Texture* gameScreen =
         SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET,
-            Game::VIRTUAL_WIDTH, Game::VIRTUAL_HEIGHT);
+            virtualWidth, virtualHeight);
     if (!gameScreen) {
         //errorString.Create("SDL_CreateTexture (gameScreen) error: ", SDL_GetError());
         return false;
@@ -87,7 +98,7 @@ bool ssge::Program::mainLoop()
             switch (event.type)
             {
             case SDL_QUIT:
-                done = true;
+                engine->wrapUp();
                 break;
             default:
                 engine->handle(event);
@@ -107,7 +118,7 @@ bool ssge::Program::mainLoop()
 
         // Render the game onto the virtual gameScreen texture.
         SDL_SetRenderTarget(renderer, gameScreen);
-        engine->render(renderer);
+        engine->render(DrawContext(renderer));
         SDL_SetRenderTarget(renderer, NULL);
 
         // Clear the window (black background for letterboxing).

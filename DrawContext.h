@@ -3,39 +3,36 @@
 
 namespace ssge
 {
-	class DrawContext // Encapsulates core objects while calling draw functions
+	class DrawContext
 	{
-		friend class Program;
-	private:
-		double deltaTime;
-		Program& program;
-		DrawContext(Program& program);
-		DrawContext(const DrawContext& toCopy) = delete;
-		DrawContext(DrawContext&& toMove);
-		~DrawContext() = default;
-	};
+		SDL_Renderer* const renderer;
+		SDL_Rect bounds;
+		const SDL_Point origin;
+		const double deltaTime;
+		SDL_Texture* const renderTarget;
 
-	class SceneManagerDrawContext // Encapsulates core objects while calling draw functions from SceneManager
-	{
-		friend class Program;
-	private:
-		double deltaTime;
-		Program& program;
-		SceneManagerDrawContext(Program& program);
-		SceneManagerDrawContext(const SceneManagerDrawContext& toCopy) = delete;
-		SceneManagerDrawContext(SceneManagerDrawContext&& toMove);
-		~SceneManagerDrawContext() = default;
-	};
+	public:
+		DrawContext(SDL_Renderer* const renderer);
+		DrawContext(SDL_Renderer* const renderer,
+			const SDL_Rect bounds,
+			const SDL_Point origin,
+			const double deltaTime,
+			SDL_Texture* const renderTarget = nullptr
+			);
+		SDL_Renderer* getRenderer() const;
+		SDL_Rect getBounds() const;
+		SDL_Point getOrigin() const;
+		double getDeltaTime() const;
 
-	class SceneDrawContext // Encapsulates core objects while calling draw functions from Scene
-	{
-		friend class Program;
-	private:
-		double deltaTime;
-		Program& program;
-		SceneDrawContext(Program& program);
-		SceneDrawContext(const SceneDrawContext& toCopy) = delete;
-		SceneDrawContext(SceneDrawContext&& toMove);
-		~SceneDrawContext() = default;
+		// Context derivation
+
+
+
+		// SDL function help
+
+		void applyTarget() const;
+		void commitFromSubContext(const DrawContext& subContext, const SDL_Point where);
+
+
 	};
 }

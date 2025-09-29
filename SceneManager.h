@@ -15,6 +15,7 @@ namespace ssge
 		bool sceneInitialized;
 		std::unique_ptr<Scene> queuedScene;
 		uint8_t fadeVal;
+		bool wannaWrapUp;
 
 		SceneManager();
 		SceneManager(const SceneManager& toCopy) = delete;
@@ -23,7 +24,8 @@ namespace ssge
 
 	public:
 		void step(StepContext& context);
-		//void draw(DrawContext& context);
+		void draw(DrawContext& context);
+		void wrapUp();
 
 		Scene* getCurrentScene() const;
 		SceneClassID getCurrentSceneClassID() const;

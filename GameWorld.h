@@ -1,7 +1,8 @@
 #pragma once
-#include "SuperShiny.h"
-//#include "Scene.h"
+#include "Scene.h"
+#include "SDL.h"
 #include <vector>
+#include "StepContext.h"
 //#include "Entity.h"
 #include <memory>
 //#include "Level.h"
@@ -9,6 +10,8 @@
 //#include "PowerupType.h"
 #include <list>
 //#include "HintManager.h"
+static_assert(sizeof(ssge::Scene) > 0, "Scene must be defined");
+
 
 // Forward declarations
 //class Entity;
@@ -38,8 +41,8 @@ namespace ssge
         SceneClassID getSceneClassID() const override;
         void init(SceneStepContext& context) override;
         void step(SceneStepContext& context) override;
-        void draw(SceneDrawContext& context) override;
-        void drawHUD(SceneDrawContext& context) const;
+        void draw(DrawContext& context) override;
+        void drawHUD(DrawContext& context) const;
         SDL_Color backgroundColor;
     };
 };

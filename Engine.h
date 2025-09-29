@@ -28,7 +28,7 @@ namespace ssge
 		// Updates the engine
 		bool update(double deltaTime);
 		// Lets the engine draw
-		void render(SDL_Renderer* renderer);
+		void render(DrawContext context);
 		// Shut down the engine
 		void shutdown();
 
@@ -38,6 +38,8 @@ namespace ssge
 		// Engine control from higher levels
 
 		void finish();
+
+		void wrapUp();
 	private:
 		// Manages scenes
 		SceneManager* scenes;
@@ -47,5 +49,6 @@ namespace ssge
 		//ResourceManager resources;
 
 		bool wannaFinish;
+		bool wannaWrapUp;
 	};
 }

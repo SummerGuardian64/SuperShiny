@@ -41,6 +41,9 @@ const char* ssge::WindowManager::init(const char* title, int width, int height)
         return SDL_GetError();
     }
 
+    // Allow semi-transparency
+    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+
     // No error
     return nullptr;
 }

@@ -30,16 +30,15 @@ namespace ssge // Super Shiny Game Engine
 	class Entity;
 	//class Sprite;
 
-	//// Contexts
+	// StepContexts
 	class StepContext;
-	class DrawContext;
 	class SceneStepContext;
-	class SceneDrawContext;
 	class GameWorldStepContext;
-	class GameWorldDrawContext;
 	//class EntityStepContext;
-	//class EntityDrawContext;
 	//...
+
+	// DrawContexts
+	class DrawContext;
 }
 
 // Header files that belong to Super Shiny Game Engine

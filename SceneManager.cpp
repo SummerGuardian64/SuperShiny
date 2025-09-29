@@ -7,6 +7,7 @@ ssge::SceneManager::SceneManager()
 	paused = false;
 	sceneInitialized = false;
 	fadeVal = 0;
+	wannaWrapUp = false;
 }
 
 ssge::SceneManager::~SceneManager()
@@ -31,8 +32,22 @@ void ssge::SceneManager::step(StepContext& context)
 		}
 	}
 
+	// Are we wrapping up for quitting the program?
+	if (wannaWrapUp)
+	{
+		// Let's fade out of the current scene first
+		if (fadeVal < 255)
+		{
+			fadeVal = std::clamp(fadeVal + 10, 0, 255);
+		}
+		else
+		{
+			// Now we can finish
+			context.engine.finish();
+		}
+	}
 	// If we've got a queued scene
-	if (queuedScene)
+	else if (queuedScene)
 	{
 		// If there is no current scene, just start from a fade-in
 		if (!currentScene)
@@ -58,24 +73,42 @@ void ssge::SceneManager::step(StepContext& context)
 	}
 }
 
-//void ssge::SceneManager::draw(DrawContext& context)
-//{
-//	std::cout << "SceneManager::draw()" << std::endl;
-//	// Draw current scene
-//	if (auto scene = getCurrentScene())
-//	{
-//		//TODO: Implement rendering
-//		//scene->draw(renderTarget);
-//	}
-//
-//	// Draw fader
-//	//TODO: Port to SDL2
-//	/*
-//	auto faderRect = sf::RectangleShape(game.getWindowSizeFloat());
-//	faderRect.setFillColor(sf::Color(0, 0, 0, fadeVal));
-//	renderTarget.draw(faderRect);
-//	*/
-//}
+void ssge::SceneManager::draw(DrawContext& context)
+{
+	std::cout << "SceneManager::draw()" << std::endl;
+	// Draw current scene
+	if (auto scene = getCurrentScene())
+	{
+		scene->draw(context);
+	}
+
+	SDL_Renderer* renderer = context.getRenderer();
+	SDL_Color backgroundColor{ 0,0,0,fadeVal };
+
+	// Draw background color
+	SDL_SetRenderDrawColor(
+		renderer,
+		backgroundColor.r,
+		backgroundColor.g,
+		backgroundColor.b,
+		backgroundColor.a
+	);
+	
+	SDL_RenderFillRect(renderer, &context.getBounds());
+
+	// Draw fader
+	//TODO: Port to SDL2
+	/*
+	auto faderRect = sf::RectangleShape(game.getWindowSizeFloat());
+	faderRect.setFillColor(sf::Color(0, 0, 0, fadeVal));
+	renderTarget.draw(faderRect);
+	*/
+}
+
+void ssge::SceneManager::wrapUp()
+{
+	wannaWrapUp = true;
+}
 
 ssge::Scene* ssge::SceneManager::getCurrentScene() const
 {

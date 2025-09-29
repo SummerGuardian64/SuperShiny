@@ -5,6 +5,7 @@ ssge::Engine::Engine(ssge::Program& program) : program(program)
 	scenes = new SceneManager();
 	inputs = new InputManager();
 	wannaFinish = false;
+	wannaWrapUp = false;
 }
 
 ssge::Engine::~Engine()
@@ -61,13 +62,25 @@ void ssge::Engine::handle(SDL_Event e)
 
 bool ssge::Engine::update(double deltaTime)
 {
+	// Stop updating the engine if it's finished
+	if (wannaFinish)
+		return false;
+
+	// Start wrapping things up. This is a gentle quit request
+	if (wannaWrapUp)
+		scenes->wrapUp();
+	
+	// Step the scenes via SceneManager
 	auto context = Factory::ForEngine::stepContext(this);
 	scenes->step(context);
+
+	// Let this be the final update if we're finished
 	return !wannaFinish;
 }
 
-void ssge::Engine::render(SDL_Renderer* renderer)
+void ssge::Engine::render(DrawContext context)
 {
+	scenes->draw(context);
 }
 
 void ssge::Engine::shutdown()
@@ -97,4 +110,9 @@ ssge::InputManager* ssge::Engine::getInputManager()
 void ssge::Engine::finish()
 {
 	wannaFinish = true;
+}
+
+void ssge::Engine::wrapUp()
+{
+	wannaWrapUp = true;
 }

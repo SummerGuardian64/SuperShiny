@@ -120,10 +120,19 @@ void GameWorld::step(SceneStepContext& context)
     // Here would be the hints
 }
 
-void GameWorld::draw(SceneDrawContext& context)
+void GameWorld::draw(DrawContext& context)
 {
+    SDL_Renderer* renderer = context.getRenderer();
+    
     // Draw background color
-    //renderTarget.clear(backgroundColor);
+    SDL_SetRenderDrawColor(
+        renderer,
+        backgroundColor.r,
+        backgroundColor.g,
+        backgroundColor.b,
+        backgroundColor.a
+    );
+    SDL_RenderFillRect(renderer, &context.getBounds());
 
     // Draw level
     //if (auto realLevel = level.get())
@@ -144,7 +153,7 @@ void GameWorld::draw(SceneDrawContext& context)
     drawHUD(context);
 }
 
-void GameWorld::drawHUD(SceneDrawContext& context) const
+void GameWorld::drawHUD(DrawContext& context) const
 {
     /*sf::Font& font = game.getFont();
     Text::fastDraw(renderTarget, font, sf::String("LIVES: ") + std::to_string(game.progress.getLives()), 50, 50, 24, TextAlign::Left);

@@ -11,8 +11,8 @@ namespace ssge
 	};
 
 	class SceneStepContext;
-	class SceneDrawContext;
-
+	class DrawContext;
+	
 	class Scene
 	{
 	public:
@@ -20,7 +20,7 @@ namespace ssge
 		virtual SceneClassID getSceneClassID() const = 0;
 		virtual void init(ssge::SceneStepContext& context) = 0;
 		virtual void step(ssge::SceneStepContext& context) = 0;
-		virtual void draw(ssge::SceneDrawContext& context) = 0;
+		virtual void draw(ssge::DrawContext& context) = 0;
 		virtual ~Scene() = default;
 	};
 };
