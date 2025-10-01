@@ -44,10 +44,19 @@ namespace ssge {
             bool isJustReleased(int buttonIndex);
         };
 
+        class Drawing {
+            explicit Drawing(ssge::WindowManager* windowManager);
+            ssge::WindowManager* windowManager = nullptr;
+            friend class StepContext;
+        public:
+            SDL_Renderer* getRenderer() const;
+        };
+
         // public sugar
         Engine engine;
         Scenes scenes;
         Inputs inputs;
+        Drawing drawing;
 
     private:
         StepContext(ssge::Engine* actualEngine);
@@ -55,6 +64,7 @@ namespace ssge {
         ssge::Engine* getActualEngine();
         ssge::SceneManager* getActualSceneManager();
         ssge::InputManager* getActualInputManager();
+        ssge::WindowManager* getActualWindowManager();
 
         // Strict lifetime rules: no copying allowed.
         StepContext(const StepContext&) = delete;
@@ -98,10 +108,19 @@ namespace ssge {
             bool isJustReleased(int buttonIndex);
         };
 
+        class Drawing {
+            explicit Drawing(ssge::WindowManager* windowManager);
+            ssge::WindowManager* windowManager = nullptr;
+            friend class SceneStepContext;
+        public:
+            SDL_Renderer* getRenderer() const;
+        };
+
         // public sugar
         Engine engine;
         Scenes scenes;
         Inputs inputs;
+        Drawing drawing;
         Scene& currentScene;
 
     private:
@@ -110,6 +129,7 @@ namespace ssge {
         ssge::Engine* getActualEngine();
         ssge::SceneManager* getActualSceneManager();
         ssge::InputManager* getActualInputManager();
+        ssge::WindowManager* getActualWindowManager();
 
         // Strict lifetime rules: no copying allowed.
         SceneStepContext(const SceneStepContext&) = delete;
@@ -153,10 +173,19 @@ namespace ssge {
             bool isJustReleased(int buttonIndex);
         };
 
+        class Drawing {
+            explicit Drawing(ssge::WindowManager* windowManager);
+            ssge::WindowManager* windowManager = nullptr;
+            friend class GameWorldStepContext;
+        public:
+            SDL_Renderer* getRenderer() const;
+        };
+
         // public sugar
         Engine engine;
         Scenes scenes;
         Inputs inputs;
+        Drawing drawing;
         Scene& currentScene;
         GameWorld& world;
 
@@ -166,6 +195,7 @@ namespace ssge {
         ssge::Engine* getActualEngine();
         ssge::SceneManager* getActualSceneManager();
         ssge::InputManager* getActualInputManager();
+        ssge::WindowManager* getActualWindowManager();
 
         // Strict lifetime rules: no copying allowed.
         GameWorldStepContext(const GameWorldStepContext&) = delete;

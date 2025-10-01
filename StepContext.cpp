@@ -56,10 +56,21 @@ bool ssge::StepContext::Inputs::isJustReleased(int buttonIndex)
 	return this->actual->getPad().checkJustReleased(1 << buttonIndex);
 }
 
+ssge::StepContext::Drawing::Drawing(ssge::WindowManager* windowManager)
+{
+	this->windowManager = windowManager;
+}
+
+SDL_Renderer* ssge::StepContext::Drawing::getRenderer() const
+{
+	return windowManager->getRenderer();
+}
+
 ssge::StepContext::StepContext(ssge::Engine* actualEngine) 
 	: engine(actualEngine),
 	  scenes(actualEngine->getSceneManager()),
-	  inputs(actualEngine->getInputManager())
+	  inputs(actualEngine->getInputManager()),
+	  drawing(actualEngine->getWindowManager())
 {
 	;
 }
@@ -79,12 +90,18 @@ ssge::InputManager* ssge::StepContext::getActualInputManager()
 	return inputs.actual;
 }
 
+ssge::WindowManager* ssge::StepContext::getActualWindowManager()
+{
+	return drawing.windowManager;
+}
+
 // SceneStepContext impl
 
 ssge::SceneStepContext::SceneStepContext(ssge::Scene& currentScene, ssge::StepContext& stepContext)
 	: engine(stepContext.getActualEngine()),
 	  scenes(stepContext.getActualSceneManager()),
 	  inputs(stepContext.getActualInputManager()),
+	  drawing(stepContext.getActualWindowManager()),
 	  currentScene(currentScene)
 {
 	;
@@ -135,6 +152,16 @@ bool ssge::SceneStepContext::Inputs::isJustReleased(int buttonIndex)
 	return this->actual->getPad().checkJustReleased(1 << buttonIndex);
 }
 
+ssge::SceneStepContext::Drawing::Drawing(ssge::WindowManager* windowManager)
+{
+	this->windowManager = windowManager;
+}
+
+SDL_Renderer* ssge::SceneStepContext::Drawing::getRenderer() const
+{
+	return windowManager->getRenderer();
+}
+
 ssge::Engine* ssge::SceneStepContext::getActualEngine()
 {
 	return engine.actual;
@@ -150,12 +177,18 @@ ssge::InputManager* ssge::SceneStepContext::getActualInputManager()
 	return inputs.actual;
 }
 
+ssge::WindowManager* ssge::SceneStepContext::getActualWindowManager()
+{
+	return drawing.windowManager;
+}
+
 // GameWorldStepContext impl
 
 ssge::GameWorldStepContext::GameWorldStepContext(ssge::GameWorld& currentGameWorld, ssge::SceneStepContext& sceneStepContext)
 	: engine(sceneStepContext.getActualEngine()),
 	scenes(sceneStepContext.getActualSceneManager()),
 	inputs(sceneStepContext.getActualInputManager()),
+	drawing(sceneStepContext.getActualWindowManager()),
 	currentScene(currentGameWorld.getAsScene()),
 	world(currentGameWorld)
 {
@@ -207,6 +240,16 @@ bool ssge::GameWorldStepContext::Inputs::isJustReleased(int buttonIndex)
 	return this->actual->getPad().checkJustReleased(1 << buttonIndex);
 }
 
+ssge::GameWorldStepContext::Drawing::Drawing(ssge::WindowManager* windowManager)
+{
+	this->windowManager = windowManager;
+}
+
+SDL_Renderer* ssge::GameWorldStepContext::Drawing::getRenderer() const
+{
+	return windowManager->getRenderer();
+}
+
 ssge::Engine* ssge::GameWorldStepContext::getActualEngine()
 {
 	return engine.actual;
@@ -222,3 +265,7 @@ ssge::InputManager* ssge::GameWorldStepContext::getActualInputManager()
 	return inputs.actual;
 }
 
+ssge::WindowManager* ssge::GameWorldStepContext::getActualWindowManager()
+{
+	return drawing.windowManager;
+}

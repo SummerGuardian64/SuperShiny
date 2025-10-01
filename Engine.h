@@ -34,6 +34,7 @@ namespace ssge
 
 		ssge::SceneManager* getSceneManager();
 		ssge::InputManager* getInputManager();
+		ssge::WindowManager* getWindowManager();
 
 		// Engine control from higher levels
 

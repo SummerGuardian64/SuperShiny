@@ -106,6 +106,11 @@ ssge::InputManager* ssge::Engine::getInputManager()
 	return inputs;
 }
 
+ssge::WindowManager* ssge::Engine::getWindowManager()
+{
+	return program.window;
+}
+
 void ssge::Engine::finish()
 {
 	wannaFinish = true;
