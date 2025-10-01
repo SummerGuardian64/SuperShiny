@@ -1,4 +1,5 @@
 #include "Engine.h"
+#include "SplashScreen.h"
 
 ssge::Engine::Engine(ssge::Program& program) : program(program)
 {
@@ -28,7 +29,9 @@ bool ssge::Engine::loadInitialResources()
 bool ssge::Engine::prepareInitialState()
 {
 	//TODO: Initialize first scene
-	scenes->changeScene(std::make_unique<GameWorld>());
+	//scenes->changeScene(std::make_unique<GameWorld>());
+	scenes->changeScene(std::make_unique<SplashScreen>());
+	inputs->bindings[0].bindToKey(SDL_Scancode::SDL_SCANCODE_E);
 	
 	return true;
 }
@@ -38,22 +41,15 @@ void ssge::Engine::handle(SDL_Event e)
 	switch (e.type)
 	{
 	case SDL_EventType::SDL_KEYDOWN:
-		break;
 	case SDL_EventType::SDL_KEYUP:
-		break;
 	case SDL_EventType::SDL_JOYBUTTONDOWN:
-		break;
 	case SDL_EventType::SDL_JOYBUTTONUP:
-		break;
 	case SDL_EventType::SDL_JOYAXISMOTION:
-		break;
 	case SDL_EventType::SDL_JOYBALLMOTION:
-		break;
 	case SDL_EventType::SDL_JOYHATMOTION:
-		break;
 	case SDL_EventType::SDL_JOYDEVICEADDED:
-		break;
 	case SDL_EventType::SDL_JOYDEVICEREMOVED:
+		inputs->handle(e);
 		break;
 	default:
 		break;
@@ -69,6 +65,9 @@ bool ssge::Engine::update(double deltaTime)
 	// Start wrapping things up. This is a gentle quit request
 	if (wannaWrapUp)
 		scenes->wrapUp();
+
+	// Latch all inputs the way the NES does it
+	inputs->latch();
 	
 	// Step the scenes via SceneManager
 	auto context = Factory::ForEngine::stepContext(this);

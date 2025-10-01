@@ -39,7 +39,9 @@ namespace ssge {
             ssge::InputManager* actual = nullptr;
             friend class StepContext;
         public:
-            //bool isPressed();
+            bool isPressed(int buttonIndex);
+            bool isJustPressed(int buttonIndex);
+            bool isJustReleased(int buttonIndex);
         };
 
         // public sugar
@@ -91,7 +93,9 @@ namespace ssge {
             ssge::InputManager* actual = nullptr;
             friend class SceneStepContext;
         public:
-            //bool isPressed();
+            bool isPressed(int buttonIndex);
+            bool isJustPressed(int buttonIndex);
+            bool isJustReleased(int buttonIndex);
         };
 
         // public sugar
@@ -144,7 +148,9 @@ namespace ssge {
             ssge::InputManager* actual = nullptr;
             friend class GameWorldStepContext;
         public:
-            //bool isPressed();
+            bool isPressed(int buttonIndex);
+            bool isJustPressed(int buttonIndex);
+            bool isJustReleased(int buttonIndex);
         };
 
         // public sugar

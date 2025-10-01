@@ -41,6 +41,21 @@ ssge::StepContext::Inputs::Inputs(ssge::InputManager* actual)
 	this->actual = actual;
 }
 
+bool ssge::StepContext::Inputs::isPressed(int buttonIndex)
+{
+	return this->actual->getPad().checkPressed(1 << buttonIndex);
+}
+
+bool ssge::StepContext::Inputs::isJustPressed(int buttonIndex)
+{
+	return this->actual->getPad().checkJustPressed(1 << buttonIndex);
+}
+
+bool ssge::StepContext::Inputs::isJustReleased(int buttonIndex)
+{
+	return this->actual->getPad().checkJustReleased(1 << buttonIndex);
+}
+
 ssge::StepContext::StepContext(ssge::Engine* actualEngine) 
 	: engine(actualEngine),
 	  scenes(actualEngine->getSceneManager()),
@@ -105,6 +120,21 @@ ssge::SceneStepContext::Inputs::Inputs(ssge::InputManager* actual)
 	this->actual = actual;
 }
 
+bool ssge::SceneStepContext::Inputs::isPressed(int buttonIndex)
+{
+	return this->actual->getPad().checkPressed(1 << buttonIndex);
+}
+
+bool ssge::SceneStepContext::Inputs::isJustPressed(int buttonIndex)
+{
+	return this->actual->getPad().checkJustPressed(1 << buttonIndex);
+}
+
+bool ssge::SceneStepContext::Inputs::isJustReleased(int buttonIndex)
+{
+	return this->actual->getPad().checkJustReleased(1 << buttonIndex);
+}
+
 ssge::Engine* ssge::SceneStepContext::getActualEngine()
 {
 	return engine.actual;
@@ -160,6 +190,21 @@ void ssge::GameWorldStepContext::Scenes::changeScene(std::unique_ptr<ssge::Scene
 ssge::GameWorldStepContext::Inputs::Inputs(ssge::InputManager* actual)
 {
 	this->actual = actual;
+}
+
+bool ssge::GameWorldStepContext::Inputs::isPressed(int buttonIndex)
+{
+	return this->actual->getPad().checkPressed(1 << buttonIndex);
+}
+
+bool ssge::GameWorldStepContext::Inputs::isJustPressed(int buttonIndex)
+{
+	return this->actual->getPad().checkJustPressed(1 << buttonIndex);
+}
+
+bool ssge::GameWorldStepContext::Inputs::isJustReleased(int buttonIndex)
+{
+	return this->actual->getPad().checkJustReleased(1 << buttonIndex);
 }
 
 ssge::Engine* ssge::GameWorldStepContext::getActualEngine()
