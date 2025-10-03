@@ -6,6 +6,7 @@
 #include "SceneManager.h"
 #include "GameWorld.h"
 #include "Scene.h"
+#include "EntityManager.h"
 
 using namespace ssge;
 
@@ -66,7 +67,12 @@ SDL_Renderer* ssge::StepContext::Drawing::getRenderer() const
 	return windowManager->getRenderer();
 }
 
-ssge::StepContext::StepContext(ssge::Engine* actualEngine) 
+double ssge::StepContext::getDeltaTime()
+{
+	return deltaTime;
+}
+
+ssge::StepContext::StepContext(ssge::Engine* actualEngine)
 	: engine(actualEngine),
 	  scenes(actualEngine->getSceneManager()),
 	  inputs(actualEngine->getInputManager()),
@@ -96,6 +102,11 @@ ssge::WindowManager* ssge::StepContext::getActualWindowManager()
 }
 
 // SceneStepContext impl
+
+double ssge::SceneStepContext::getDeltaTime()
+{
+	return deltaTime;
+}
 
 ssge::SceneStepContext::SceneStepContext(ssge::Scene& currentScene, ssge::StepContext& stepContext)
 	: engine(stepContext.getActualEngine()),
@@ -184,13 +195,18 @@ ssge::WindowManager* ssge::SceneStepContext::getActualWindowManager()
 
 // GameWorldStepContext impl
 
+double ssge::GameWorldStepContext::getDeltaTime()
+{
+	return deltaTime;
+}
+
 ssge::GameWorldStepContext::GameWorldStepContext(ssge::GameWorld& currentGameWorld, ssge::SceneStepContext& sceneStepContext)
 	: engine(sceneStepContext.getActualEngine()),
 	scenes(sceneStepContext.getActualSceneManager()),
 	inputs(sceneStepContext.getActualInputManager()),
 	drawing(sceneStepContext.getActualWindowManager()),
-	currentScene(currentGameWorld.getAsScene()),
-	world(currentGameWorld)
+	currentScene(&currentGameWorld.getAsScene()),
+	world(&currentGameWorld)
 {
 	;
 }
@@ -250,6 +266,14 @@ SDL_Renderer* ssge::GameWorldStepContext::Drawing::getRenderer() const
 	return windowManager->getRenderer();
 }
 
+ssge::GameWorldStepContext::Scene::Scene(ssge::Scene* actual)
+{
+}
+
+ssge::GameWorldStepContext::GameWorld::GameWorld(ssge::GameWorld* actual)
+{
+}
+
 ssge::Engine* ssge::GameWorldStepContext::getActualEngine()
 {
 	return engine.actual;
@@ -266,6 +290,112 @@ ssge::InputManager* ssge::GameWorldStepContext::getActualInputManager()
 }
 
 ssge::WindowManager* ssge::GameWorldStepContext::getActualWindowManager()
+{
+	return drawing.windowManager;
+}
+
+ssge::GameWorld* ssge::GameWorldStepContext::getCurrentGameWorld()
+{
+	return world.actual;
+}
+
+ssge::Scene* ssge::GameWorldStepContext::getCurrentScene()
+{
+	return currentScene.actual;
+}
+
+// EntityStepContext impl
+
+double ssge::EntityStepContext::getDeltaTime()
+{
+	//FIXME: This is hardcoded! Please implement properly!
+	return 1.0f / 60.f;
+	//return deltaTime;
+}
+
+ssge::EntityStepContext::EntityStepContext(ssge::GameWorldStepContext& gameWorldStepContext)
+	: engine(gameWorldStepContext.getActualEngine()),
+	scenes(gameWorldStepContext.getActualSceneManager()),
+	inputs(gameWorldStepContext.getActualInputManager()),
+	drawing(gameWorldStepContext.getActualWindowManager()),
+	currentScene(gameWorldStepContext.getCurrentScene()),
+	world(gameWorldStepContext.getCurrentGameWorld()),
+	entities(&gameWorldStepContext.getCurrentGameWorld()->entities)
+{
+	;
+}
+
+ssge::EntityStepContext::Engine::Engine(ssge::Engine* actual)
+{
+	this->actual = actual;
+}
+
+void ssge::EntityStepContext::Engine::finish()
+{
+	actual->finish();
+}
+
+void ssge::EntityStepContext::Engine::wrapUp()
+{
+	actual->wrapUp();
+}
+
+ssge::EntityStepContext::Scenes::Scenes(ssge::SceneManager* actual)
+{
+	this->actual = actual;
+}
+
+void ssge::EntityStepContext::Scenes::changeScene(std::unique_ptr<ssge::Scene> newScene)
+{
+	actual->changeScene(std::move(newScene));
+}
+
+ssge::EntityStepContext::Inputs::Inputs(ssge::InputManager* actual)
+{
+	this->actual = actual;
+}
+
+bool ssge::EntityStepContext::Inputs::isPressed(int buttonIndex)
+{
+	return this->actual->getPad().checkPressed(1 << buttonIndex);
+}
+
+bool ssge::EntityStepContext::Inputs::isJustPressed(int buttonIndex)
+{
+	return this->actual->getPad().checkJustPressed(1 << buttonIndex);
+}
+
+bool ssge::EntityStepContext::Inputs::isJustReleased(int buttonIndex)
+{
+	return this->actual->getPad().checkJustReleased(1 << buttonIndex);
+}
+
+ssge::EntityStepContext::Drawing::Drawing(ssge::WindowManager* windowManager)
+{
+	this->windowManager = windowManager;
+}
+
+SDL_Renderer* ssge::EntityStepContext::Drawing::getRenderer() const
+{
+	return windowManager->getRenderer();
+}
+
+ssge::Engine* ssge::EntityStepContext::getActualEngine()
+{
+	return engine.actual;
+}
+
+ssge::SceneManager* ssge::EntityStepContext::getActualSceneManager()
+{
+	return scenes.actual;
+}
+
+ssge::InputManager* ssge::EntityStepContext::getActualInputManager()
+{
+	return inputs.actual;
+}
+
+ssge::WindowManager* ssge::EntityStepContext::getActualWindowManager()
 {
 	return drawing.windowManager;
 }

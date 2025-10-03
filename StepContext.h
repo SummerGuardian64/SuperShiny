@@ -8,6 +8,7 @@ namespace ssge {
     class SceneManager;
     class Scene;
     class GameWorld;
+    class Entity;
     
     // Forward context classes
     
@@ -58,6 +59,8 @@ namespace ssge {
         Inputs inputs;
         Drawing drawing;
 
+        double getDeltaTime();
+
     private:
         StepContext(ssge::Engine* actualEngine);
 
@@ -65,6 +68,8 @@ namespace ssge {
         ssge::SceneManager* getActualSceneManager();
         ssge::InputManager* getActualInputManager();
         ssge::WindowManager* getActualWindowManager();
+
+        double deltaTime;
 
         // Strict lifetime rules: no copying allowed.
         StepContext(const StepContext&) = delete;
@@ -123,6 +128,8 @@ namespace ssge {
         Drawing drawing;
         Scene& currentScene;
 
+        double getDeltaTime();
+
     private:
         SceneStepContext(ssge::Scene& currentScene, ssge::StepContext& stepContext);
 
@@ -130,6 +137,8 @@ namespace ssge {
         ssge::SceneManager* getActualSceneManager();
         ssge::InputManager* getActualInputManager();
         ssge::WindowManager* getActualWindowManager();
+
+        double deltaTime;
 
         // Strict lifetime rules: no copying allowed.
         SceneStepContext(const SceneStepContext&) = delete;
@@ -181,13 +190,33 @@ namespace ssge {
             SDL_Renderer* getRenderer() const;
         };
 
+        class Scene
+        {
+            explicit Scene(ssge::Scene* actual);
+            ssge::Scene* actual = nullptr;
+            friend class GameWorldStepContext;
+        public:
+            //TBA
+        };
+
+        class GameWorld
+        {
+            explicit GameWorld(ssge::GameWorld* actual);
+            ssge::GameWorld* actual = nullptr;
+            friend class GameWorldStepContext;
+        public:
+            //TBA
+        };
+
         // public sugar
         Engine engine;
         Scenes scenes;
         Inputs inputs;
         Drawing drawing;
-        Scene& currentScene;
-        GameWorld& world;
+        Scene currentScene;
+        GameWorld world;
+
+        double getDeltaTime();
 
     private:
         GameWorldStepContext(ssge::GameWorld& currentGameWorld, ssge::SceneStepContext& sceneStepContext);
@@ -196,6 +225,10 @@ namespace ssge {
         ssge::SceneManager* getActualSceneManager();
         ssge::InputManager* getActualInputManager();
         ssge::WindowManager* getActualWindowManager();
+        ssge::Scene* getCurrentScene();
+        ssge::GameWorld* getCurrentGameWorld();
+
+        double deltaTime;
 
         // Strict lifetime rules: no copying allowed.
         GameWorldStepContext(const GameWorldStepContext&) = delete;
@@ -204,6 +237,104 @@ namespace ssge {
         // Move exists but is private so only friends can move it into locals if needed (return-from-factory).
         GameWorldStepContext(GameWorldStepContext&&) noexcept = default;
         GameWorldStepContext& operator=(GameWorldStepContext&&) = delete;
+
+        // Trusted classes:
+        friend class Factory;
+        friend class ::ssge::EntityStepContext; // For initialization
+    };
+
+    class EntityStepContext {
+    public:
+        class Engine {
+            explicit Engine(ssge::Engine* actual);
+            ssge::Engine* actual = nullptr;
+            friend class EntityStepContext;
+        public:
+            void finish();
+            void wrapUp();
+        };
+
+        class Scenes {
+            explicit Scenes(ssge::SceneManager* actual);
+            ssge::SceneManager* actual = nullptr;
+            friend class EntityStepContext;
+        public:
+            void changeScene(std::unique_ptr<ssge::Scene> newScene);
+        };
+
+        class Inputs {
+            explicit Inputs(ssge::InputManager* actual);
+            ssge::InputManager* actual = nullptr;
+            friend class EntityStepContext;
+        public:
+            bool isPressed(int buttonIndex);
+            bool isJustPressed(int buttonIndex);
+            bool isJustReleased(int buttonIndex);
+        };
+
+        class Drawing {
+            explicit Drawing(ssge::WindowManager* windowManager);
+            ssge::WindowManager* windowManager = nullptr;
+            friend class EntityStepContext;
+        public:
+            SDL_Renderer* getRenderer() const;
+        };
+
+        class Scene
+        {
+            explicit Scene(ssge::Scene* actual);
+            ssge::Scene* actual = nullptr;
+            friend class EntityStepContext;
+        public:
+            //TBA
+        };
+
+        class GameWorld
+        {
+            explicit GameWorld(ssge::GameWorld* actual);
+            ssge::GameWorld* actual = nullptr;
+            friend class EntityStepContext;
+        public:
+            //TBA
+        };
+
+        class EntityManager
+        {
+            explicit EntityManager(ssge::EntityManager* actual);
+            ssge::EntityManager* actual = nullptr;
+            friend class EntityStepContext;
+        public:
+            //TBA
+        };
+
+        // public sugar
+        Engine engine;
+        Scenes scenes;
+        Inputs inputs;
+        Drawing drawing;
+        Scene currentScene;
+        GameWorld world;
+        EntityManager entities;
+
+        double getDeltaTime();
+
+    private:
+        EntityStepContext(ssge::GameWorldStepContext& gameWorldStepContext);
+
+        ssge::Engine* getActualEngine();
+        ssge::SceneManager* getActualSceneManager();
+        ssge::InputManager* getActualInputManager();
+        ssge::WindowManager* getActualWindowManager();
+
+        double deltaTime;
+
+        // Strict lifetime rules: no copying allowed.
+        EntityStepContext(const EntityStepContext&) = delete;
+        EntityStepContext& operator=(const EntityStepContext&) = delete;
+
+        // Move exists but is private so only friends can move it into locals if needed (return-from-factory).
+        EntityStepContext(EntityStepContext&&) noexcept = default;
+        EntityStepContext& operator=(EntityStepContext&&) = delete;
 
         // Trusted classes:
         friend class Factory;

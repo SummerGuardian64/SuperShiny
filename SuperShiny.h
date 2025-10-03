@@ -26,7 +26,11 @@ namespace ssge // Super Shiny Game Engine
 	//class Level;
 	//class LevelLoader;
 
+	class EntityCollection;
+	class EntityReference;
+	class EntityAllocator;
 	class EntityManager;
+	enum class EntityClassID : int;
 	class Entity;
 	//class Sprite;
 
@@ -34,7 +38,7 @@ namespace ssge // Super Shiny Game Engine
 	class StepContext;
 	class SceneStepContext;
 	class GameWorldStepContext;
-	//class EntityStepContext;
+	class EntityStepContext;
 	//...
 
 	// DrawContexts
@@ -52,12 +56,12 @@ namespace ssge // Super Shiny Game Engine
 #include "Scene.h"
 #include "SceneManager.h"
 //#include "SceneCollection.h"
+#include "Entity.h"
+#include "EntityManager.h"
 #include "GameWorld.h"
 //#include "GameProgress.h"
 //#include "Level.h"
 //#include "LevelLoader.h"
-#include "Entity.h"
 //#include "Sprite.h"
-#include "EntityManager.h"
 #include "Engine.h"
 #include "Game.h"

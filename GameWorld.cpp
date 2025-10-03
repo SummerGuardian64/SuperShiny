@@ -73,16 +73,9 @@ void GameWorld::init(SceneStepContext& context)
 
 void GameWorld::step(SceneStepContext& context)
 {
-    //entities.step();
-
     //// Step all entities
-    //for (auto& entityPtr : entities)
-    //{
-    //    entityPtr->step(deltaTime);
-    //}
-
-    //// Destroy scheduled entities
-    //destroyScheduledEntities();
+    GameWorldStepContext gameWorldStepContext = Factory::ForGameWorld::gameWorldStepContext(*this, context);
+    entities.step(gameWorldStepContext);
 
     //// TODO: game victory/loss criteria check
 

@@ -3,6 +3,7 @@
 #include "SDL.h"
 #include <vector>
 #include "StepContext.h"
+#include "EntityManager.h"
 //#include "Entity.h"
 #include <memory>
 //#include "Level.h"
@@ -11,6 +12,7 @@
 #include <list>
 //#include "HintManager.h"
 static_assert(sizeof(ssge::Scene) > 0, "Scene must be defined");
+static_assert(sizeof(ssge::EntityManager) > 0, "EntityManager must be defined");
 
 
 // Forward declarations
@@ -28,7 +30,7 @@ namespace ssge
     public:
         GameWorld();
         Scene& getAsScene();
-        //EntityManager entities;
+        ssge::EntityManager entities;
         //std::unique_ptr<Level> level;
         //HintManager hints;
         bool isGameplayOver() const;

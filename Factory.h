@@ -46,5 +46,14 @@ namespace ssge
 			~ForGameWorld() = delete;
 			static ssge::GameWorldStepContext gameWorldStepContext(::ssge::GameWorld& currentGameWorld, ::ssge::SceneStepContext& sceneStepContext);
 		};
+		class ForEntityManager
+		{
+			friend class ::ssge::EntityManager;
+			ForEntityManager() = delete;
+			ForEntityManager(const ForEntityManager& toCopy) = delete;
+			ForEntityManager(ForEntityManager&& toMove) = delete;
+			~ForEntityManager() = delete;
+			static ssge::EntityStepContext entityStepContext(ssge::GameWorldStepContext& gameWorldStepContext);
+		};
 	};
 }
