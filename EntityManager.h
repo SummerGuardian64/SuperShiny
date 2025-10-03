@@ -1,5 +1,4 @@
 #pragma once
-#include "StepContext.h"
 #include "Entity.h"
 #include <list>
 #include <memory>
@@ -13,6 +12,9 @@ namespace ssge
     class EntityAllocator;
     class EntityReference;
     enum class EntityClassID : int;
+
+    class GameWorldStepContext;
+    class DrawContext;
 
     // Reference (non-owning, like weak_ptr)
     class EntityReference {

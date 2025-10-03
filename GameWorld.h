@@ -1,25 +1,17 @@
 #pragma once
 #include "Scene.h"
-#include "SDL.h"
-#include <vector>
-#include "StepContext.h"
 #include "EntityManager.h"
-//#include "Entity.h"
+#include "SDL.h"
+#include "StepContext.h"
 #include <memory>
+#include <vector>
+#include <list>
 //#include "Level.h"
 //#include "LevelLoader.h"
 //#include "PowerupType.h"
-#include <list>
 //#include "HintManager.h"
 static_assert(sizeof(ssge::Scene) > 0, "Scene must be defined");
 static_assert(sizeof(ssge::EntityManager) > 0, "EntityManager must be defined");
-
-
-// Forward declarations
-//class Entity;
-//class Game;
-//class Ball;
-//enum class EntityClassID;
 
 namespace ssge
 {

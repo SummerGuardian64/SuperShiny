@@ -1,4 +1,5 @@
 #include "WindowManager.h"
+#include "Game.h"
 
 ssge::WindowManager::WindowManager()
 {

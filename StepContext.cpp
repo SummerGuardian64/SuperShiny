@@ -4,9 +4,11 @@
 // Headers remain free of raw public Program* signatures.
 #include "Engine.h"
 #include "SceneManager.h"
-#include "GameWorld.h"
 #include "Scene.h"
+#include "GameWorld.h"
 #include "EntityManager.h"
+#include "InputManager.h"
+#include "WindowManager.h"
 
 using namespace ssge;
 
@@ -78,7 +80,8 @@ ssge::StepContext::StepContext(ssge::Engine* actualEngine)
 	  inputs(actualEngine->getInputManager()),
 	  drawing(actualEngine->getWindowManager())
 {
-	;
+	//FIXME: UNIMPLEMENTED!
+	deltaTime = 0;
 }
 
 ssge::Engine* ssge::StepContext::getActualEngine()
@@ -115,7 +118,8 @@ ssge::SceneStepContext::SceneStepContext(ssge::Scene& currentScene, ssge::StepCo
 	  drawing(stepContext.getActualWindowManager()),
 	  currentScene(currentScene)
 {
-	;
+	//FIXME: UNIMPLEMENTED!
+	deltaTime = 0;
 }
 
 ssge::SceneStepContext::Engine::Engine(ssge::Engine* actual)
@@ -208,7 +212,8 @@ ssge::GameWorldStepContext::GameWorldStepContext(ssge::GameWorld& currentGameWor
 	currentScene(&currentGameWorld.getAsScene()),
 	world(&currentGameWorld)
 {
-	;
+	//FIXME: UNIMPLEMENTED!
+	deltaTime = 0;
 }
 
 ssge::GameWorldStepContext::Engine::Engine(ssge::Engine* actual)
@@ -266,11 +271,11 @@ SDL_Renderer* ssge::GameWorldStepContext::Drawing::getRenderer() const
 	return windowManager->getRenderer();
 }
 
-ssge::GameWorldStepContext::Scene::Scene(ssge::Scene* actual)
+ssge::GameWorldStepContext::Scene::Scene(ssge::Scene* actual) : actual(actual)
 {
 }
 
-ssge::GameWorldStepContext::GameWorld::GameWorld(ssge::GameWorld* actual)
+ssge::GameWorldStepContext::GameWorld::GameWorld(ssge::GameWorld* actual) : actual(actual)
 {
 }
 
@@ -322,7 +327,8 @@ ssge::EntityStepContext::EntityStepContext(ssge::GameWorldStepContext& gameWorld
 	world(gameWorldStepContext.getCurrentGameWorld()),
 	entities(&gameWorldStepContext.getCurrentGameWorld()->entities)
 {
-	;
+	//FIXME: UNIMPLEMENTED!
+	deltaTime = 0;
 }
 
 ssge::EntityStepContext::Engine::Engine(ssge::Engine* actual)
@@ -378,6 +384,18 @@ ssge::EntityStepContext::Drawing::Drawing(ssge::WindowManager* windowManager)
 SDL_Renderer* ssge::EntityStepContext::Drawing::getRenderer() const
 {
 	return windowManager->getRenderer();
+}
+
+ssge::EntityStepContext::Scene::Scene(ssge::Scene* actual) : actual(actual)
+{
+}
+
+ssge::EntityStepContext::GameWorld::GameWorld(ssge::GameWorld* actual) : actual(actual)
+{
+}
+
+ssge::EntityStepContext::EntityManager::EntityManager(ssge::EntityManager* actual) : actual(actual)
+{
 }
 
 ssge::Engine* ssge::EntityStepContext::getActualEngine()

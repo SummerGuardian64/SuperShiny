@@ -1,8 +1,18 @@
 #pragma once
-#include "SuperShiny.h"
 
 namespace ssge
 {
+	class Program;
+	class Engine;
+	class Scene;
+	class SceneManager;
+	class GameWorld;
+	class EntityManager;
+	class StepContext;
+	class SceneStepContext;
+	class GameWorldStepContext;
+	class EntityStepContext;
+
 	class Factory
 	{
 		Factory() = delete;

@@ -1,10 +1,13 @@
 #pragma once
-#include "SuperShiny.h"
 #include <vector>
 #include <memory>
+#include "Scene.h"
 
 namespace ssge
 {
+	class StepContext;
+	class DrawContext;
+
 	class SceneManager // Manages Scenes
 	{
 		//TODO: Refactor to friend class Factory

@@ -1,4 +1,6 @@
 #include "EntityManager.h"
+#include "StepContext.h"
+#include "Factory.h"
 
 using namespace ssge;
 

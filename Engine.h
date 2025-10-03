@@ -1,8 +1,15 @@
 #pragma once
-#include "SuperShiny.h"
+#include "SDL.h"
 
 namespace ssge
 {
+	class SceneManager;
+	class WindowManager;
+	class InputManager;
+	class Scene;
+	class Program;
+	class DrawContext;
+
 	class Engine // The game engine core
 	{
 		friend class Factory;

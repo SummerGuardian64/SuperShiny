@@ -1,6 +1,10 @@
 #include "SceneManager.h"
 #include <iostream>
 #include <algorithm>
+#include "StepContext.h"
+#include "Factory.h"
+#include "SDL.h"
+#include "DrawContext.h"
 
 ssge::SceneManager::SceneManager()
 {

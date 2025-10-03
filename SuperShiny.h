@@ -45,23 +45,4 @@ namespace ssge // Super Shiny Game Engine
 	class DrawContext;
 }
 
-// Header files that belong to Super Shiny Game Engine
-#include "Factory.h"
 #include "Program.h"
-#include "WindowManager.h"
-#include "InputManager.h"
-//#include "ResourceManager.h"
-#include "StepContext.h"
-#include "DrawContext.h"
-#include "Scene.h"
-#include "SceneManager.h"
-//#include "SceneCollection.h"
-#include "Entity.h"
-#include "EntityManager.h"
-#include "GameWorld.h"
-//#include "GameProgress.h"
-//#include "Level.h"
-//#include "LevelLoader.h"
-//#include "Sprite.h"
-#include "Engine.h"
-#include "Game.h"

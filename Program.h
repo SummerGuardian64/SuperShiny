@@ -4,6 +4,9 @@
 
 namespace ssge
 {
+	class WindowManager;
+	class Engine;
+
 	class Program // Super Shiny Game Engine Program class
 	{
 	public:

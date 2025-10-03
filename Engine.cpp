@@ -1,4 +1,12 @@
 #include "Engine.h"
+#include "SceneManager.h"
+#include "InputManager.h"
+#include <memory>
+#include "Factory.h"
+#include "StepContext.h"
+#include "DrawContext.h"
+#include "Program.h"
+
 #include "SplashScreen.h"
 
 ssge::Engine::Engine(ssge::Program& program) : program(program)

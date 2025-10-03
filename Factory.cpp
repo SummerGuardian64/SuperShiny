@@ -1,4 +1,6 @@
 #include "Factory.h"
+#include "Engine.h"
+#include "StepContext.h"
 
 ssge::StepContext ssge::Factory::ForEngine::stepContext(::ssge::Engine* actualEngine)
 {

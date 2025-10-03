@@ -1,4 +1,5 @@
 #include "InputManager.h"
+#include "SDL.h"
 
 using namespace ssge;
 

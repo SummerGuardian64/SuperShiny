@@ -1,6 +1,11 @@
 #include "Program.h"
 #include <iostream>
 #include "SDL.h"
+#include "WindowManager.h"
+#include "Game.h"
+#include "Factory.h"
+#include "Engine.h"
+#include "DrawContext.h"
 
 using namespace ssge;
 

@@ -1,5 +1,5 @@
 #pragma once
-#include "SuperShiny.h"
+#include "SDL.h"
 
 namespace ssge
 {

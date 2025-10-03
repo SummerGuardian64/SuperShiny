@@ -1,5 +1,5 @@
 #pragma once
-#include "SuperShiny.h"
+#include "SDL.h"
 #include <chrono>
 
 namespace ssge
@@ -9,6 +9,9 @@ namespace ssge
 		Shiny, // Currently the only entity we have in the game
 		TOTAL
 	};
+
+	class EntityStepContext;
+	class DrawContext;
 
 	class Entity
 	{

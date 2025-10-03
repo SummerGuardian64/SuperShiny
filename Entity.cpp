@@ -1,4 +1,6 @@
 #include "Entity.h"
+#include "StepContext.h"
+#include "DrawContext.h"
 
 ssge::Entity::Entity()
 {
@@ -7,6 +9,12 @@ ssge::Entity::Entity()
 SDL_FPoint ssge::Entity::setVelocityMagnitude(const SDL_FPoint& v, float speed)
 {
 	return SDL_FPoint();
+}
+
+float ssge::Entity::getDistance(const Entity& other) const
+{
+	//FIXME: UNIMPLEMENTED!
+	return 0.0f;
 }
 
 void ssge::Entity::step(EntityStepContext& context)
@@ -36,7 +44,8 @@ void ssge::Entity::step(EntityStepContext& context)
 	postStep(context);
 
 	// Increment lifespan
-	lifespan += context.getDeltaTime();
+	//FIXME: THIS NEEDS REFINEMENT!
+	lifespan += context.getDeltaTime() * 60;
 }
 
 void ssge::Entity::draw(DrawContext context) const

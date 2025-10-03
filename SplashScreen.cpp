@@ -1,5 +1,8 @@
 #include "SplashScreen.h"
 #include "StepContext.h"
+#include <memory>
+#include "GameWorld.h"
+#include "DrawContext.h"
 
 SceneClassID ssge::SplashScreen::getSceneClassID() const
 {

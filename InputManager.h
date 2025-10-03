@@ -1,10 +1,11 @@
 #pragma once
-#include "SuperShiny.h"
 #include "InputBinding.h"
 #include "InputPad.h"
 
 namespace ssge
 {
+	class Engine;
+
 	class InputManager // Manages Inputs
 	{
 		friend class Engine;

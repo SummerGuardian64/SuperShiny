@@ -1,14 +1,17 @@
 #pragma once
-#include "SuperShiny.h"
 #include <memory>
+#include "SDL.h"
 
 namespace ssge {
     // Engine types
 
+    class Engine;
     class SceneManager;
     class Scene;
     class GameWorld;
-    class Entity;
+    class EntityManager;
+    class WindowManager;
+    class InputManager;
     
     // Forward context classes
     

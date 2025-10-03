@@ -1,5 +1,7 @@
 #include "GameWorld.h"
 #include <string>
+#include "Factory.h"
+#include "DrawContext.h"
 
 using namespace ssge;
 
