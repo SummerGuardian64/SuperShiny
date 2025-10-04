@@ -1,6 +1,7 @@
 #include "EntityManager.h"
 #include "StepContext.h"
 #include "Factory.h"
+#include "Game.h"
 
 using namespace ssge;
 
@@ -31,17 +32,14 @@ EntityCollection::iterator EntityManager::getEntitiesEnd()
     return entities.end();
 }
 
-EntityReference EntityManager::addEntity(EntityAllocator entity)
+EntityReference EntityManager::addEntity(EntityClassID id)
 {
-    if (entity)
-    {
-        entities.push_back(entity);
-        return entity;
-    }
-    else
-    {
-        return EntityReference(); // Return an empty weak_ptr
-    }
+	auto entity = Game::Entities::create(id);
+	if (!entity)
+		return EntityReference(nullptr); // invalid ID
+
+	entities.add(EntityAllocator(entity));
+	return EntityReference(entity);
 }
 
 bool EntityManager::deleteEntity(EntityAllocator entity)

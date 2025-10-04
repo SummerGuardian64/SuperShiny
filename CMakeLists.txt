@@ -14,7 +14,7 @@ project ("SuperShiny")
 find_package(SDL2 REQUIRED)
 
 # Add source to this project's executable.
-add_executable (SuperShiny "SuperShiny.cpp" "SuperShiny.h" "Program.cpp" "Program.h" "Engine.cpp" "Engine.h" "WindowManager.cpp" "WindowManager.h" "SceneManager.cpp" "SceneManager.h" "InputManager.cpp" "InputManager.h" "StepContext.cpp" "StepContext.h" "DrawContext.cpp" "DrawContext.h" "Factory.cpp" "Factory.h" "Scene.cpp" "Scene.h" "GameWorld.cpp" "GameWorld.h" "Game.cpp" "Game.h" "EntityManager.cpp" "EntityManager.h" "Entity.cpp" "Entity.h" "SplashScreen.cpp" "SplashScreen.h"     "InputPad.cpp" "InputPad.h"  "InputBinding.h" "InputSet.h")
+add_executable (SuperShiny "SuperShiny.cpp" "SuperShiny.h" "Program.cpp" "Program.h" "Engine.cpp" "Engine.h" "WindowManager.cpp" "WindowManager.h" "SceneManager.cpp" "SceneManager.h" "InputManager.cpp" "InputManager.h" "StepContext.cpp" "StepContext.h" "DrawContext.cpp" "DrawContext.h" "Factory.cpp" "Factory.h" "Scene.cpp" "Scene.h" "GameWorld.cpp" "GameWorld.h" "Game.cpp" "Game.h" "EntityManager.cpp" "EntityManager.h" "Entity.cpp" "Entity.h" "SplashScreen.cpp" "SplashScreen.h"     "InputPad.cpp" "InputPad.h"  "InputBinding.h" "InputSet.h" "Shiny.cpp" "Shiny.h")
 
 target_link_libraries(SuperShiny SDL2::SDL2 SDL2::SDL2main)
 

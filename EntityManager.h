@@ -16,22 +16,47 @@ namespace ssge
     class GameWorldStepContext;
     class DrawContext;
 
-    // Reference (non-owning, like weak_ptr)
     class EntityReference {
         std::weak_ptr<Entity> ref;
     public:
         EntityReference() = default;
         EntityReference(const std::weak_ptr<Entity>& r) : ref(r) {}
         EntityReference(const std::shared_ptr<Entity>& r) : ref(r) {}
+        EntityReference(std::nullptr_t) noexcept : ref() {}
 
-        std::weak_ptr<Entity>& get() { return ref; }
-        const std::weak_ptr<Entity>& get() const { return ref; }
-
-        operator std::weak_ptr<Entity>& () { return ref; }
-        operator const std::weak_ptr<Entity>& () const { return ref; }
-
-        // <-- NEW: make it usable in if(ref) checks
         explicit operator bool() const noexcept { return !ref.expired(); }
+
+        Entity* operator->() {
+            auto sp = ref.lock();
+            return sp ? sp.get() : nullptr;
+        }
+        const Entity* operator->() const {
+            auto sp = ref.lock();
+            return sp ? sp.get() : nullptr;
+        }
+
+        Entity& operator*() {
+            auto sp = ref.lock();
+            if (!sp) throw std::runtime_error("Dereferencing expired EntityReference");
+            return *sp;
+        }
+        const Entity& operator*() const {
+            auto sp = ref.lock();
+            if (!sp) throw std::runtime_error("Dereferencing expired EntityReference");
+            return *sp;
+        }
+
+        //std::shared_ptr<Entity> lock() const { return ref.lock(); }
+
+        // Casting helper
+        template<typename T>
+        T* tryCast(EntityClassID expectedID) const {
+            auto sp = ref.lock();
+            if (sp && sp->getEntityClassID() == expectedID) {
+                return dynamic_cast<T*>(sp.get());
+            }
+            return nullptr;
+        }
     };
 
     // Allocator (owning, like shared_ptr)
@@ -130,6 +155,7 @@ namespace ssge
         EntityCollection entities;
         EntityCollection::iterator getEntitiesBegin();
         EntityCollection::iterator getEntitiesEnd();
+        EntityReference addEntity(EntityClassID entityClassID);
         EntityReference addEntity(EntityAllocator entity);
         bool deleteEntity(EntityAllocator entity);
         Entity* findEntity(EntityClassID entityClassID);
