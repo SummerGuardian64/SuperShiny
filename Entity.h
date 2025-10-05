@@ -40,7 +40,7 @@ namespace ssge
 		//std::shared_ptr<Collision> collideWith(Entity& other);
 		virtual void firstStep(EntityStepContext& context) = 0;
 		virtual void preStep(EntityStepContext& context) = 0;
-		virtual void step(EntityStepContext& context) final;
+		void step(EntityStepContext& context);
 		bool isScheduledToDestroy() const { return scheduledToDestroy; }
 		virtual void postStep(EntityStepContext& context) = 0;
 		virtual void draw(DrawContext context) const = 0;

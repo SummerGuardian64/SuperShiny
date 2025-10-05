@@ -42,7 +42,7 @@ EntityReference EntityManager::addEntity(EntityClassID id)
 	return EntityReference(entity);
 }
 
-bool EntityManager::deleteEntity(EntityAllocator entity)
+bool ssge::EntityManager::deleteEntity(EntityReference entity)
 {
     auto it = std::find(entities.begin(), entities.end(), entity);
 

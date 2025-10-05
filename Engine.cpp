@@ -40,7 +40,7 @@ bool ssge::Engine::prepareInitialState()
 	//scenes->changeScene(std::make_unique<GameWorld>());
 	scenes->changeScene(std::make_unique<SplashScreen>());
 	inputs->bindings[0].bindToKey(SDL_Scancode::SDL_SCANCODE_E);
-	
+
 	return true;
 }
 

@@ -1,6 +1,7 @@
 #include "Entity.h"
 #include "StepContext.h"
 #include "DrawContext.h"
+#include <iostream>
 
 ssge::Entity::Entity()
 {
@@ -46,10 +47,8 @@ void ssge::Entity::step(EntityStepContext& context)
 	// Increment lifespan
 	//FIXME: THIS NEEDS REFINEMENT!
 	lifespan += context.getDeltaTime() * 60;
-}
 
-void ssge::Entity::draw(DrawContext context) const
-{
+	std::cout << "Entity " << (void*)this << " has been there for " << lifespan << std::endl;
 }
 
 void ssge::Entity::destroy()

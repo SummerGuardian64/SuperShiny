@@ -49,6 +49,7 @@ SceneClassID GameWorld::getSceneClassID() const
 
 void GameWorld::init(SceneStepContext& context)
 {
+    entities.addEntity(EntityClassID::Shiny);
     //std::string error;
     //level = LevelLoader::loadLevel(game.progress.getLevel(), error);
     //if (level == NULL)

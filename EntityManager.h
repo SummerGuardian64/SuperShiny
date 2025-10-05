@@ -45,6 +45,11 @@ namespace ssge
             if (!sp) throw std::runtime_error("Dereferencing expired EntityReference");
             return *sp;
         }
+        Entity* get() const {
+            auto sp = ref.lock();
+            if (!sp) throw std::runtime_error("Dereferencing expired EntityReference");
+            return &*sp;
+        }
 
         //std::shared_ptr<Entity> lock() const { return ref.lock(); }
 
@@ -72,6 +77,8 @@ namespace ssge
 
         bool operator==(const EntityAllocator& other) const { return ptr == other.ptr; }
         bool operator!=(const EntityAllocator& other) const { return ptr != other.ptr; }
+        bool operator==(const EntityReference& other) const { return other.get() == get(); }
+        bool operator!=(const EntityReference& other) const { return other.get() != get(); }
 
         // Allow implicit conversion back to shared_ptr when needed
         operator std::shared_ptr<Entity>&() { return ptr; }
@@ -156,8 +163,7 @@ namespace ssge
         EntityCollection::iterator getEntitiesBegin();
         EntityCollection::iterator getEntitiesEnd();
         EntityReference addEntity(EntityClassID entityClassID);
-        EntityReference addEntity(EntityAllocator entity);
-        bool deleteEntity(EntityAllocator entity);
+        bool deleteEntity(EntityReference entity);
         Entity* findEntity(EntityClassID entityClassID);
         const Entity* findConstEntity(EntityClassID entityClassID) const;
         EntityQueryResult findAllEntities(EntityClassID entityClassID);
