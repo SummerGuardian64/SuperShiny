@@ -1,6 +1,7 @@
 #pragma once
 #include "SDL.h"
 #include <chrono>
+#include "Sprite.h"
 
 namespace ssge
 {
@@ -19,6 +20,8 @@ namespace ssge
 		bool scheduledToDestroy{ false };
 	public:
 		Entity();
+		virtual EntityClassID getEntityClassID() const = 0;
+		std::unique_ptr<Sprite> sprite;
 		SDL_FPoint position{ 0.0f, 0.0f };
 		SDL_FPoint velocity{ 0.0f, 0.0f };
 		bool processVelocity{ true };
@@ -27,7 +30,6 @@ namespace ssge
 		SDL_FRect rect{ 0.0f, 0.0f, 0.0f, 0.0f };
 		SDL_Color color{ 255, 255, 255, 255 };
 		uint32_t getLifespan() const { return lifespan; }
-		virtual EntityClassID getEntityClassID() const = 0;
 		float getLeftEdge() const { return rect.x; }
 		float getRightEdge() const { return rect.x + rect.w; }
 		float getTopEdge() const { return rect.y; }
@@ -43,7 +45,9 @@ namespace ssge
 		void step(EntityStepContext& context);
 		bool isScheduledToDestroy() const { return scheduledToDestroy; }
 		virtual void postStep(EntityStepContext& context) = 0;
-		virtual void draw(DrawContext context) const = 0;
+		virtual void preDraw(DrawContext& context) const = 0;
+		void draw(DrawContext context) const;
+		virtual void postDraw(DrawContext& context) const = 0;
 		void destroy();
 		virtual void onDestroy(EntityStepContext& context) = 0;
 		virtual ~Entity() = default;

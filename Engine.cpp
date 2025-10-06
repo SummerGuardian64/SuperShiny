@@ -6,6 +6,8 @@
 #include "StepContext.h"
 #include "DrawContext.h"
 #include "Program.h"
+#include "Game.h"
+#include "SDL.h"
 
 #include "SplashScreen.h"
 
@@ -29,8 +31,9 @@ bool ssge::Engine::init()
 	return true;
 }
 
-bool ssge::Engine::loadInitialResources()
+bool ssge::Engine::loadInitialResources(SDL_Renderer* renderer)
 {
+	ssge::Game::init(renderer);
 	return true;
 }
 

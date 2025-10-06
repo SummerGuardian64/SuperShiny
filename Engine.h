@@ -26,7 +26,7 @@ namespace ssge
 		bool init();
 		// Loads all necessary resources without which the Program cannot work.
 		// Returns true on success, false on failure.
-		bool loadInitialResources();
+		bool loadInitialResources(SDL_Renderer* renderer);
 		// Prepares the initial state for the first main loop iteration.
 		// Returns true on success, false on failure.
 		bool prepareInitialState();

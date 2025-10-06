@@ -20,6 +20,8 @@ float ssge::Entity::getDistance(const Entity& other) const
 
 void ssge::Entity::step(EntityStepContext& context)
 {
+	double deltaTime = context.getDeltaTime();
+
 	// If this is the entity's first step, execute it
 	if (lifespan == 0)
 	{
@@ -44,11 +46,28 @@ void ssge::Entity::step(EntityStepContext& context)
 	// Finally, execute the entity-specific post-step code
 	postStep(context);
 
+	if (sprite)
+	{
+		sprite->update(deltaTime);
+	}
+
 	// Increment lifespan
 	//FIXME: THIS NEEDS REFINEMENT!
-	lifespan += context.getDeltaTime() * 60;
+	lifespan += deltaTime * 60;
 
 	std::cout << "Entity " << (void*)this << " has been there for " << lifespan << std::endl;
+}
+
+void ssge::Entity::draw(DrawContext context) const
+{
+	preDraw(context);
+
+	if (sprite)
+	{
+		sprite->draw(context);
+	}
+
+	postDraw(context);
 }
 
 void ssge::Entity::destroy()

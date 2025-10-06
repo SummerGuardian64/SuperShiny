@@ -136,7 +136,9 @@ void GameWorld::draw(DrawContext& context)
     //    realLevel->draw(renderTarget);
     //}
 
-    //// Draw all entities
+    entities.draw(context);
+
+    // Draw all entities
     //for (auto& entityPtr : entities)
     //{
     //    // Don't draw an entity immediately! Give it time to initialize!

@@ -19,7 +19,15 @@ void ssge::EntityManager::step(GameWorldStepContext& context)
 
 void ssge::EntityManager::draw(DrawContext& context)
 {
-
+    for (auto& entity : entities)
+    {
+        // Don't draw an entity immediately! Give it time to initialize!
+        if (entity->getLifespan() > 0)
+        {
+            DrawContext newContext = context.clone();
+            entity->draw(newContext);
+        }
+    }
 }
 
 EntityCollection::iterator EntityManager::getEntitiesBegin()

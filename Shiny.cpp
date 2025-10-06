@@ -2,6 +2,15 @@
 #include "StepContext.h"
 #include "DrawContext.h"
 #include <iostream>
+#include <memory>
+#include "Game.h"
+
+using namespace ssge;
+
+Shiny::Shiny()
+{
+	sprite = std::make_unique<Sprite>(Game::Sprites::shiny());
+}
 
 EntityClassID Shiny::getEntityClassID() const
 {
@@ -23,9 +32,12 @@ void Shiny::postStep(EntityStepContext& context)
 	std::cout << "...floof~" << std::endl;
 }
 
-void Shiny::draw(DrawContext context) const
+void Shiny::preDraw(DrawContext& context) const
 {
-	std::cout << "Shiny has an artblock" << std::endl;
+}
+
+void Shiny::postDraw(DrawContext& context) const
+{
 }
 
 void Shiny::onDestroy(EntityStepContext& context)

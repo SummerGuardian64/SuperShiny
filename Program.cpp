@@ -68,6 +68,9 @@ bool ssge::Program::init()
         success = false;
     }
 
+    //TODO: Better error handling
+    engine->loadInitialResources(window->getRenderer());
+
     return success;
 }
 

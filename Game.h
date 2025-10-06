@@ -1,9 +1,12 @@
 #pragma once
 #include <memory>
 #include "Entity.h"
+#include "SDL.h"
 
 namespace ssge
 {
+	class Sprite;
+
 	class Game
 	{
 		Game() = delete;
@@ -12,10 +15,26 @@ namespace ssge
 		~Game() = delete;
 
 	public:
+		static bool init(SDL_Renderer* renderer);
+
 		static const int VIRTUAL_WIDTH = 1280;
 		static const int VIRTUAL_HEIGHT = 720;
 		static const char APPLICATION_TITLE[];
 		const char* getApplicationTitle();
+
+		class Sprites
+		{
+			Sprites() = delete;
+			Sprites(const Sprites& toCopy) = delete;
+			Sprites(Sprites&& toMove) = delete;
+			~Sprites() = delete;
+
+			friend class Game;
+			static bool _init(SDL_Renderer* renderer);
+			static Sprite::Definition sprdefShiny;
+		public:
+			static Sprite::Definition& shiny();
+		};
 
 		class Entities
 		{

@@ -8,6 +8,7 @@ ssge::DrawContext::DrawContext(SDL_Renderer* const renderer)
 	bounds({0,0,0,0}),
 	origin({0,0}),
 	deltaTime(0),
+	scrollOffset({0,0}),
 	renderTarget(nullptr)
 {
 	// Set bounds to match the render texture size
@@ -32,6 +33,16 @@ DrawContext::DrawContext(
 	renderTarget(renderTarget)
 { }
 
+ssge::DrawContext::DrawContext(const DrawContext& toCopy)
+	:
+	renderer(toCopy.renderer),
+	bounds(toCopy.bounds),
+	origin(toCopy.origin),
+	deltaTime(toCopy.deltaTime),
+	scrollOffset(toCopy.scrollOffset),
+	renderTarget(toCopy.renderTarget)
+{ }
+
 SDL_Renderer* DrawContext::getRenderer() const
 {
 	return renderer;
@@ -50,6 +61,25 @@ SDL_Point ssge::DrawContext::getOrigin() const
 double ssge::DrawContext::getDeltaTime() const
 {
 	return deltaTime;
+}
+
+SDL_Point ssge::DrawContext::getScrollOffset() const
+{
+	return scrollOffset;
+}
+
+DrawContext ssge::DrawContext::clone() const
+{
+	return DrawContext(*this);
+}
+
+DrawContext ssge::DrawContext::deriveForScrolling(SDL_Point offset) const
+{
+	DrawContext derivedContext = DrawContext(*this);
+
+	derivedContext.scrollOffset = offset;
+
+	return derivedContext;
 }
 
 void ssge::DrawContext::applyTarget() const
