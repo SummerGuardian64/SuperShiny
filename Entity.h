@@ -17,10 +17,11 @@ namespace ssge
 
 	class Entity
 	{
+	public:
 		class Control
 		{
-			Entity& entity;
 		public:
+			Entity& entity;
 			Control(Entity& entity);
 
 			enum class Mode
@@ -42,6 +43,7 @@ namespace ssge
 			int playerId;
 			//TBA: ControlAI
 
+		private:
 			InputPad pad;
 		public:
 			//TODO: Harden later. Make work now.
@@ -61,12 +63,10 @@ namespace ssge
 			int getPlayerId() const { return playerId; };
 			void setPlayerId(int playerId) { this->playerId = playerId; };*/
 
-			//E0433 WHY?! I wanna give out an InputPad as a const reference.
 			//The reason for decoupling is because maybe a player is controlling?
 			//Maybe NPC/AI logic? Maybe it's a replay or a cutscene?
 			//And it MUST be independent of the real input to avoid the pause abuse bug
-			//ChatGPT please help here:
-			//InputPad& const getPad() const { return pad; };
+			const InputPad& getPad() const { return pad; };
 
 			//TBA: InputManager will call all latch functions
 			//void latch(InputContext context);
@@ -75,6 +75,7 @@ namespace ssge
 		{
 			// This will have NPC code execute
 
+		public:
 			Entity& entity;
 			NPC(Entity& entity);
 			void step(EntityStepContext& context);
@@ -87,38 +88,51 @@ namespace ssge
 		{
 			// This will have all physics variables
 
+			//TODO: Harden later
+		public:
+			// References Entity's position
+			SDL_FPoint& position;
+			// References Entity's hitbox
+			SDL_FRect& hitbox;
+
+			SDL_FPoint velocity{ 0.0f, 0.0f };
+			bool processVelocity{ true };
+			SDL_FPoint setVelocityMagnitude(const SDL_FPoint& v, float speed);
+			//std::unique_ptr<Collider> collider; //TODO: May be not needed
+			float getLeftEdge() const { return hitbox.x; }
+			float getRightEdge() const { return hitbox.x + hitbox.w; }
+			float getTopEdge() const { return hitbox.y; }
+			float getBottomEdge() const { return hitbox.y + hitbox.h; }
+			float getHorizontalCenter() const { return hitbox.x + hitbox.w / 2.0f; }
+			float getVerticalCenter() const { return hitbox.y + hitbox.h / 2.0f; }
+			SDL_FRect getBounds() const { return hitbox; }
+			SDL_FPoint getSize() const { return SDL_FPoint{ hitbox.w, hitbox.h }; }
+			float getDistance(const Entity& other) const;
+			//std::shared_ptr<Collision> collideWith(Entity& other); //TODO: May be not needed
+
+		public:
 			Entity& entity;
 			Physics(Entity& entity);
 			void step(EntityStepContext& context);
 		};
 
-		std::unique_ptr<Control> control;
-		std::unique_ptr<Physics> physics;
+	public:
 
 		uint32_t lifespan{ 0 };
 		bool scheduledToDestroy{ false };
+
+	protected:
+		std::unique_ptr<Control> control;
+		std::unique_ptr<Physics> physics;
+
 	public:
 		Entity();
 		virtual EntityClassID getEntityClassID() const = 0;
-		std::unique_ptr<Sprite> sprite;
-		SDL_FPoint position{ 0.0f, 0.0f }; //TODO: Move to Physics
-		SDL_FPoint velocity{ 0.0f, 0.0f }; //TODO: Move to Physics
-		bool processVelocity{ true }; //TODO: Move to Physics
-		SDL_FPoint setVelocityMagnitude(const SDL_FPoint& v, float speed); //TODO: Move to Physics
-		//std::unique_ptr<Collider> collider; //TODO: Move to Physics
-		SDL_FRect rect{ 0.0f, 0.0f, 0.0f, 0.0f };
-		SDL_Color color{ 255, 255, 255, 255 };
 		uint32_t getLifespan() const { return lifespan; }
-		float getLeftEdge() const { return rect.x; }
-		float getRightEdge() const { return rect.x + rect.w; }
-		float getTopEdge() const { return rect.y; }
-		float getBottomEdge() const { return rect.y + rect.h; }
-		float getHorizontalCenter() const { return rect.x + rect.w / 2.0f; }
-		float getVerticalCenter() const { return rect.y + rect.h / 2.0f; }
-		SDL_FRect getBounds() const { return rect; }
-		SDL_FPoint getSize() const { return SDL_FPoint{ rect.w, rect.h }; }
-		float getDistance(const Entity& other) const;
-		//std::shared_ptr<Collision> collideWith(Entity& other);
+		SDL_FPoint position{ 0.0f, 0.0f };
+		std::unique_ptr<Sprite> sprite;
+		SDL_FRect hitbox{ 0.0f, 0.0f, 0.0f, 0.0f };
+		
 		virtual void firstStep(EntityStepContext& context) = 0;
 		virtual void preStep(EntityStepContext& context) = 0;
 		void step(EntityStepContext& context);

@@ -10,7 +10,8 @@ using namespace ssge;
 Shiny::Shiny()
 {
 	sprite = std::make_unique<Sprite>(Game::Sprites::shiny());
-	processVelocity = true;
+	physics = std::make_unique<Physics>(*this);
+	physics->processVelocity = true;
 }
 
 EntityClassID Shiny::getEntityClassID() const
@@ -30,10 +31,10 @@ void Shiny::preStep(EntityStepContext& context)
 	bool down = context.inputs.isPressed(1);
 	bool left = context.inputs.isPressed(2);
 	bool right = context.inputs.isPressed(3);
-	velocity.y -= up * 2;
-	velocity.y += down * 2;
-	velocity.x -= left * 2;
-	velocity.x += right * 2;
+	physics->velocity.y -= up * 2;
+	physics->velocity.y += down * 2;
+	physics->velocity.x -= left * 2;
+	physics->velocity.x += right * 2;
 }
 
 void Shiny::postStep(EntityStepContext& context)
