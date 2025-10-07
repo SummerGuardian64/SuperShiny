@@ -125,28 +125,31 @@ bool ssge::Program::mainLoop()
 
         Uint32 currentTicks = SDL_GetTicks();
         float deltaTime = (currentTicks - lastTicks) / 1000.0f;
-        lastTicks = currentTicks;
+        if (deltaTime >= 1.0f / 60.0f)
+        {
+            lastTicks = currentTicks;
 
-        // Update the engine and see if it's done (wants to quit)
-        done |= !engine->update(deltaTime);
+            // Update the engine and see if it's done (wants to quit)
+            done |= !engine->update(deltaTime);
 
-        // Delay to simulate ~60 FPS.
-        SDL_Delay(16);
+            // Delay to simulate ~60 FPS.
+            //SDL_Delay(16);
 
-        // Render the game onto the virtual gameScreen texture.
-        SDL_SetRenderTarget(renderer, gameScreen);
-        engine->render(DrawContext(renderer));
-        SDL_SetRenderTarget(renderer, NULL);
+            // Render the game onto the virtual gameScreen texture.
+            SDL_SetRenderTarget(renderer, gameScreen);
+            engine->render(DrawContext(renderer));
+            SDL_SetRenderTarget(renderer, NULL);
 
-        // Clear the window (black background for letterboxing).
-        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-        SDL_RenderClear(renderer);
+            // Clear the window (black background for letterboxing).
+            SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+            SDL_RenderClear(renderer);
 
-        // Render the gameScreen texture scaled to best fit the window.
-        SDL_Rect fitRect = window->makeBestFitScale();
-        SDL_RenderCopy(renderer, gameScreen, NULL, &fitRect);
+            // Render the gameScreen texture scaled to best fit the window.
+            SDL_Rect fitRect = window->makeBestFitScale();
+            SDL_RenderCopy(renderer, gameScreen, NULL, &fitRect);
 
-        SDL_RenderPresent(renderer);
+            SDL_RenderPresent(renderer);
+        }
     }
     SDL_DestroyTexture(gameScreen);
 
