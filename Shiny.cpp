@@ -18,21 +18,21 @@ Shiny::Shiny()
 	physics->processVelocity = true;
 	physics->enablePhysics = true;
 	physics->enableHorizontalMove = true;
-    physics->enableVerticalBounce = true;
-    physics->enableVerticalMove = true;
+    //physics->enableVerticalBounce = true;
+    //physics->enableVerticalMove = true;
 	physics->enableJump = true;
 	physics->enableHorizontalCollision = true;
 	physics->enableVerticalCollision = true;
 
-    physics->jumpSpeed = 6.5;
-    physics->jumpStrength = 8;
+    physics->jumpSpeed = 12;
+    physics->jumpStrength = 16;
     physics->swimPower = 5;
-    physics->gravity = 0.25;
+    physics->gravity = 0.7;
     physics->gravityInWater = 0.1;
 
-    physics->maxWalkSpeed = 3;
-    physics->maxRunSpeed = 4;
-    physics->maxAirWalkSpeed = 3;
+    physics->maxWalkSpeed = 8;
+    physics->maxRunSpeed = 10;
+    physics->maxAirWalkSpeed = 7;
     physics->maxAirRunSpeed = 4;
     physics->maxAirJumpSpeed = 7;
     physics->maxAirFallSpeed = 10;
@@ -42,7 +42,7 @@ Shiny::Shiny()
     physics->maxWaterFallSpeed = 5;
     physics->maxSwimSpeed = 8;
 
-    physics->accWalk.x = 0.2;
+    physics->accWalk.x = 0.5;
     physics->accRun.x = 0.5;
     physics->accAir.x = 0.3;
     physics->accWater.x = 0.4;
