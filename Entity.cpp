@@ -41,6 +41,9 @@ void ssge::Entity::Physics::step(EntityStepContext& context)
 
     //GML port
 
+    //FIXME
+    int fixmeMockupFloor = 650;
+
     ///Platformer Physics
     // Copy collision list
     //ds_list_clear(CollisionsPrevious);
@@ -302,51 +305,70 @@ void ssge::Entity::Physics::step(EntityStepContext& context)
         // Collision when falling
         if (enableVerticalCollision && !ignoreCollision)
         {
-            //if(place_meeting(x,y+SpeedY,par_Block))
-            if (/*!place_free(x, y + SpeedY)*/ false) //TODO: Collision
+            //FIXME: This is a mockup
+            if (position.y >= fixmeMockupFloor && speed.y>=0)
             {
-                if (!enableVerticalBounce)
+                if (enableVerticalBounce)
                 {
-                    if (speed.y != 0) // Prevent infinite loop
-                    {
-                        // Just like "Move to Contact"
-                        //while(!place_meeting(x,y+sign(SpeedY),par_Block)){y+=sign(SpeedY);}
-                        while (/*place_free(position.x, position.y + (speed.x ? (speed.x > 0 ? 1 : -1) : 0))*/ false) //TODO: Collision
-                        {
-                            position.y += (speed.y ? (speed.y > 0 ? 1 : -1) : 0);
-                        }
-                    }
-                    if (speed.y > 0) { grounded = true; }
-                    if (speed.y < 0) { jumpTimer = 0; grounded = false; } // Stop the jump
-                    speed.y = 0;
-                }
-                else if (!enableGMBounce)
-                {
-                    int steps = 0;
-                    if (speed.y != 0) // Prevent infinite loop
-                    {
-                        //while(!place_meeting(x,y+sign(SpeedY),par_Block))
-                        while (/*place_free(position.x, position.y + (speed.y ? (speed.y > 0 ? 1 : -1) : 0))*/ false) //TODO: Collision
-                        {
-                            position.y += (speed.y ? (speed.y > 0 ? 1 : -1) : 0);
-                            steps++;
-                        }
-                        position.y -= (speed.y ? (speed.y > 0 ? 1 : -1) : 0) * (abs(speed.y) - steps);
-                        if (speed.y > 0)
-                        {
-                            grounded = true;
-                        }
-                        speed.y *= -1;
-                        applyy = false;
-                    }
+                    position.y -= (position.y - fixmeMockupFloor);
+                    speed.y *= -1;
+                    applyy = false;
                     grounded = false;
                 }
+                else
+                {
+                    position.y = fixmeMockupFloor;
+                    speed.y = 0;
+                    grounded = true;
+                }
             }
-            else
-            {
-                oldysign = 0;
-                grounded = false;
-            }
+
+            //FIXME: Uncomment after removing mockup!
+            //if(place_meeting(x,y+SpeedY,par_Block))
+        //    if (/*!place_free(x, y + SpeedY)*/ false) //TODO: Collision
+        //    {
+        //        if (!enableVerticalBounce)
+        //        {
+        //            if (speed.y != 0) // Prevent infinite loop
+        //            {
+        //                // Just like "Move to Contact"
+        //                //while(!place_meeting(x,y+sign(SpeedY),par_Block)){y+=sign(SpeedY);}
+        //                while (/*place_free(position.x, position.y + (speed.x ? (speed.x > 0 ? 1 : -1) : 0))*/ false) //TODO: Collision
+        //                {
+        //                    position.y += (speed.y ? (speed.y > 0 ? 1 : -1) : 0);
+        //                }
+        //            }
+        //            if (speed.y > 0) { grounded = true; }
+        //            if (speed.y < 0) { jumpTimer = 0; grounded = false; } // Stop the jump
+        //            speed.y = 0;
+        //        }
+        //        else if (!enableGMBounce)
+        //        {
+        //            int steps = 0;
+        //            if (speed.y != 0) // Prevent infinite loop
+        //            {
+        //                //while(!place_meeting(x,y+sign(SpeedY),par_Block))
+        //                while (/*place_free(position.x, position.y + (speed.y ? (speed.y > 0 ? 1 : -1) : 0))*/ false) //TODO: Collision
+        //                {
+        //                    position.y += (speed.y ? (speed.y > 0 ? 1 : -1) : 0);
+        //                    steps++;
+        //                }
+        //                position.y -= (speed.y ? (speed.y > 0 ? 1 : -1) : 0) * (abs(speed.y) - steps);
+        //                if (speed.y > 0)
+        //                {
+        //                    grounded = true;
+        //                }
+        //                speed.y *= -1;
+        //                applyy = false;
+        //            }
+        //            grounded = false;
+        //        }
+        //    }
+        //    else
+        //    {
+        //        oldysign = 0;
+        //        grounded = false;
+        //    }
         }
         // Apply speed
         if (applyy)
@@ -452,6 +474,12 @@ void ssge::Entity::Physics::step(EntityStepContext& context)
                 ////mask_index=tmpmask;
             }
 
+            //FIXME: MOCKUP
+            if (position.y >= fixmeMockupFloor)
+            {
+                position.y = fixmeMockupFloor;
+            }
+
             // Break out if stuck inside of a wall
             //if (place_meeting(x,y,par_Block))
             if (/*!place_free(position.x, position.y)*/ false) //TODO: Collision
@@ -495,12 +523,13 @@ void ssge::Entity::Physics::step(EntityStepContext& context)
             }
 
             // Check if grounded
-            grounded = false;
+            // FIXME: UNCOMMENT THIS SNIPPET!
+            //grounded = false;
             //if (place_meeting(x,y+1,par_Block))
-            if (/*!place_free(position.x, position.y + 1)*/ false)
-            {
-                grounded = true;
-            }
+            //if (/*!place_free(position.x, position.y + 1)*/ false)
+            //{
+            //    grounded = true;
+            //}
             //// Add solids to collision list
             //for (var i = 0; i < ds_list_size(SolidList); i++)
             //{

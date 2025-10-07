@@ -18,6 +18,8 @@ Shiny::Shiny()
 	physics->processVelocity = true;
 	physics->enablePhysics = true;
 	physics->enableHorizontalMove = true;
+    physics->enableVerticalBounce = true;
+    physics->enableVerticalMove = true;
 	physics->enableJump = true;
 	physics->enableHorizontalCollision = true;
 	physics->enableVerticalCollision = true;
