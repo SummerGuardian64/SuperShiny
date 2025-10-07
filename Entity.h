@@ -110,6 +110,71 @@ namespace ssge
 			float getDistance(const Entity& other) const;
 			//std::shared_ptr<Collision> collideWith(Entity& other); //TODO: May be not needed
 
+			//GML port:
+
+			bool enablePhysics = false;
+			bool enableHorizontalMove = false;
+			bool enableVerticalMove = false;
+			bool enableJump = false;
+			bool enableRun = false;
+			bool enableSwim = false;
+			bool running = false;
+			bool inWater = false;
+			bool grounded = false;
+			bool touchesWall = false;
+
+			bool enableHorizontalCollision = false;
+			bool enableVerticalCollision = false;
+			bool ignoreCollision = false;
+			bool enableHorizontalBounce = false;
+			bool enableVerticalBounce = false;
+			bool enableGMBounce = false;
+			bool enableGMCollision = false;
+
+			SDL_FPoint speedX = { 0,0 };
+			float maxSpeedHor = 0;
+			float maxSpeedUp = 0;
+			float maxSpeedDown = 0;
+			SDL_Point dir = { 0,0 };
+			SDL_Point side = { 0,0 };
+			SDL_FPoint acc = { 0,0 };
+			SDL_FPoint dec = { 0,0 };
+			double jumpTimer = 0;
+
+			float jumpSpeed = 0;
+			double jumpStrength = 0;
+			float swimPower = 0;
+			float gravity = 0;
+			float gravityInWater = 0;
+
+			float maxWalkSpeed = 0;
+			float maxRunSpeed = 0;
+			float maxAirWalkSpeed = 0;
+			float maxAirRunSpeed = 0;
+			float maxAirJumpSpeed = 0;
+			float maxAirFallSpeed = 0;
+			float maxWalkInWaterSpeed = 0;
+			float maxRunInWaterSpeed = 0;
+			float maxWaterJumpSpeed = 0;
+			float maxWaterFallSpeed = 0;
+			float maxSwimSpeed = 0;
+
+			SDL_FPoint accWalk = { 0,0 };
+			SDL_FPoint accRun = { 0,0 };
+			SDL_FPoint accAir = { 0,0 };
+			SDL_FPoint accWater = { 0,0 };
+			SDL_FPoint accWaterWalk = { 0,0 };
+			SDL_FPoint accAirRun = { 0,0 };
+			SDL_FPoint accWaterRun = { 0,0 };
+
+			SDL_FPoint decWalk = { 0,0 };
+			SDL_FPoint decRun = { 0,0 };
+			SDL_FPoint decAir = { 0,0 };
+			SDL_FPoint decWater = { 0,0 };
+			SDL_FPoint decWaterWalk = { 0,0 };
+			SDL_FPoint decAirRun = { 0,0 };
+			SDL_FPoint decWaterRun = { 0,0 };
+
 		public:
 			Entity& entity;
 			Physics(Entity& entity);
