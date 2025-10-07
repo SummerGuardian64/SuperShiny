@@ -131,7 +131,7 @@ namespace ssge
 			bool enableGMBounce = false;
 			bool enableGMCollision = false;
 
-			SDL_FPoint speedX = { 0,0 };
+			SDL_FPoint speed = { 0,0 };
 			float maxSpeedHor = 0;
 			float maxSpeedUp = 0;
 			float maxSpeedDown = 0;
