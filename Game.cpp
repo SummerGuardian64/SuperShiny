@@ -47,8 +47,9 @@ bool ssge::Game::Sprites::_init(SDL_Renderer* renderer)
 	using Image = ssge::Sprite::Image;
 	using Sequence = ssge::Sprite::Animation::Sequence;
 
-	//sprdefShiny.spritesheet
-	sprdefShiny.images.push_back(Image(0, 0, 64, 64, 32, 32));
+	sprdefShiny.spritesheet = SdlTexture("Sprites/Shiny.png", renderer);
+
+	sprdefShiny.images.push_back(Image(0, 0, 128, 128, 64, 64));
 	{
 		auto& seq = sprdefShiny.addSequence(20, 20, 0);
 		seq.imageIndexes.push_back(0);

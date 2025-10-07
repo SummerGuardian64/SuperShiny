@@ -36,7 +36,7 @@ namespace ssge
 			ForEngine(const ForEngine& toCopy) = delete;
 			ForEngine(ForEngine&& toMove) = delete;
 			~ForEngine() = delete;
-			static ssge::StepContext stepContext(::ssge::Engine* actualEngine);
+			static ssge::StepContext stepContext(::ssge::Engine* actualEngine, double deltaTime);
 		};
 		class ForSceneManager
 		{

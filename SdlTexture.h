@@ -1,5 +1,8 @@
 #pragma once
 #include "SDL.h"
+#include "SDL_image.h"
+#include <string>
+#include <iostream>
 
 class SdlTexture {
 public:
@@ -8,6 +11,29 @@ public:
 
     // Constructor from an existing SDL_Texture*
     explicit SdlTexture(SDL_Texture* tex) noexcept : texture(tex) {}
+
+    // Constructor from file path and renderer
+    SdlTexture(const std::string& path, SDL_Renderer* renderer) noexcept : texture(nullptr)
+    {
+        SDL_Surface* loadedSurface = IMG_Load(path.c_str());
+        if (!loadedSurface)
+        {
+            std::cout << "Unable to load image %s! SDL_image Error: %s\n" << path.c_str() << IMG_GetError();
+        }
+        else
+        {
+            texture = SDL_CreateTextureFromSurface(renderer, loadedSurface);
+            if (!texture)
+            {
+                std::cout << "Unable to create texture from %s! SDL Error: %s\n" << path.c_str() << SDL_GetError();
+            }
+            else
+            {
+                SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
+            }
+            SDL_FreeSurface(loadedSurface);
+        }
+    }
 
     // Assignment operator from SDL_Texture* (lazy initialization/ownership transfer)
     SdlTexture& operator=(SDL_Texture* tex) noexcept {

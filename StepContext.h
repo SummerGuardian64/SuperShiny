@@ -65,7 +65,7 @@ namespace ssge {
         double getDeltaTime();
 
     private:
-        StepContext(ssge::Engine* actualEngine);
+        StepContext(ssge::Engine* actualEngine, double deltaTime);
 
         ssge::Engine* getActualEngine();
         ssge::SceneManager* getActualSceneManager();

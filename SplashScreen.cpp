@@ -42,7 +42,7 @@ void ssge::SplashScreen::init(ssge::SceneStepContext& context)
 
 void ssge::SplashScreen::step(ssge::SceneStepContext& context)
 {
-	if (context.inputs.isJustPressed(0))
+	if (context.inputs.isJustPressed(4))
 	{
 		context.scenes.changeScene(std::make_unique<GameWorld>());
 	}

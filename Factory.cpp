@@ -2,9 +2,9 @@
 #include "Engine.h"
 #include "StepContext.h"
 
-ssge::StepContext ssge::Factory::ForEngine::stepContext(::ssge::Engine* actualEngine)
+ssge::StepContext ssge::Factory::ForEngine::stepContext(::ssge::Engine* actualEngine, double deltaTime)
 {
-    return ssge::StepContext(actualEngine);
+    return ssge::StepContext(actualEngine, deltaTime);
 }
 
 ssge::SceneStepContext ssge::Factory::ForSceneManager::sceneStepContext(::ssge::Scene& currentScene, ::ssge::StepContext& stepContext)

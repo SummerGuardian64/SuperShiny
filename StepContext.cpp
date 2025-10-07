@@ -74,14 +74,13 @@ double ssge::StepContext::getDeltaTime()
 	return deltaTime;
 }
 
-ssge::StepContext::StepContext(ssge::Engine* actualEngine)
+ssge::StepContext::StepContext(ssge::Engine* actualEngine, double deltaTime)
 	: engine(actualEngine),
 	  scenes(actualEngine->getSceneManager()),
 	  inputs(actualEngine->getInputManager()),
 	  drawing(actualEngine->getWindowManager())
 {
-	//FIXME: UNIMPLEMENTED!
-	deltaTime = 0;
+	this->deltaTime = deltaTime;
 }
 
 ssge::Engine* ssge::StepContext::getActualEngine()
@@ -118,8 +117,7 @@ ssge::SceneStepContext::SceneStepContext(ssge::Scene& currentScene, ssge::StepCo
 	  drawing(stepContext.getActualWindowManager()),
 	  currentScene(currentScene)
 {
-	//FIXME: UNIMPLEMENTED!
-	deltaTime = 0;
+	this->deltaTime = stepContext.getDeltaTime();
 }
 
 ssge::SceneStepContext::Engine::Engine(ssge::Engine* actual)
@@ -212,8 +210,7 @@ ssge::GameWorldStepContext::GameWorldStepContext(ssge::GameWorld& currentGameWor
 	currentScene(&currentGameWorld.getAsScene()),
 	world(&currentGameWorld)
 {
-	//FIXME: UNIMPLEMENTED!
-	deltaTime = 0;
+	this->deltaTime = sceneStepContext.getDeltaTime();
 }
 
 ssge::GameWorldStepContext::Engine::Engine(ssge::Engine* actual)
@@ -313,9 +310,7 @@ ssge::Scene* ssge::GameWorldStepContext::getCurrentScene()
 
 double ssge::EntityStepContext::getDeltaTime()
 {
-	//FIXME: This is hardcoded! Please implement properly!
-	return 1.0f / 60.f;
-	//return deltaTime;
+	return deltaTime;
 }
 
 ssge::EntityStepContext::EntityStepContext(ssge::GameWorldStepContext& gameWorldStepContext)
@@ -327,8 +322,7 @@ ssge::EntityStepContext::EntityStepContext(ssge::GameWorldStepContext& gameWorld
 	world(gameWorldStepContext.getCurrentGameWorld()),
 	entities(&gameWorldStepContext.getCurrentGameWorld()->entities)
 {
-	//FIXME: UNIMPLEMENTED!
-	deltaTime = 0;
+	this->deltaTime = gameWorldStepContext.getDeltaTime();
 }
 
 ssge::EntityStepContext::Engine::Engine(ssge::Engine* actual)

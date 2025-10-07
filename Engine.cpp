@@ -42,7 +42,11 @@ bool ssge::Engine::prepareInitialState()
 	//TODO: Initialize first scene
 	//scenes->changeScene(std::make_unique<GameWorld>());
 	scenes->changeScene(std::make_unique<SplashScreen>());
-	inputs->bindings[0].bindToKey(SDL_Scancode::SDL_SCANCODE_E);
+	inputs->bindings[0].bindToKey(SDL_Scancode::SDL_SCANCODE_UP);
+	inputs->bindings[1].bindToKey(SDL_Scancode::SDL_SCANCODE_DOWN);
+	inputs->bindings[2].bindToKey(SDL_Scancode::SDL_SCANCODE_LEFT);
+	inputs->bindings[3].bindToKey(SDL_Scancode::SDL_SCANCODE_RIGHT);
+	inputs->bindings[4].bindToKey(SDL_Scancode::SDL_SCANCODE_RETURN);
 
 	return true;
 }
@@ -81,7 +85,7 @@ bool ssge::Engine::update(double deltaTime)
 	inputs->latch();
 	
 	// Step the scenes via SceneManager
-	auto context = Factory::ForEngine::stepContext(this);
+	auto context = Factory::ForEngine::stepContext(this, deltaTime);
 	scenes->step(context);
 
 	// Let this be the final update if we're finished

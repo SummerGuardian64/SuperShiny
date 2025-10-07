@@ -277,7 +277,7 @@ void Sprite::update(float deltaTime)
 
 void ssge::Sprite::draw(DrawContext context) const
 {
-	render(context.getRenderer(), context.getScrollOffset());
+	render(context.getRenderer(), context.calculateAnchorPoint());
 }
 
 void Sprite::render(SDL_Renderer* renderer, SDL_Point offsetFromViewport) const

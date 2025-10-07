@@ -68,6 +68,14 @@ SDL_Point ssge::DrawContext::getScrollOffset() const
 	return scrollOffset;
 }
 
+SDL_Point ssge::DrawContext::calculateAnchorPoint() const
+{
+	SDL_Point anchor = this->origin;
+	anchor.x += scrollOffset.x;
+	anchor.y += scrollOffset.y;
+	return anchor;
+}
+
 DrawContext ssge::DrawContext::clone() const
 {
 	return DrawContext(*this);
@@ -78,6 +86,15 @@ DrawContext ssge::DrawContext::deriveForScrolling(SDL_Point offset) const
 	DrawContext derivedContext = DrawContext(*this);
 
 	derivedContext.scrollOffset = offset;
+
+	return derivedContext;
+}
+
+DrawContext ssge::DrawContext::deriveForEntity(SDL_FPoint entityPosition) const
+{
+	DrawContext derivedContext = DrawContext(*this);
+
+	derivedContext.origin = SDL_Point{ (int)entityPosition.x,(int)entityPosition.y };
 
 	return derivedContext;
 }

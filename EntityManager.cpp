@@ -24,7 +24,7 @@ void ssge::EntityManager::draw(DrawContext& context)
         // Don't draw an entity immediately! Give it time to initialize!
         if (entity->getLifespan() > 0)
         {
-            DrawContext newContext = context.clone();
+            DrawContext newContext = context.deriveForEntity(entity->position);
             entity->draw(newContext);
         }
     }

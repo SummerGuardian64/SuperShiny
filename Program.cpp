@@ -1,6 +1,7 @@
 #include "Program.h"
 #include <iostream>
 #include "SDL.h"
+#include "SDL_image.h"
 #include "WindowManager.h"
 #include "Game.h"
 #include "Factory.h"
@@ -61,6 +62,14 @@ bool ssge::Program::init()
         success = false;
     }
 
+    // Initialize SDL_image for PNG support
+    int imgFlags = IMG_INIT_PNG;
+    if (!(IMG_Init(imgFlags) & imgFlags))
+    {
+        std::cout << "SDL_image could not initialize! SDL_image Error: " << IMG_GetError();
+        return false;
+    }
+
     // Initialize program window
     else if (auto error = window->init(ssge::Game::APPLICATION_TITLE, 1280, 720))
     {
@@ -92,7 +101,7 @@ bool ssge::Program::mainLoop()
         SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET,
             virtualWidth, virtualHeight);
     if (!gameScreen) {
-        //errorString.Create("SDL_CreateTexture (gameScreen) error: ", SDL_GetError());
+        std::cout << "SDL_CreateTexture (gameScreen) error: " << SDL_GetError();
         return false;
     }
 
@@ -122,7 +131,7 @@ bool ssge::Program::mainLoop()
         done |= !engine->update(deltaTime);
 
         // Delay to simulate ~50 FPS.
-        SDL_Delay(20);
+        SDL_Delay(16);
 
         // Render the game onto the virtual gameScreen texture.
         SDL_SetRenderTarget(renderer, gameScreen);
@@ -154,12 +163,13 @@ bool ssge::Program::shutdown()
 {
     std::cout << "shutdown()" << std::endl;
 
-    // Shut down the program window
-    window->shutdown();
-
     if (engine)
         engine->shutdown();
 
+    // Shut down the program window
+    window->shutdown();
+
+    IMG_Quit();
     SDL_Quit();
     return true;
 }
