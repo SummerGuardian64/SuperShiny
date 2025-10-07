@@ -130,7 +130,7 @@ bool ssge::Program::mainLoop()
         // Update the engine and see if it's done (wants to quit)
         done |= !engine->update(deltaTime);
 
-        // Delay to simulate ~50 FPS.
+        // Delay to simulate ~60 FPS.
         SDL_Delay(16);
 
         // Render the game onto the virtual gameScreen texture.

@@ -18,6 +18,18 @@ float ssge::Entity::getDistance(const Entity& other) const
 	return 0.0f;
 }
 
+ssge::Entity::Physics::Physics(Entity& entity) : entity(entity)
+{
+}
+
+void ssge::Entity::Physics::step(EntityStepContext& context)
+{
+}
+
+ssge::Entity::NPC::NPC(Entity& entity) : entity(entity)
+{
+}
+
 void ssge::Entity::step(EntityStepContext& context)
 {
 	double deltaTime = context.getDeltaTime();
@@ -73,4 +85,8 @@ void ssge::Entity::draw(DrawContext context) const
 void ssge::Entity::destroy()
 {
 	scheduledToDestroy = true;
+}
+
+ssge::Entity::Control::Control(Entity& entity) : entity(entity)
+{
 }
