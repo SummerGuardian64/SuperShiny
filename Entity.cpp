@@ -2,6 +2,7 @@
 #include "StepContext.h"
 #include "DrawContext.h"
 #include <iostream>
+#include "Utilities.h"
 
 ssge::Entity::Entity()
 {
@@ -52,47 +53,10 @@ void ssge::Entity::Physics::step(EntityStepContext& context)
     if (enablePhysics)
     {
         // Check direction buttons X
-        side.x = 0;
-        if (enableHorizontalMove)
-        {
-            side.x = context.inputs.isPressed(3) - context.inputs.isPressed(2);
-            //if (context.inputs.isPressed(2)) //Left
-            //{
-            //    side.x = -1;
-            //}
-            //if (context.inputs.isPressed(3)) //Right
-            //{
-            //    if (SideX == -1)
-            //    {
-            //        SideX = 0
-            //    }
-            //    else
-            //    {
-            //        SideX = 1
-            //    }
-            //}
-        }
+        side.x = enableHorizontalMove ? context.inputs.isPressed(3) - context.inputs.isPressed(2) : 0;
         // Check direction buttons Y
-        side.y = 0;
-        if (enableVerticalMove)
-        {
-            side.y = context.inputs.isPressed(1) - context.inputs.isPressed(0);
-            //if (context.inputs.isPressed(0))//Up
-            //{
-            //    SideY = -1
-            //}
-            //if (script_execute(scr_ChkBtnPressed, controlBtns.down))
-            //{
-            //    if (SideY == -1)
-            //    {
-            //        SideY = 0
-            //    }
-            //    else
-            //    {
-            //        SideY = 1
-            //    }
-            //}
-        }
+        side.y = enableVerticalMove ? context.inputs.isPressed(1) - context.inputs.isPressed(0) : 0;
+        // Reset jump timer if jump isn't pressed
         if (!context.inputs.isPressed(4))//Jump
         {
             jumpTimer = 0;
@@ -209,23 +173,23 @@ void ssge::Entity::Physics::step(EntityStepContext& context)
         // Offer the ability to move horizontally
         if (enableHorizontalMove)
         {
-            speed.x += (side.x ? (side.x > 0 ? 1 : -1) : 0) * acc.x;
+            speed.x += sign(side.x) * acc.x;
             if (abs(speed.x) > maxSpeedHor)
             {
-                speed.x = (speed.x ? (speed.x > 0 ? 1 : -1) : 0) * maxSpeedHor;
+                speed.x = sign(speed.x) * maxSpeedHor;
             }
         }
         // Offer the ability to move vertically
         if (enableVerticalMove)
         {
-            speed.y += (side.y ? (side.y > 0 ? 1 : -1) : 0) * acc.y;
+            speed.y += sign(side.y) * acc.y;
             if ((speed.y < 0) && (-speed.y > maxSpeedUp))
             {
-                speed.y = (speed.y ? (speed.y > 0 ? 1 : -1) : 0) * maxSpeedUp;
+                speed.y = sign(speed.y) * maxSpeedUp;
             }
             if (speed.y > maxSpeedDown)
             {
-                speed.y = (speed.y ? (speed.y > 0 ? 1 : -1) : 0) * maxSpeedDown;
+                speed.y = sign(speed.y) * maxSpeedDown;
             }
         }
         // Deccellerate
@@ -237,7 +201,7 @@ void ssge::Entity::Physics::step(EntityStepContext& context)
             }
             else
             {
-                speed.x -= (speed.x ? (speed.x > 0 ? 1 : -1) : 0) * dec.x;
+                speed.x -= sign(speed.x) * dec.x;
             }
         }
         if (side.y == 0 && jumpTimer == 0 && gravity == 0)
@@ -248,7 +212,7 @@ void ssge::Entity::Physics::step(EntityStepContext& context)
             }
             else
             {
-                speed.y -= (speed.y ? (speed.y > 0 ? 1 : -1) : 0) * dec.y;
+                speed.y -= sign(speed.y) * dec.y;
             }
         }
         // Apply jump
@@ -333,9 +297,9 @@ void ssge::Entity::Physics::step(EntityStepContext& context)
         //            {
         //                // Just like "Move to Contact"
         //                //while(!place_meeting(x,y+sign(SpeedY),par_Block)){y+=sign(SpeedY);}
-        //                while (/*place_free(position.x, position.y + (speed.x ? (speed.x > 0 ? 1 : -1) : 0))*/ false) //TODO: Collision
+        //                while (/*place_free(position.x, position.y + sign(speed.x))*/ false) //TODO: Collision
         //                {
-        //                    position.y += (speed.y ? (speed.y > 0 ? 1 : -1) : 0);
+        //                    position.y += sign(speed.y);
         //                }
         //            }
         //            if (speed.y > 0) { grounded = true; }
@@ -348,12 +312,12 @@ void ssge::Entity::Physics::step(EntityStepContext& context)
         //            if (speed.y != 0) // Prevent infinite loop
         //            {
         //                //while(!place_meeting(x,y+sign(SpeedY),par_Block))
-        //                while (/*place_free(position.x, position.y + (speed.y ? (speed.y > 0 ? 1 : -1) : 0))*/ false) //TODO: Collision
+        //                while (/*place_free(position.x, position.y + sign(speed.y))*/ false) //TODO: Collision
         //                {
-        //                    position.y += (speed.y ? (speed.y > 0 ? 1 : -1) : 0);
+        //                    position.y += sign(speed.y);
         //                    steps++;
         //                }
-        //                position.y -= (speed.y ? (speed.y > 0 ? 1 : -1) : 0) * (abs(speed.y) - steps);
+        //                position.y -= sign(speed.y) * (abs(speed.y) - steps);
         //                if (speed.y > 0)
         //                {
         //                    grounded = true;
@@ -387,9 +351,9 @@ void ssge::Entity::Physics::step(EntityStepContext& context)
                     {
                         // Just like "Move to Contact"
                         //while(!place_meeting(x+sign(SpeedX),y,par_Block)){x+=sign(SpeedX);}
-                        while (/*place_free(position.x + (speed.x ? (speed.x > 0 ? 1 : -1) : 0), position.y)*/ false)//TODO: Collision
+                        while (/*place_free(position.x + sign(speed.x), position.y)*/ false)//TODO: Collision
                         {
-                            position.x += (speed.x ? (speed.x > 0 ? 1 : -1) : 0);
+                            position.x += sign(speed.x);
                         }
                     }
                     speed.x = 0;
@@ -400,12 +364,12 @@ void ssge::Entity::Physics::step(EntityStepContext& context)
                     if (speed.x != 0) // Prevent infinite loop
                     {
                         //while(!place_meeting(x+sign(SpeedX),y,par_Block))
-                        while (/*place_free(position.x + (speed.x ? (speed.x > 0 ? 1 : -1) : 0), position.y)*/ false)
+                        while (/*place_free(position.x + sign(speed.x) : 0), position.y)*/ false)
                         {
-                            position.x += (speed.x ? (speed.x > 0 ? 1 : -1) : 0);
+                            position.x += sign(speed.x);
                             steps++;
                         }
-                        position.x -= (speed.x ? (speed.x > 0 ? 1 : -1) : 0) * (abs(speed.x) - steps);
+                        position.x -= sign(speed.x) * (abs(speed.x) - steps);
                         speed.x *= -1;
                         applyx = false;
                     }
