@@ -1,5 +1,6 @@
 #include "Game.h"
 #include "Shiny.h"
+#include "Level.h"
 
 using namespace ssge;
 
@@ -63,4 +64,48 @@ Sprite::Definition Game::Sprites::sprdefShiny;
 Sprite::Definition& ssge::Game::Sprites::shiny()
 {
 	return sprdefShiny;
+}
+
+// Example static level data (see below for format & builder)
+extern const unsigned char g_Level_01[] =
+{
+	'S','S','G','E','L','E','V','1', // Magic number "SSGELEV1"
+	16,0,0,0, // columns
+	16,0,0,0, // rows
+	32,0,0,0, // blockWidth
+	32,0,0,0, // blockHeight
+	(unsigned char)ssge::Level::Block::Collision::Solid,
+	(unsigned char)ssge::Level::Block::Collision::Air,
+	(unsigned char)ssge::Level::Block::Collision::Solid,
+	(unsigned char)ssge::Level::Block::Collision::Solid,
+	(unsigned char)ssge::Level::Block::Collision::Solid,
+	(unsigned char)ssge::Level::Block::Collision::Solid,
+	(unsigned char)ssge::Level::Block::Collision::Solid,
+	(unsigned char)ssge::Level::Block::Collision::Solid,
+	0,0,
+	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+	0,0,0,0,0,0,0,0,0,0,4,1,4,1,5,1,5,1,5,1,5,1,3,1,3,1,3,1,0,0,0,0,
+	0,0,0,0,0,0,0,0,4,1,4,1,4,1,5,1,5,1,5,1,5,1,2,1,2,1,2,1,3,1,3,1,
+	4,1,4,1,4,1,4,1,4,1,4,1,4,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,
+	2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1
+};
+extern const std::size_t   g_Level_01_Size = sizeof(g_Level_01);
+
+const unsigned char* Game::Levels::getBytes(int id, std::size_t& outSize)
+{
+	switch (id) {
+	case 1: outSize = g_Level_01_Size; return g_Level_01;
+	default: outSize = 0; return nullptr;
+	}
 }

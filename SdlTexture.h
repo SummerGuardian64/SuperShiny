@@ -9,6 +9,9 @@ public:
     // Default constructor (creates an empty texture)
     SdlTexture() noexcept : texture(nullptr) {}
 
+    // Constructor from nullptr
+    SdlTexture(nullptr_t nulltex) noexcept : texture(nullptr) {}
+
     // Constructor from an existing SDL_Texture*
     explicit SdlTexture(SDL_Texture* tex) noexcept : texture(tex) {}
 

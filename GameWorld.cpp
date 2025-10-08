@@ -2,6 +2,7 @@
 #include <string>
 #include "Factory.h"
 #include "DrawContext.h"
+#include "Game.h"
 
 using namespace ssge;
 
@@ -10,6 +11,35 @@ GameWorld::GameWorld()
     backgroundColor = SDL_Color{ 0,0,255,255 };
     setConfines(SDL_FRect{ 0,0,1280,720 });
     gameplayOver = false;
+}
+
+GameWorld::GameWorld(int wantedLevel)
+{
+    backgroundColor = SDL_Color{ 0,0,255,255 };
+    setConfines(SDL_FRect{ 0,0,1280,720 });
+    gameplayOver = false;
+
+    if (!level)
+    {
+        std::size_t sz = 0;
+        const unsigned char* bytes = ssge::Game::Levels::getBytes(wantedLevel, sz);
+        if (bytes && sz > 0)
+        {
+            std::string tilesetPath;
+            std::string error;
+            auto lvl = ssge::Level::loadFromBytes(bytes, sz, &tilesetPath, &error);
+            if (!lvl)
+            {
+                std::cout << error << std::endl;
+            }
+            else
+            {
+                // If you want, load the tileset here using tilesetPath:
+                // if (!tilesetPath.empty()) { tileset.load(renderer, tilesetPath.c_str()); }
+                level = std::move(lvl);
+            }
+        }
+    }
 }
 
 Scene& ssge::GameWorld::getAsScene()
@@ -50,6 +80,7 @@ SceneClassID GameWorld::getSceneClassID() const
 void GameWorld::init(SceneStepContext& context)
 {
     entities.addEntity(EntityClassID::Shiny);
+
     //std::string error;
     //level = LevelLoader::loadLevel(game.progress.getLevel(), error);
     //if (level == NULL)
@@ -131,22 +162,13 @@ void GameWorld::draw(DrawContext& context)
     SDL_RenderFillRect(renderer, &context.getBounds());
 
     // Draw level
-    //if (auto realLevel = level.get())
-    //{
-    //    realLevel->draw(renderTarget);
-    //}
-
-    entities.draw(context);
+    if (level)
+    {
+        level->draw(context);
+    }
 
     // Draw all entities
-    //for (auto& entityPtr : entities)
-    //{
-    //    // Don't draw an entity immediately! Give it time to initialize!
-    //    if (entityPtr->getLifespan().asSeconds() > 0)
-    //    {
-    //        entityPtr->draw(renderTarget);
-    //    }
-    //}
+    entities.draw(context);
 
     drawHUD(context);
 }

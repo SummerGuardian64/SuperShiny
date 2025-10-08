@@ -6,7 +6,7 @@
 #include <memory>
 #include <vector>
 #include <list>
-//#include "Level.h"
+#include "Level.h"
 //#include "LevelLoader.h"
 //#include "PowerupType.h"
 //#include "HintManager.h"
@@ -21,9 +21,10 @@ namespace ssge
         bool gameplayOver;
     public:
         GameWorld();
+        GameWorld(int wantedLevel);
         Scene& getAsScene();
         ssge::EntityManager entities;
-        //std::unique_ptr<Level> level;
+        std::unique_ptr<Level> level;
         //HintManager hints;
         bool isGameplayOver() const;
         void finishGameplay();

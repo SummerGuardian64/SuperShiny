@@ -66,5 +66,16 @@ namespace ssge
 				return fn ? fn() : nullptr;
 			}
 		};
+
+		class Levels
+		{
+			Levels() = delete;
+			Levels(const Levels&) = delete;
+			Levels(Levels&&) = delete;
+			~Levels() = delete;
+		public:
+			// Return a pointer and size for a given level ID; nullptr if not found.
+			static const unsigned char* getBytes(int id, std::size_t& outSize);
+		};
 	};
 }
