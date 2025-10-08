@@ -106,6 +106,8 @@ bool ssge::Program::mainLoop()
     }
 
     bool done = false;
+    double fps = 60.0f;
+    double frameDuration = 1.0f / fps;
     Uint32 lastTicks = SDL_GetTicks();
     while (!done)
     {
@@ -125,15 +127,12 @@ bool ssge::Program::mainLoop()
 
         Uint32 currentTicks = SDL_GetTicks();
         float deltaTime = (currentTicks - lastTicks) / 1000.0f;
-        if (deltaTime >= 1.0f / 60.0f)
+        if (deltaTime >= frameDuration)
         {
-            lastTicks = currentTicks;
+            lastTicks -= frameDuration;
 
             // Update the engine and see if it's done (wants to quit)
-            done |= !engine->update(deltaTime);
-
-            // Delay to simulate ~60 FPS.
-            //SDL_Delay(16);
+            done |= !engine->update(frameDuration);
 
             // Render the game onto the virtual gameScreen texture.
             SDL_SetRenderTarget(renderer, gameScreen);
