@@ -19,6 +19,8 @@ namespace ssge
     {
         SDL_FRect confines;
         bool gameplayOver;
+        int wantedLevel;
+        void initLevel(SceneStepContext& context);
     public:
         GameWorld();
         GameWorld(int wantedLevel);

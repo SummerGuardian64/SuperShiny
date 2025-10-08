@@ -6,19 +6,8 @@
 
 using namespace ssge;
 
-GameWorld::GameWorld()
+void ssge::GameWorld::initLevel(SceneStepContext& context)
 {
-    backgroundColor = SDL_Color{ 0,0,255,255 };
-    setConfines(SDL_FRect{ 0,0,1280,720 });
-    gameplayOver = false;
-}
-
-GameWorld::GameWorld(int wantedLevel)
-{
-    backgroundColor = SDL_Color{ 0,0,255,255 };
-    setConfines(SDL_FRect{ 0,0,1280,720 });
-    gameplayOver = false;
-
     if (!level)
     {
         std::size_t sz = 0;
@@ -35,11 +24,31 @@ GameWorld::GameWorld(int wantedLevel)
             else
             {
                 // If you want, load the tileset here using tilesetPath:
-                // if (!tilesetPath.empty()) { tileset.load(renderer, tilesetPath.c_str()); }
+                if (!tilesetPath.empty())
+                {
+                    lvl->setTileset(SdlTexture(tilesetPath.c_str(), context.drawing.getRenderer()));
+                }
                 level = std::move(lvl);
             }
         }
     }
+}
+
+GameWorld::GameWorld()
+{
+    backgroundColor = SDL_Color{ 0,0,255,255 };
+    setConfines(SDL_FRect{ 0,0,1280,720 });
+    gameplayOver = false;
+    wantedLevel = 0;
+}
+
+GameWorld::GameWorld(int wantedLevel)
+{
+    backgroundColor = SDL_Color{ 0,0,255,255 };
+    setConfines(SDL_FRect{ 0,0,1280,720 });
+    gameplayOver = false;
+
+    this->wantedLevel = wantedLevel;
 }
 
 Scene& ssge::GameWorld::getAsScene()
@@ -79,6 +88,8 @@ SceneClassID GameWorld::getSceneClassID() const
 
 void GameWorld::init(SceneStepContext& context)
 {
+    initLevel(context);
+
     entities.addEntity(EntityClassID::Shiny);
 
     //std::string error;

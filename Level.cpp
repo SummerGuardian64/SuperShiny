@@ -6,46 +6,44 @@
 
 namespace ssge
 {
-
-	namespace {
-		// read helpers (little-endian, bounds-checked)
-		inline bool read_u32(const unsigned char*& p, const unsigned char* end, uint32_t& out) {
-			if (end - p < 4) return false;
-			out = (uint32_t)p[0] | ((uint32_t)p[1] << 8) | ((uint32_t)p[2] << 16) | ((uint32_t)p[3] << 24);
-			p += 4; return true;
-		}
-		inline bool read_s32(const unsigned char*& p, const unsigned char* end, int32_t& out) {
-			uint32_t u; if (!read_u32(p, end, u)) return false; out = (int32_t)u; return true;
-		}
-		inline bool read_u16(const unsigned char*& p, const unsigned char* end, uint16_t& out) {
-			if (end - p < 2) return false;
-			out = (uint16_t)p[0] | ((uint16_t)p[1] << 8);
-			p += 2; return true;
-		}
-		inline bool read_u8(const unsigned char*& p, const unsigned char* end, uint8_t& out) {
-			if (end - p < 1) return false; out = *p++; return true;
-		}
-		inline bool read_bytes(const unsigned char*& p, const unsigned char* end, char* dst, std::size_t n) {
-			if ((std::size_t)(end - p) < n) return false;
-			std::memcpy(dst, p, n); p += n; return true;
-		}
-
-		inline bool check_magic(const unsigned char*& p, const unsigned char* end) {
-			static const char kMagic[8] = { 'S','S','G','E','L','E','V','1' };
-			if (end - p < 8) return false;
-			if (std::memcmp(p, kMagic, 8) != 0) return false;
-			p += 8; return true;
-		}
-
-		inline ssge::Level::Block::Collision toCollision(uint8_t v) {
-			using C = ssge::Level::Block::Collision;
-			return (v < (uint8_t)C::TOTAL) ? (C)v : C::Air;
-		}
-		inline ssge::Level::Block::Type toType(uint8_t v) {
-			using T = ssge::Level::Block::Type;
-			return (v < (uint8_t)T::TOTAL) ? (T)v : T::EMPTY;
-		}
+	// read helpers (little-endian, bounds-checked)
+	inline bool read_u32(const unsigned char*& p, const unsigned char* end, uint32_t& out) {
+		if (end - p < 4) return false;
+		out = (uint32_t)p[0] | ((uint32_t)p[1] << 8) | ((uint32_t)p[2] << 16) | ((uint32_t)p[3] << 24);
+		p += 4; return true;
 	}
+	inline bool read_s32(const unsigned char*& p, const unsigned char* end, int32_t& out) {
+		uint32_t u; if (!read_u32(p, end, u)) return false; out = (int32_t)u; return true;
+	}
+	inline bool read_u16(const unsigned char*& p, const unsigned char* end, uint16_t& out) {
+		if (end - p < 2) return false;
+		out = (uint16_t)p[0] | ((uint16_t)p[1] << 8);
+		p += 2; return true;
+	}
+	inline bool read_u8(const unsigned char*& p, const unsigned char* end, uint8_t& out) {
+		if (end - p < 1) return false; out = *p++; return true;
+	}
+	inline bool read_bytes(const unsigned char*& p, const unsigned char* end, char* dst, std::size_t n) {
+		if ((std::size_t)(end - p) < n) return false;
+		std::memcpy(dst, p, n); p += n; return true;
+	}
+
+	inline bool check_magic(const unsigned char*& p, const unsigned char* end) {
+		static const char kMagic[8] = { 'S','S','G','E','L','E','V','1' };
+		if (end - p < 8) return false;
+		if (std::memcmp(p, kMagic, 8) != 0) return false;
+		p += 8; return true;
+	}
+
+	inline ssge::Level::Block::Collision toCollision(uint8_t v) {
+		using C = ssge::Level::Block::Collision;
+		return (v < (uint8_t)C::TOTAL) ? (C)v : C::Air;
+	}
+	inline ssge::Level::Block::Type toType(uint8_t v) {
+		using T = ssge::Level::Block::Type;
+		return (v < (uint8_t)T::TOTAL) ? (T)v : T::EMPTY;
+	}
+
 
 	std::unique_ptr<ssge::Level> ssge::Level::loadFromBytes(
 		const unsigned char* data,
@@ -145,6 +143,9 @@ namespace ssge
 
 
 	// ---------------- Block ----------------
+	// Transforms Level::Block::Type of this block into a 0-based index.
+	// Use this for tileset layout indexing.
+	// -1 means empty block or out-of-scope block
 	int Level::Block::getTypeIndex() const
 	{
 		// Map enum Type to a 0-based tileset index. Adjust to your tileset layout.
@@ -172,6 +173,8 @@ namespace ssge
 	{
 		const std::size_t count = static_cast<std::size_t>(columns) * static_cast<std::size_t>(rows);
 		array = (count > 0) ? new Block[count] : nullptr;
+		tilesMeta.tileW = blockSize.w;
+		tilesMeta.tileH = blockSize.h;
 	}
 
 	Level::~Level()
@@ -292,47 +295,83 @@ namespace ssge
 		return r;
 	}
 
+	const SdlTexture& Level::getTilesetTexture() const
+	{
+		return tileset;
+	}
+
+	const Level::TilesetMeta Level::getTilesetMeta() const
+	{
+		return tilesMeta;
+	}
+
+	void Level::setTileset(SdlTexture& SdlTexture)
+	{
+		this->tileset = std::move(SdlTexture);
+		tilesMeta.inferColumnsFromTexture(tileset);
+	}
+
 	void Level::draw(DrawContext context) const
 	{
 		SDL_Renderer* renderer = context.getRenderer();
 		if (!renderer || !array) return;
 
-		// Conservative drawing without depending on SdlTexture specifics.
-		// We can still visualize by filling rects. Integrate tileset when ready.
-		for (int r = 0; r < rows; ++r)
+		if (tileset)
 		{
-			for (int c = 0; c < columns; ++c)
+			for (int r = 0; r < rows; ++r)
 			{
-				const Block& b = array[indexOf(r, c)];
-				if (b.type == Block::Type::EMPTY) continue;
-
-				SDL_Rect dst{
-					c * blockSize.w,
-					r * blockSize.h,
-					blockSize.w,
-					blockSize.h
-				};
-
-				// Simple color coding for now; replace with tileset blit when integrated
-				Uint8 R=200,G=200,B=200;
-				switch (b.type)
+				for (int c = 0; c < columns; ++c)
 				{
-					case Block::Type::Grass: R=80; G=180; B=80; break;
-					case Block::Type::Ground: R=150; G=120; B=70; break;
-					case Block::Type::RedBricks: R=180; G=60; B=60; break;
-					case Block::Type::StoneFloor: R=120; G=120; B=130; break;
-					case Block::Type::PuzzlePavement: R=100; G=80; B=150; break;
-					default: break;
-				}
+					const Block& b = array[indexOf(r, c)];
+					if (b.type == Block::Type::EMPTY) continue;
 
-				SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
-				SDL_SetRenderDrawColor(renderer, R, G, B, 255);
-				SDL_RenderFillRect(renderer, &dst);
+					SDL_Rect src = tilesMeta.makeRectForTile(b.getTypeIndex());
+
+					SDL_Rect dst{
+						c * blockSize.w,
+						r * blockSize.h,
+						blockSize.w,
+						blockSize.h
+					};
+
+					SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+					SDL_RenderCopy(renderer, tileset, &src, &dst);
+				}
 			}
 		}
+		else
+		{
+			for (int r = 0; r < rows; ++r)
+			{
+				for (int c = 0; c < columns; ++c)
+				{
+					const Block& b = array[indexOf(r, c)];
+					if (b.type == Block::Type::EMPTY) continue;
 
-		// If you have a tileset helper, replace per-block fill with something like:
-		// int idx = b.getTypeIndex();
-		// if (idx >= 0) tileset.blit(renderer, idx, dst);
+					SDL_Rect dst{
+						c * blockSize.w,
+						r * blockSize.h,
+						blockSize.w,
+						blockSize.h
+					};
+
+					// Simple color coding for now; replace with tileset blit when integrated
+					Uint8 R = 200, G = 200, B = 200;
+					switch (b.type)
+					{
+					case Block::Type::Grass: R = 80; G = 180; B = 80; break;
+					case Block::Type::Ground: R = 150; G = 120; B = 70; break;
+					case Block::Type::RedBricks: R = 180; G = 60; B = 60; break;
+					case Block::Type::StoneFloor: R = 120; G = 120; B = 130; break;
+					case Block::Type::PuzzlePavement: R = 100; G = 80; B = 150; break;
+					default: break;
+					}
+
+					SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+					SDL_SetRenderDrawColor(renderer, R, G, B, 255);
+					SDL_RenderFillRect(renderer, &dst);
+				}
+			}
+		}
 	}
 }

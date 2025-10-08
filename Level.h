@@ -58,12 +58,51 @@ namespace ssge
 			// TODO: increment/decrement, directional moves, bounds helpers, deref, etc.
 		};
 
+		struct TilesetMeta
+		{
+			int tileW = 0;
+			int tileH = 0;
+			int columns = 0;  // tiles per row; 0 means "infer after load"
+			bool isValid() const { return tileW > 0 && tileH > 0; }
+			void inferColumnsFromTexture(const SdlTexture& tilesetTexture)
+			{
+				int tilesetWidth = 0, tilesetHeight = 0;
+				if (!tilesetTexture || !isValid())
+					return;
+
+				SDL_QueryTexture(
+					tilesetTexture,
+					nullptr,
+					nullptr,
+					&tilesetWidth,
+					&tilesetHeight
+				);
+
+				// Depending on how many whole tiles fit into the width of the texture,
+				// that's how many columns we shall have
+				columns = tilesetWidth / tileW;
+			}
+			SDL_Rect makeRectForTile(int index) const
+			{
+				if (columns == 0)
+					return SDL_Rect{ 0,0,0,0 };
+
+				SDL_Rect rect;
+				rect.w = tileW;
+				rect.h = tileH;
+				rect.x = (index % columns) * tileW;
+				rect.y = (index / columns) * tileH;
+				return rect;
+			}
+		};
 	public:
 		// Level never changes dimensions once constructed.
 		const int columns;
 		const int rows;
 		const SDL_Rect blockSize; // width/height of a single block in pixels
-		SdlTexture tileset;       // public on purpose (as requested)
+	private:
+		SdlTexture tileset;
+		TilesetMeta tilesMeta;
 
 	private:
 		// Flat array allocated with columns * rows elements.
@@ -104,6 +143,10 @@ namespace ssge
 		Block::Collision getCollisionAt(SDL_Point point) const;
 
 		SDL_Rect calculateLevelSize() const; // total pixel rectangle of the level starting at (0,0)
+
+		const SdlTexture& getTilesetTexture() const;
+		const TilesetMeta getTilesetMeta() const;
+		void setTileset(SdlTexture& SdlTexture);
 
 		void draw(DrawContext context) const; // conservative draw (no templates)
 
