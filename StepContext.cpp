@@ -110,7 +110,7 @@ double ssge::SceneStepContext::getDeltaTime()
 	return deltaTime;
 }
 
-ssge::SceneStepContext::SceneStepContext(ssge::Scene& currentScene, ssge::StepContext& stepContext)
+ssge::SceneStepContext::SceneStepContext(ssge::PassKey<ssge::SceneManager> pk, ssge::Scene& currentScene, ssge::StepContext& stepContext)
 	: engine(stepContext.getActualEngine()),
 	  scenes(stepContext.getActualSceneManager()),
 	  inputs(stepContext.getActualInputManager()),

@@ -2,17 +2,6 @@
 #include "Engine.h"
 #include "StepContext.h"
 
-//This will be deleted
-//ssge::StepContext ssge::Factory::ForEngine::stepContext(::ssge::Engine* actualEngine, double deltaTime)
-//{
-//    return ssge::StepContext(actualEngine, deltaTime);
-//}
-
-ssge::SceneStepContext ssge::Factory::ForSceneManager::sceneStepContext(::ssge::Scene& currentScene, ::ssge::StepContext& stepContext)
-{
-    return ssge::SceneStepContext(currentScene, stepContext);
-}
-
 ssge::GameWorldStepContext ssge::Factory::ForGameWorld::gameWorldStepContext(::ssge::GameWorld& currentGameWorld, ::ssge::SceneStepContext& sceneStepContext)
 {
     return ssge::GameWorldStepContext(currentGameWorld, sceneStepContext);

@@ -85,7 +85,7 @@ namespace ssge {
         StepContext& operator=(StepContext&&) = delete;
 
         // Trusted classes:
-        friend class Factory;
+        //TODO: Do something about this!
         friend class ::ssge::SceneStepContext; // For copying information into
     };
     
@@ -135,9 +135,9 @@ namespace ssge {
 
         double getDeltaTime();
 
+    public:
+        SceneStepContext(ssge::PassKey<SceneManager> pk, ssge::Scene& currentScene, ssge::StepContext& stepContext);
     private:
-        SceneStepContext(ssge::Scene& currentScene, ssge::StepContext& stepContext);
-
         ssge::Engine* getActualEngine();
         ssge::SceneManager* getActualSceneManager();
         ssge::InputManager* getActualInputManager();
@@ -154,7 +154,6 @@ namespace ssge {
         SceneStepContext& operator=(SceneStepContext&&) = delete;
 
         // Trusted classes:
-        friend class Factory;
         friend class ::ssge::GameWorldStepContext; // For initialization
     };
 
