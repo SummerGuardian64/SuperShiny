@@ -29,15 +29,6 @@ namespace ssge
 			~ForProgram() = delete;
 			static Engine* engine(Program& program);
 		};
-		class ForGameWorld
-		{
-			friend class ::ssge::GameWorld;
-			ForGameWorld() = delete;
-			ForGameWorld(const ForGameWorld& toCopy) = delete;
-			ForGameWorld(ForGameWorld&& toMove) = delete;
-			~ForGameWorld() = delete;
-			static ssge::GameWorldStepContext gameWorldStepContext(::ssge::GameWorld& currentGameWorld, ::ssge::SceneStepContext& sceneStepContext);
-		};
 		class ForEntityManager
 		{
 			friend class ::ssge::EntityManager;

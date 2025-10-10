@@ -222,9 +222,9 @@ namespace ssge {
 
         double getDeltaTime();
 
+    public:
+        GameWorldStepContext(ssge::PassKey<ssge::GameWorld> pk, ssge::GameWorld& currentGameWorld, ssge::SceneStepContext& sceneStepContext);
     private:
-        GameWorldStepContext(ssge::GameWorld& currentGameWorld, ssge::SceneStepContext& sceneStepContext);
-
         ssge::Engine* getActualEngine();
         ssge::SceneManager* getActualSceneManager();
         ssge::InputManager* getActualInputManager();
@@ -243,7 +243,6 @@ namespace ssge {
         GameWorldStepContext& operator=(GameWorldStepContext&&) = delete;
 
         // Trusted classes:
-        friend class Factory;
         friend class ::ssge::EntityStepContext; // For initialization
     };
 

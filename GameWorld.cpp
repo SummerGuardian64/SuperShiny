@@ -119,7 +119,7 @@ void GameWorld::init(SceneStepContext& context)
 void GameWorld::step(SceneStepContext& context)
 {
     //// Step all entities
-    GameWorldStepContext gameWorldStepContext = Factory::ForGameWorld::gameWorldStepContext(*this, context);
+    GameWorldStepContext gameWorldStepContext(ssge::PassKey<GameWorld>(), *this, context);
     entities.step(gameWorldStepContext);
 
     //// TODO: game victory/loss criteria check

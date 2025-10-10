@@ -202,7 +202,7 @@ double ssge::GameWorldStepContext::getDeltaTime()
 	return deltaTime;
 }
 
-ssge::GameWorldStepContext::GameWorldStepContext(ssge::GameWorld& currentGameWorld, ssge::SceneStepContext& sceneStepContext)
+ssge::GameWorldStepContext::GameWorldStepContext(ssge::PassKey<ssge::GameWorld> pk, ssge::GameWorld& currentGameWorld, ssge::SceneStepContext& sceneStepContext)
 	: engine(sceneStepContext.getActualEngine()),
 	scenes(sceneStepContext.getActualSceneManager()),
 	inputs(sceneStepContext.getActualInputManager()),
