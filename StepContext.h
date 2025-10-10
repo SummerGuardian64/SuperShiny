@@ -1,6 +1,7 @@
 #pragma once
 #include <memory>
 #include "SDL.h"
+#include "PassKey.h"
 
 namespace ssge {
     // Engine types
@@ -64,8 +65,9 @@ namespace ssge {
 
         double getDeltaTime();
 
+    public:
+        StepContext(ssge::PassKey<ssge::Engine> pk, ssge::Engine* actualEngine, double deltaTime);
     private:
-        StepContext(ssge::Engine* actualEngine, double deltaTime);
 
         ssge::Engine* getActualEngine();
         ssge::SceneManager* getActualSceneManager();

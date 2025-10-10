@@ -8,6 +8,7 @@
 #include "Program.h"
 #include "Game.h"
 #include "SDL.h"
+#include "PassKey.h"
 
 #include "SplashScreen.h"
 
@@ -85,8 +86,8 @@ bool ssge::Engine::update(double deltaTime)
 	inputs->latch();
 	
 	// Step the scenes via SceneManager
-	auto context = Factory::ForEngine::stepContext(this, deltaTime);
-	scenes->step(context);
+	StepContext stepContext(ssge::PassKey<ssge::Engine>(), this, deltaTime);
+	scenes->step(stepContext);
 
 	// Let this be the final update if we're finished
 	return !wannaFinish;

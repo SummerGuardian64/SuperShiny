@@ -74,7 +74,7 @@ double ssge::StepContext::getDeltaTime()
 	return deltaTime;
 }
 
-ssge::StepContext::StepContext(ssge::Engine* actualEngine, double deltaTime)
+ssge::StepContext::StepContext(ssge::PassKey<ssge::Engine> pk, ssge::Engine* actualEngine, double deltaTime)
 	: engine(actualEngine),
 	  scenes(actualEngine->getSceneManager()),
 	  inputs(actualEngine->getInputManager()),

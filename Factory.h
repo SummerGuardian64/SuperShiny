@@ -29,7 +29,8 @@ namespace ssge
 			~ForProgram() = delete;
 			static Engine* engine(Program& program);
 		};
-		class ForEngine
+		// This will be deleted
+		/*class ForEngine
 		{
 			friend class ::ssge::Engine;
 			ForEngine() = delete;
@@ -37,7 +38,7 @@ namespace ssge
 			ForEngine(ForEngine&& toMove) = delete;
 			~ForEngine() = delete;
 			static ssge::StepContext stepContext(::ssge::Engine* actualEngine, double deltaTime);
-		};
+		};*/
 		class ForSceneManager
 		{
 			friend class ::ssge::SceneManager;
