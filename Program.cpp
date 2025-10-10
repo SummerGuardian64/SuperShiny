@@ -4,9 +4,9 @@
 #include "SDL_image.h"
 #include "WindowManager.h"
 #include "Game.h"
-#include "Factory.h"
 #include "Engine.h"
 #include "DrawContext.h"
+#include "PassKey.h"
 
 using namespace ssge;
 
@@ -85,7 +85,7 @@ bool ssge::Program::init()
 
 bool ssge::Program::startEngine()
 {
-    engine = Factory::ForProgram::engine(*this);
+    engine = new Engine(ssge::PassKey<ssge::Program>(), *this);
     return engine->init();
 }
 

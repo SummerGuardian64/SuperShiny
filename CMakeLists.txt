@@ -22,7 +22,7 @@ add_executable (SuperShiny
   "InputManager.cpp" "InputManager.h"
   "StepContext.cpp" "StepContext.h"
   "DrawContext.cpp" "DrawContext.h"
-  "Factory.cpp" "Factory.h"
+   
   "Scene.cpp" "Scene.h"
   "GameWorld.cpp" "GameWorld.h"
   "Game.cpp" "Game.h"

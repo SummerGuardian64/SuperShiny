@@ -1,6 +1,5 @@
 #include "GameWorld.h"
 #include <string>
-#include "Factory.h"
 #include "DrawContext.h"
 #include "Game.h"
 

@@ -1,5 +1,6 @@
 #pragma once
 #include "SDL.h"
+#include "PassKey.h"
 
 namespace ssge
 {
@@ -12,11 +13,10 @@ namespace ssge
 
 	class Engine // The game engine core
 	{
-		friend class Factory;
 	private:
 		Program& program;
-
-		Engine(Program& program);
+	public:
+		Engine(ssge::PassKey<ssge::Program> pk, Program& program);
 		Engine(const Engine& toCopy) = delete;
 		Engine(Engine&& toMove) = delete;
 		~Engine();

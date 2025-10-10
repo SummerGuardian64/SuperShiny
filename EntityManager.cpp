@@ -1,6 +1,5 @@
 #include "EntityManager.h"
 #include "StepContext.h"
-#include "Factory.h"
 #include "Game.h"
 
 using namespace ssge;
