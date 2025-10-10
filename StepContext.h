@@ -321,9 +321,9 @@ namespace ssge {
 
         double getDeltaTime();
 
+    public:
+        EntityStepContext(ssge::PassKey<ssge::EntityManager> pk, ssge::GameWorldStepContext& gameWorldStepContext);
     private:
-        EntityStepContext(ssge::GameWorldStepContext& gameWorldStepContext);
-
         ssge::Engine* getActualEngine();
         ssge::SceneManager* getActualSceneManager();
         ssge::InputManager* getActualInputManager();

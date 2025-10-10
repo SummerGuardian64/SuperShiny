@@ -10,7 +10,7 @@ void ssge::EntityManager::step(GameWorldStepContext& context)
     // Step all entities
     for (auto& entityPtr : entities)
     {
-        EntityStepContext entityStepContext = Factory::ForEntityManager::entityStepContext(context);
+        EntityStepContext entityStepContext(ssge::PassKey<ssge::EntityManager>(), context);
         entityPtr->step(entityStepContext);
     }
 
@@ -155,7 +155,7 @@ void EntityManager::destroyScheduledEntities(GameWorldStepContext& context)
     {
         if ((*it)->isScheduledToDestroy())
         {
-            EntityStepContext entityStepContext = Factory::ForEntityManager::entityStepContext(context);
+            EntityStepContext entityStepContext(ssge::PassKey<EntityManager>(), context);
             (*it)->onDestroy(entityStepContext);
             it = entities.erase(it);
         }

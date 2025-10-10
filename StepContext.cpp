@@ -313,7 +313,7 @@ double ssge::EntityStepContext::getDeltaTime()
 	return deltaTime;
 }
 
-ssge::EntityStepContext::EntityStepContext(ssge::GameWorldStepContext& gameWorldStepContext)
+ssge::EntityStepContext::EntityStepContext(ssge::PassKey<ssge::EntityManager> pk, ssge::GameWorldStepContext& gameWorldStepContext)
 	: engine(gameWorldStepContext.getActualEngine()),
 	scenes(gameWorldStepContext.getActualSceneManager()),
 	inputs(gameWorldStepContext.getActualInputManager()),
