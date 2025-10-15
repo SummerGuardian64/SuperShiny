@@ -34,7 +34,11 @@ add_executable (SuperShiny
   "Shiny.cpp" "Shiny.h"
   "Sprite.cpp" "Sprite.h"
   "SdlTexture.h"
- "Level.cpp" "Level.h" "Utilities.h" "Utilities.cpp" "PassKey.h" "Accessor.h")
+  "Level.cpp" "Level.h"
+  "Utilities.h" "Utilities.cpp"
+  "PassKey.h"
+  "Accessor.h" "Accessor.cpp"
+)
 
 # Link against SDL2 and SDL2_image
 # SDL2main is needed on Windows to provide a main() wrapper

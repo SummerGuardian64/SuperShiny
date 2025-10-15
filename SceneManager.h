@@ -14,11 +14,12 @@ namespace ssge
 		friend class Engine;
 	private:
 		std::unique_ptr<Scene> currentScene;
-		bool paused;
-		bool sceneInitialized;
+		bool paused = false;
+		bool wannaPause = false;
+		bool sceneInitialized = false;
 		std::unique_ptr<Scene> queuedScene;
-		uint8_t fadeVal;
-		bool wannaWrapUp;
+		uint8_t fadeVal = 0;
+		bool wannaWrapUp = false;
 
 		SceneManager();
 		SceneManager(const SceneManager& toCopy) = delete;

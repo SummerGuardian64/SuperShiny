@@ -8,10 +8,6 @@
 
 ssge::SceneManager::SceneManager()
 {
-	paused = false;
-	sceneInitialized = false;
-	fadeVal = 0;
-	wannaWrapUp = false;
 }
 
 ssge::SceneManager::~SceneManager()
@@ -21,6 +17,9 @@ ssge::SceneManager::~SceneManager()
 void ssge::SceneManager::step(StepContext& context)
 {
 	std::cout << "SceneManager::step()" << std::endl;
+
+	paused = wannaPause;
+
 	if (auto scene = getCurrentScene())
 	{
 		if (!isSceneInitialized())
@@ -163,12 +162,12 @@ bool ssge::SceneManager::isFadeFinished() const
 
 void ssge::SceneManager::pause()
 {
-	paused = true;
+	wannaPause = true;
 }
 
 void ssge::SceneManager::unpause()
 {
-	paused = false;
+	wannaPause = false;
 }
 
 bool ssge::SceneManager::togglePause()
@@ -179,7 +178,7 @@ bool ssge::SceneManager::togglePause()
 
 void ssge::SceneManager::setPause(bool pause)
 {
-	paused = pause;
+	wannaPause = pause;
 }
 
 void ssge::SceneManager::shutdown()
