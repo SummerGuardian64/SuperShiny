@@ -14,6 +14,7 @@
 
 ssge::Engine::Engine(ssge::PassKey<ssge::Program> pk, ssge::Program& program) : program(program)
 {
+	window = new WindowManager(PassKey<Engine>());
 	scenes = new SceneManager();
 	inputs = new InputManager();
 	wannaFinish = false;
@@ -27,6 +28,16 @@ ssge::Engine::~Engine()
 
 bool ssge::Engine::init()
 {
+	// Initialize program window
+	if (auto error = getWindowManager()->init(ssge::Game::APPLICATION_TITLE, 1280, 720))
+	{
+		std::cout << error << std::endl;
+		return false;
+	}
+
+	//TODO: Better error handling
+	loadInitialResources(window->getRenderer());
+
 	if (!prepareInitialState()) return false;
 	
 	return true;
@@ -108,6 +119,11 @@ void ssge::Engine::render(DrawContext context)
 
 void ssge::Engine::shutdown()
 {
+	if (window)
+	{
+		delete window;
+		window = nullptr;
+	}
 	if (scenes)
 	{
 		delete scenes;
@@ -132,7 +148,7 @@ ssge::InputManager* ssge::Engine::getInputManager()
 
 ssge::WindowManager* ssge::Engine::getWindowManager()
 {
-	return program.window;
+	return window;
 }
 
 void ssge::Engine::finish()

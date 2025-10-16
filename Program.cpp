@@ -1,7 +1,7 @@
 #include "Program.h"
 #include <iostream>
 #include "SDL.h"
-#include "SDL_image.h"
+#include "SDL_image.h""
 #include "WindowManager.h"
 #include "Game.h"
 #include "Engine.h"
@@ -21,12 +21,14 @@ int ssge::Program::run(int argc, char* argv[])
 ssge::Program::Program()
 {
     engine = nullptr;
-    window = new WindowManager();
 }
 
 ssge::Program::~Program()
 {
-    delete window;
+    if (engine)
+    {
+        delete engine;
+    }
 }
 
 int ssge::Program::_run(int argc, char* argv[])
@@ -70,16 +72,6 @@ bool ssge::Program::init()
         return false;
     }
 
-    // Initialize program window
-    else if (auto error = window->init(ssge::Game::APPLICATION_TITLE, 1280, 720))
-    {
-        std::cout << error << std::endl;
-        success = false;
-    }
-
-    //TODO: Better error handling
-    engine->loadInitialResources(window->getRenderer());
-
     return success;
 }
 
@@ -91,7 +83,7 @@ bool ssge::Program::startEngine()
 
 bool ssge::Program::mainLoop()
 {
-    SDL_Renderer* renderer = window->getRenderer();
+    SDL_Renderer* renderer = engine->getWindowManager()->getRenderer();
 
     int virtualWidth = Game::VIRTUAL_WIDTH;
     int virtualHeight = Game::VIRTUAL_HEIGHT;
@@ -144,7 +136,7 @@ bool ssge::Program::mainLoop()
             SDL_RenderClear(renderer);
 
             // Render the gameScreen texture scaled to best fit the window.
-            SDL_Rect fitRect = window->makeBestFitScale();
+            SDL_Rect fitRect = engine->getWindowManager()->makeBestFitScale();
             SDL_RenderCopy(renderer, gameScreen, NULL, &fitRect);
 
             SDL_RenderPresent(renderer);
@@ -167,10 +159,7 @@ bool ssge::Program::shutdown()
 
     if (engine)
         engine->shutdown();
-
-    // Shut down the program window
-    window->shutdown();
-
+    
     IMG_Quit();
     SDL_Quit();
     return true;

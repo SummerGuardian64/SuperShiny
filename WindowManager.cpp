@@ -1,19 +1,22 @@
 #include "WindowManager.h"
 #include "Game.h"
+#include "PassKey.h"
 
-ssge::WindowManager::WindowManager()
+using namespace ssge;
+
+WindowManager::WindowManager(PassKey<Engine> pk)
 {
     window = nullptr;
     windowSurface = nullptr;
     renderer = nullptr;
 }
 
-ssge::WindowManager::~WindowManager()
+WindowManager::~WindowManager()
 {
     shutdown();
 }
 
-const char* ssge::WindowManager::init(const char* title, int width, int height)
+const char* WindowManager::init(const char* title, int width, int height)
 {
     // Don't re-create the window!
     if (window)
@@ -49,25 +52,25 @@ const char* ssge::WindowManager::init(const char* title, int width, int height)
     return nullptr;
 }
 
-SDL_Window* ssge::WindowManager::getWindow() const
+SDL_Window* WindowManager::getWindow() const
 {
     return window;
 }
 
-SDL_Surface* ssge::WindowManager::getWindowSurface() const
+SDL_Surface* WindowManager::getWindowSurface() const
 {
     return windowSurface;
 }
 
-SDL_Renderer* ssge::WindowManager::getRenderer() const
+SDL_Renderer* WindowManager::getRenderer() const
 {
     return renderer;
 }
 
-SDL_Rect ssge::WindowManager::makeBestFitScale()
+SDL_Rect WindowManager::makeBestFitScale()
 {
-    int virtualWidth = ssge::Game::VIRTUAL_WIDTH;
-    int virtualHeight = ssge::Game::VIRTUAL_HEIGHT;
+    int virtualWidth = Game::VIRTUAL_WIDTH;
+    int virtualHeight = Game::VIRTUAL_HEIGHT;
     
     int windowWidth;
     int windowHeight;
@@ -84,12 +87,12 @@ SDL_Rect ssge::WindowManager::makeBestFitScale()
     return SDL_Rect{dstX, dstY, dstW, dstH};
 }
 
-void ssge::WindowManager::updateWindow()
+void WindowManager::updateWindow()
 {
     SDL_UpdateWindowSurface(window);
 }
 
-void ssge::WindowManager::shutdown()
+void WindowManager::shutdown()
 {
     if (renderer)
     {

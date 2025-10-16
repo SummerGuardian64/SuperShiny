@@ -49,6 +49,7 @@ namespace ssge
 
 		void wrapUp();
 	private:
+		WindowManager* window;
 		// Manages scenes
 		SceneManager* scenes;
 		// Manages inputs
