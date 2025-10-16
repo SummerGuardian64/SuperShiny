@@ -2,7 +2,7 @@
 
 using namespace ssge;
 
-ssge::DrawContext::DrawContext(SDL_Renderer* const renderer)
+DrawContext::DrawContext(SDL_Renderer* const renderer)
 	:
 	renderer(renderer),
 	bounds({0,0,0,0}),
@@ -33,7 +33,7 @@ DrawContext::DrawContext(
 	renderTarget(renderTarget)
 { }
 
-ssge::DrawContext::DrawContext(const DrawContext& toCopy)
+DrawContext::DrawContext(const DrawContext& toCopy)
 	:
 	renderer(toCopy.renderer),
 	bounds(toCopy.bounds),
@@ -48,27 +48,27 @@ SDL_Renderer* DrawContext::getRenderer() const
 	return renderer;
 }
 
-SDL_Rect ssge::DrawContext::getBounds() const
+SDL_Rect DrawContext::getBounds() const
 {
 	return bounds;
 }
 
-SDL_Point ssge::DrawContext::getOrigin() const
+SDL_Point DrawContext::getOrigin() const
 {
 	return origin;
 }
 
-double ssge::DrawContext::getDeltaTime() const
+double DrawContext::getDeltaTime() const
 {
 	return deltaTime;
 }
 
-SDL_Point ssge::DrawContext::getScrollOffset() const
+SDL_Point DrawContext::getScrollOffset() const
 {
 	return scrollOffset;
 }
 
-SDL_Point ssge::DrawContext::calculateAnchorPoint() const
+SDL_Point DrawContext::calculateAnchorPoint() const
 {
 	SDL_Point anchor = this->origin;
 	anchor.x += scrollOffset.x;
@@ -76,12 +76,12 @@ SDL_Point ssge::DrawContext::calculateAnchorPoint() const
 	return anchor;
 }
 
-DrawContext ssge::DrawContext::clone() const
+DrawContext DrawContext::clone() const
 {
 	return DrawContext(*this);
 }
 
-DrawContext ssge::DrawContext::deriveForScrolling(SDL_Point offset) const
+DrawContext DrawContext::deriveForScrolling(SDL_Point offset) const
 {
 	DrawContext derivedContext = DrawContext(*this);
 
@@ -90,7 +90,7 @@ DrawContext ssge::DrawContext::deriveForScrolling(SDL_Point offset) const
 	return derivedContext;
 }
 
-DrawContext ssge::DrawContext::deriveForEntity(SDL_FPoint entityPosition) const
+DrawContext DrawContext::deriveForEntity(SDL_FPoint entityPosition) const
 {
 	DrawContext derivedContext = DrawContext(*this);
 
@@ -99,12 +99,12 @@ DrawContext ssge::DrawContext::deriveForEntity(SDL_FPoint entityPosition) const
 	return derivedContext;
 }
 
-void ssge::DrawContext::applyTarget() const
+void DrawContext::applyTarget() const
 {
 	SDL_SetRenderTarget(renderer, renderTarget);
 }
 
-void ssge::DrawContext::commitFromSubContext(const DrawContext& subContext, const SDL_Point where)
+void DrawContext::commitFromSubContext(const DrawContext& subContext, const SDL_Point where)
 {
 	// Nothing to commit if renderTarget is null
 	if (subContext.renderTarget == nullptr)

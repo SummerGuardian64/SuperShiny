@@ -14,7 +14,7 @@ find_package(SDL2_image REQUIRED)
 
 # Add source to this project's executable.
 add_executable (SuperShiny
-  "SuperShiny.cpp" "SuperShiny.h"
+  "main.cpp" 
   "Program.cpp" "Program.h"
   "Engine.cpp" "Engine.h"
   "WindowManager.cpp" "WindowManager.h"

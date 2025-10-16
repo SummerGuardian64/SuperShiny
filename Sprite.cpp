@@ -9,7 +9,7 @@ Sprite::Animation::Sequence::Sequence()
 	loopTo = 0;
 }
 
-ssge::Sprite::Animation::Sequence::Sequence(int speed, int altSpeed, int loopTo)
+Sprite::Animation::Sequence::Sequence(int speed, int altSpeed, int loopTo)
 {
 	this->speed = speed;
 	this->altSpeed = altSpeed;
@@ -275,7 +275,7 @@ void Sprite::update(float deltaTime)
 	}
 }
 
-void ssge::Sprite::draw(DrawContext context) const
+void Sprite::draw(DrawContext context) const
 {
 	render(context.getRenderer(), context.calculateAnchorPoint());
 }
@@ -338,20 +338,20 @@ void Sprite::render(SDL_Renderer* renderer, SDL_Point offsetFromViewport) const
 	SDL_SetTextureAlphaMod(definition.spritesheet, 255);
 }
 
-ssge::Sprite::Image::Image(int x, int y, int w, int h, int cx, int cy)
+Sprite::Image::Image(int x, int y, int w, int h, int cx, int cy)
 {
 	region = { x,y,w,h };
 	anchor = { cx,cy };
 }
 
-Sprite::Animation::Sequence& ssge::Sprite::Definition::addSequence()
+Sprite::Animation::Sequence& Sprite::Definition::addSequence()
 {
 	Sprite::Animation::Sequence seq;
 	sequences.push_back(std::move(seq));
 	return sequences.back();
 }
 
-Sprite::Animation::Sequence& ssge::Sprite::Definition::addSequence(int speed, int altSpeed, int loopTo)
+Sprite::Animation::Sequence& Sprite::Definition::addSequence(int speed, int altSpeed, int loopTo)
 {
 	Sprite::Animation::Sequence seq(speed, altSpeed, loopTo);
 	sequences.push_back(std::move(seq));

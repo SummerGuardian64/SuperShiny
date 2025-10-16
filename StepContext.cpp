@@ -1,11 +1,13 @@
 #include "StepContext.h"
 
+using namespace ssge;
+
 // ---- StepContextBase -------------------------------------------------
-ssge::StepContextBase::StepContextBase(double deltaTime) : deltaTime(deltaTime) {}
+StepContextBase::StepContextBase(double deltaTime) : deltaTime(deltaTime) {}
 
 // ---- StepContext -----------------------------------------------------
-ssge::StepContext::StepContext(
-    ssge::PassKey<ssge::Engine> /*pk*/,
+StepContext::StepContext(
+    PassKey<Engine> /*pk*/,
     double deltaTime,
     EngineAccess engine_,
     ScenesAccess scenes_,
@@ -21,8 +23,8 @@ ssge::StepContext::StepContext(
 }
 
 // ---- SceneStepContext -----------------------------------------------
-ssge::SceneStepContext::SceneStepContext(
-    ssge::PassKey<ssge::SceneManager> /*pk*/,
+SceneStepContext::SceneStepContext(
+    PassKey<SceneManager> /*pk*/,
     double deltaTime,
     EngineAccess engine_,
     ScenesAccess scenes_,
@@ -40,8 +42,8 @@ ssge::SceneStepContext::SceneStepContext(
 }
 
 // ---- GameWorldStepContext -------------------------------------------
-ssge::GameWorldStepContext::GameWorldStepContext(
-    ssge::PassKey<ssge::GameWorld> /*pk*/,
+GameWorldStepContext::GameWorldStepContext(
+    PassKey<GameWorld> /*pk*/,
     double deltaTime,
     EngineAccess engine_,
     ScenesAccess scenes_,
@@ -61,8 +63,8 @@ ssge::GameWorldStepContext::GameWorldStepContext(
 }
 
 // ---- EntityStepContext ----------------------------------------------
-ssge::EntityStepContext::EntityStepContext(
-    ssge::PassKey<ssge::EntityManager> /*pk*/,
+EntityStepContext::EntityStepContext(
+    PassKey<EntityManager> /*pk*/,
     double deltaTime,
     EngineAccess engine_,
     ScenesAccess scenes_,

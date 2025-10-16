@@ -6,7 +6,7 @@ using namespace ssge;
 
 const char Game::APPLICATION_TITLE[] = "Super Shiny";
 
-bool ssge::Game::init(SDL_Renderer* renderer)
+bool Game::init(SDL_Renderer* renderer)
 {
 	static bool initialized = false;
 	if (initialized)
@@ -43,10 +43,10 @@ int Game::Entities::getRegistrySize()
     return static_cast<int>(sizeof(registry) / sizeof(registry[0]));
 }
 
-bool ssge::Game::Sprites::_init(SDL_Renderer* renderer)
+bool Game::Sprites::_init(SDL_Renderer* renderer)
 {
-	using Image = ssge::Sprite::Image;
-	using Sequence = ssge::Sprite::Animation::Sequence;
+	using Image = Sprite::Image;
+	using Sequence = Sprite::Animation::Sequence;
 
 	sprdefShiny.spritesheet = SdlTexture("Sprites/Shiny.png", renderer);
 
@@ -61,7 +61,7 @@ bool ssge::Game::Sprites::_init(SDL_Renderer* renderer)
 
 Sprite::Definition Game::Sprites::sprdefShiny;
 
-Sprite::Definition& ssge::Game::Sprites::shiny()
+Sprite::Definition& Game::Sprites::shiny()
 {
 	return sprdefShiny;
 }
@@ -74,14 +74,14 @@ extern const unsigned char g_Level_01[] =
 	16,0,0,0, // rows
 	32,0,0,0, // blockWidth
 	32,0,0,0, // blockHeight
-	(unsigned char)ssge::Level::Block::Collision::Solid,
-	(unsigned char)ssge::Level::Block::Collision::Air,
-	(unsigned char)ssge::Level::Block::Collision::Solid,
-	(unsigned char)ssge::Level::Block::Collision::Solid,
-	(unsigned char)ssge::Level::Block::Collision::Solid,
-	(unsigned char)ssge::Level::Block::Collision::Solid,
-	(unsigned char)ssge::Level::Block::Collision::Solid,
-	(unsigned char)ssge::Level::Block::Collision::Solid,
+	(unsigned char)Level::Block::Collision::Solid,
+	(unsigned char)Level::Block::Collision::Air,
+	(unsigned char)Level::Block::Collision::Solid,
+	(unsigned char)Level::Block::Collision::Solid,
+	(unsigned char)Level::Block::Collision::Solid,
+	(unsigned char)Level::Block::Collision::Solid,
+	(unsigned char)Level::Block::Collision::Solid,
+	(unsigned char)Level::Block::Collision::Solid,
 	21,0,'T','i','l','e','s','e','t','s','\\','k','i','p','t','i','l','e','s','.','p','n','g',
 	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,

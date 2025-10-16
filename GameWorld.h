@@ -25,7 +25,7 @@ namespace ssge
         GameWorld();
         GameWorld(int wantedLevel);
         Scene& getAsScene();
-        ssge::EntityManager entities;
+        EntityManager entities;
         std::unique_ptr<Level> level;
         //HintManager hints;
         bool isGameplayOver() const;

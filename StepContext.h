@@ -30,7 +30,7 @@ namespace ssge {
         DrawingAccess drawing;
 
         explicit StepContext(
-            ssge::PassKey<ssge::Engine> pk,
+            PassKey<Engine> pk,
             double deltaTime,
             EngineAccess engine,
             ScenesAccess scenes,
@@ -48,7 +48,7 @@ namespace ssge {
         CurrentSceneAccess currentScene;
 
         explicit SceneStepContext(
-            ssge::PassKey<ssge::SceneManager> pk,
+            PassKey<SceneManager> pk,
             double deltaTime,
             EngineAccess engine,
             ScenesAccess scenes,
@@ -68,7 +68,7 @@ namespace ssge {
         GameWorldAccess gameWorld;
 
         explicit GameWorldStepContext(
-            ssge::PassKey<ssge::GameWorld> pk,
+            PassKey<GameWorld> pk,
             double deltaTime,
             EngineAccess engine,
             ScenesAccess scenes,
@@ -91,7 +91,7 @@ namespace ssge {
         EntitiesAccess entities;
 
         explicit EntityStepContext(
-            ssge::PassKey<ssge::EntityManager> pk,
+            PassKey<EntityManager> pk,
             double deltaTime,
             EngineAccess engine,
             ScenesAccess scenes,

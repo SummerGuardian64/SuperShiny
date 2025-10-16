@@ -4,29 +4,31 @@
 #include <iostream>
 #include "Utilities.h"
 
-ssge::Entity::Entity()
+using namespace ssge;
+
+Entity::Entity()
 {
 }
 
-SDL_FPoint ssge::Entity::Physics::setVelocityMagnitude(const SDL_FPoint& v, float speed)
+SDL_FPoint Entity::Physics::setVelocityMagnitude(const SDL_FPoint& v, float speed)
 {
 	return SDL_FPoint();
 }
 
-float ssge::Entity::Physics::getDistance(const Entity& other) const
+float Entity::Physics::getDistance(const Entity& other) const
 {
 	//FIXME: UNIMPLEMENTED!
 	return 0.0f;
 }
 
-ssge::Entity::Physics::Physics(Entity& entity)
+Entity::Physics::Physics(Entity& entity)
 	: entity(entity),
 	  position(entity.position),
 	  hitbox(entity.hitbox)
 {
 }
 
-void ssge::Entity::Physics::step(EntityStepContext& context)
+void Entity::Physics::step(EntityStepContext& context)
 {
 	//// If we wanna process velocity
 	//if (processVelocity)
@@ -524,11 +526,11 @@ void ssge::Entity::Physics::step(EntityStepContext& context)
     }
 }
 
-ssge::Entity::NPC::NPC(Entity& entity) : entity(entity)
+Entity::NPC::NPC(Entity& entity) : entity(entity)
 {
 }
 
-void ssge::Entity::step(EntityStepContext& context)
+void Entity::step(EntityStepContext& context)
 {
 	double deltaTime = context.deltaTime;
 
@@ -562,7 +564,7 @@ void ssge::Entity::step(EntityStepContext& context)
 	std::cout << "Entity " << (void*)this << " has been there for " << lifespan << std::endl;
 }
 
-void ssge::Entity::draw(DrawContext context) const
+void Entity::draw(DrawContext context) const
 {
 	preDraw(context);
 
@@ -574,12 +576,12 @@ void ssge::Entity::draw(DrawContext context) const
 	postDraw(context);
 }
 
-void ssge::Entity::destroy()
+void Entity::destroy()
 {
 	scheduledToDestroy = true;
 }
 
-ssge::Entity::Control::Control(Entity& entity) : entity(entity)
+Entity::Control::Control(Entity& entity) : entity(entity)
 {
 	mode = Mode::None;
 	ignore = false;

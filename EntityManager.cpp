@@ -5,13 +5,13 @@
 
 using namespace ssge;
 
-void ssge::EntityManager::step(GameWorldStepContext& context)
+void EntityManager::step(GameWorldStepContext& context)
 {
     // Step all entities
     for (auto& entityPtr : entities)
     {
         EntityStepContext entityStepContext(
-            ssge::PassKey<EntityManager>(),
+            PassKey<EntityManager>(),
             context.deltaTime,
             context.engine,
             context.scenes,
@@ -28,7 +28,7 @@ void ssge::EntityManager::step(GameWorldStepContext& context)
     destroyScheduledEntities(context);
 }
 
-void ssge::EntityManager::draw(DrawContext& context)
+void EntityManager::draw(DrawContext& context)
 {
     for (auto& entity : entities)
     {
@@ -61,7 +61,7 @@ EntityReference EntityManager::addEntity(EntityClassID id)
 	return EntityReference(entity);
 }
 
-bool ssge::EntityManager::deleteEntity(EntityReference entity)
+bool EntityManager::deleteEntity(EntityReference entity)
 {
     auto it = std::find(entities.begin(), entities.end(), entity);
 
@@ -167,7 +167,7 @@ void EntityManager::destroyScheduledEntities(GameWorldStepContext& context)
         if ((*it)->isScheduledToDestroy())
         {
             EntityStepContext entityStepContext(
-                ssge::PassKey<ssge::EntityManager>(),
+                PassKey<EntityManager>(),
                 context.deltaTime,
                 context.engine,
                 context.scenes,

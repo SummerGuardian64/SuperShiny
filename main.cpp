@@ -1,5 +1,5 @@
 ﻿// SuperShiny.cpp : Defines the entry point for the application.
 //
 
-#include "SuperShiny.h"
+#include "Program.h"
 int main(int argc, char* argv[]) { return ssge::Program::run(argc, argv); }

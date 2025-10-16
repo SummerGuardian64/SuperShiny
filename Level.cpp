@@ -35,17 +35,17 @@ namespace ssge
 		p += 8; return true;
 	}
 
-	inline ssge::Level::Block::Collision toCollision(uint8_t v) {
-		using C = ssge::Level::Block::Collision;
+	inline Level::Block::Collision toCollision(uint8_t v) {
+		using C = Level::Block::Collision;
 		return (v < (uint8_t)C::TOTAL) ? (C)v : C::Air;
 	}
-	inline ssge::Level::Block::Type toType(uint8_t v) {
-		using T = ssge::Level::Block::Type;
+	inline Level::Block::Type toType(uint8_t v) {
+		using T = Level::Block::Type;
 		return (v < (uint8_t)T::TOTAL) ? (T)v : T::EMPTY;
 	}
 
 
-	std::unique_ptr<ssge::Level> ssge::Level::loadFromBytes(
+	std::unique_ptr<Level> Level::loadFromBytes(
 		const unsigned char* data,
 		std::size_t size,
 		std::string* outTilesetPath,

@@ -4,23 +4,25 @@
 #include "GameWorld.h"
 #include "DrawContext.h"
 
-SceneClassID ssge::SplashScreen::getSceneClassID() const
+using namespace ssge;
+
+SceneClassID SplashScreen::getSceneClassID() const
 {
 	return SceneClassID::SplashScreen;
 }
 
-ssge::SplashScreen::SplashScreen()
+SplashScreen::SplashScreen()
 {
 	backgroundTexture = nullptr;
 }
 
-ssge::SplashScreen::~SplashScreen()
+SplashScreen::~SplashScreen()
 {
 	if (backgroundTexture)
 		SDL_DestroyTexture(backgroundTexture);
 }
 
-void ssge::SplashScreen::init(ssge::SceneStepContext& context)
+void SplashScreen::init(SceneStepContext& context)
 {
 	SDL_Renderer* renderer = context.drawing.getRenderer();
 	SDL_Surface* surface = SDL_LoadBMP("Splash.bmp");
@@ -40,7 +42,7 @@ void ssge::SplashScreen::init(ssge::SceneStepContext& context)
 	}
 }
 
-void ssge::SplashScreen::step(ssge::SceneStepContext& context)
+void SplashScreen::step(SceneStepContext& context)
 {
 	if (context.inputs.isJustPressed(4))
 	{
@@ -48,7 +50,7 @@ void ssge::SplashScreen::step(ssge::SceneStepContext& context)
 	}
 }
 
-void ssge::SplashScreen::draw(ssge::DrawContext& context)
+void SplashScreen::draw(DrawContext& context)
 {
 	SDL_Renderer* renderer = context.getRenderer();
 	SDL_Rect screenRect = context.getBounds();
