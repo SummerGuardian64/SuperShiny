@@ -8,7 +8,8 @@
 #include "Game.h"
 #include "SDL.h"
 #include "PassKey.h"
-
+#include "WindowManager.h"
+#include "Accessor.h"
 #include "SplashScreen.h"
 
 ssge::Engine::Engine(ssge::PassKey<ssge::Program> pk, ssge::Program& program) : program(program)
@@ -85,7 +86,15 @@ bool ssge::Engine::update(double deltaTime)
 	inputs->latch();
 	
 	// Step the scenes via SceneManager
-	StepContext stepContext(ssge::PassKey<ssge::Engine>(), this, deltaTime);
+	StepContext stepContext(
+		ssge::PassKey<ssge::Engine>(),
+		deltaTime,
+		EngineAccess(this),
+		ScenesAccess(scenes),
+		InputsAccess(inputs),
+		DrawingAccess(getWindowManager()->getRenderer())
+	);
+
 	scenes->step(stepContext);
 
 	// Let this be the final update if we're finished

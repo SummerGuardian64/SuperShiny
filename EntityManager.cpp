@@ -1,6 +1,7 @@
 #include "EntityManager.h"
 #include "StepContext.h"
 #include "Game.h"
+#include "PassKey.h"
 
 using namespace ssge;
 
@@ -9,7 +10,18 @@ void ssge::EntityManager::step(GameWorldStepContext& context)
     // Step all entities
     for (auto& entityPtr : entities)
     {
-        EntityStepContext entityStepContext(ssge::PassKey<ssge::EntityManager>(), context);
+        EntityStepContext entityStepContext(
+            ssge::PassKey<EntityManager>(),
+            context.deltaTime,
+            context.engine,
+            context.scenes,
+            context.inputs,
+            context.drawing,
+            context.currentScene,
+            context.gameWorld,
+            EntitiesAccess(this)
+        );
+
         entityPtr->step(entityStepContext);
     }
 
@@ -154,7 +166,17 @@ void EntityManager::destroyScheduledEntities(GameWorldStepContext& context)
     {
         if ((*it)->isScheduledToDestroy())
         {
-            EntityStepContext entityStepContext(ssge::PassKey<EntityManager>(), context);
+            EntityStepContext entityStepContext(
+                ssge::PassKey<ssge::EntityManager>(),
+                context.deltaTime,
+                context.engine,
+                context.scenes,
+                context.inputs,
+                context.drawing,
+                context.currentScene,
+                context.gameWorld,
+                EntitiesAccess(this)
+            );
             (*it)->onDestroy(entityStepContext);
             it = entities.erase(it);
         }

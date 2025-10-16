@@ -5,6 +5,7 @@
 #include "SDL.h"
 #include "DrawContext.h"
 #include "PassKey.h"
+#include "Accessor.h"
 
 ssge::SceneManager::SceneManager()
 {
@@ -24,13 +25,29 @@ void ssge::SceneManager::step(StepContext& context)
 	{
 		if (!isSceneInitialized())
 		{
-			SceneStepContext sceneStepContext(ssge::PassKey<ssge::SceneManager>(), *scene, context);
+			SceneStepContext sceneStepContext(
+				ssge::PassKey<ssge::SceneManager>(),
+				context.deltaTime,
+				context.engine,
+				context.scenes,
+				context.inputs,
+				context.drawing,
+				CurrentSceneAccess(scene)
+			);
 			scene->init(sceneStepContext);
 			sceneInitialized = true;
 		}
 		if (!isPaused() && !queuedScene)
 		{
-			SceneStepContext sceneStepContext(ssge::PassKey<ssge::SceneManager>(), *scene, context);
+			SceneStepContext sceneStepContext(
+				ssge::PassKey<ssge::SceneManager>(),
+				context.deltaTime,
+				context.engine,
+				context.scenes,
+				context.inputs,
+				context.drawing,
+				CurrentSceneAccess(scene)
+			);
 			scene->step(sceneStepContext);
 		}
 	}

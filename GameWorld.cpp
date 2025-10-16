@@ -2,6 +2,8 @@
 #include <string>
 #include "DrawContext.h"
 #include "Game.h"
+#include "PassKey.h"
+#include "Accessor.h"
 
 using namespace ssge;
 
@@ -118,7 +120,18 @@ void GameWorld::init(SceneStepContext& context)
 void GameWorld::step(SceneStepContext& context)
 {
     //// Step all entities
-    GameWorldStepContext gameWorldStepContext(ssge::PassKey<GameWorld>(), *this, context);
+    GameWorldStepContext gameWorldStepContext(
+        ssge::PassKey<GameWorld>(),
+        context.deltaTime,
+        context.engine,
+        context.scenes,
+        context.inputs,
+        context.drawing,
+        context.currentScene,
+        GameWorldAccess(this)
+    );
+
+
     entities.step(gameWorldStepContext);
 
     //// TODO: game victory/loss criteria check

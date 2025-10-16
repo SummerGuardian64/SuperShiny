@@ -27,10 +27,13 @@ namespace ssge {
         SceneManager* actual;
     public:
         explicit ScenesAccess(SceneManager* actual) : actual(actual) {}
-        void changeScene(SceneClassID newScene);
-        void pause(bool pause = true);
+        void changeScene(SceneClassID sceneClassID);
+        void goToLevel(int wantedLevel);
+        void pause();
         void unpause();
-        bool isPaused();
+        bool togglePause();
+        bool isPaused() const;
+        void setPause(bool pause);
     };
 
     class InputsAccess {
@@ -45,7 +48,7 @@ namespace ssge {
     class DrawingAccess {
         SDL_Renderer* renderer;
     public:
-        explicit DrawingAccess(SDL_Renderer* r) : renderer(renderer) {}
+        explicit DrawingAccess(SDL_Renderer* renderer) : renderer(renderer) {}
         SDL_Renderer* getRenderer() const { return renderer; }
         void fillRect(const SDL_Rect& rect, SDL_Color color) const {
             if (!renderer) return;

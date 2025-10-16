@@ -530,7 +530,7 @@ ssge::Entity::NPC::NPC(Entity& entity) : entity(entity)
 
 void ssge::Entity::step(EntityStepContext& context)
 {
-	double deltaTime = context.getDeltaTime();
+	double deltaTime = context.deltaTime;
 
 	// If this is the entity's first step, execute it
 	if (lifespan == 0)

@@ -44,7 +44,7 @@ void ssge::SplashScreen::step(ssge::SceneStepContext& context)
 {
 	if (context.inputs.isJustPressed(4))
 	{
-		context.scenes.changeScene(std::make_unique<GameWorld>(1));
+		context.scenes.goToLevel(1);
 	}
 }
 
