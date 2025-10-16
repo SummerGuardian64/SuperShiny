@@ -1,21 +1,22 @@
 #include "SceneManager.h"
 #include <iostream>
 #include <algorithm>
-#include "StepContext.h"
 #include "SDL.h"
+#include "StepContext.h"
 #include "DrawContext.h"
-#include "PassKey.h"
 #include "Accessor.h"
 
-ssge::SceneManager::SceneManager()
+using namespace ssge;
+
+SceneManager::SceneManager(PassKey<Engine> pk)
 {
 }
 
-ssge::SceneManager::~SceneManager()
+SceneManager::~SceneManager()
 {
 }
 
-void ssge::SceneManager::step(StepContext& context)
+void SceneManager::step(StepContext& context)
 {
 	std::cout << "SceneManager::step()" << std::endl;
 
@@ -26,7 +27,7 @@ void ssge::SceneManager::step(StepContext& context)
 		if (!isSceneInitialized())
 		{
 			SceneStepContext sceneStepContext(
-				ssge::PassKey<ssge::SceneManager>(),
+				PassKey<SceneManager>(),
 				context.deltaTime,
 				context.engine,
 				context.scenes,
@@ -40,7 +41,7 @@ void ssge::SceneManager::step(StepContext& context)
 		if (!isPaused() && !queuedScene)
 		{
 			SceneStepContext sceneStepContext(
-				ssge::PassKey<ssge::SceneManager>(),
+				PassKey<SceneManager>(),
 				context.deltaTime,
 				context.engine,
 				context.scenes,
@@ -93,7 +94,7 @@ void ssge::SceneManager::step(StepContext& context)
 	}
 }
 
-void ssge::SceneManager::draw(DrawContext& context)
+void SceneManager::draw(DrawContext& context)
 {
 	std::cout << "SceneManager::draw()" << std::endl;
 	// Draw current scene
@@ -125,28 +126,28 @@ void ssge::SceneManager::draw(DrawContext& context)
 	*/
 }
 
-void ssge::SceneManager::wrapUp()
+void SceneManager::wrapUp()
 {
 	wannaWrapUp = true;
 }
 
-ssge::Scene* ssge::SceneManager::getCurrentScene() const
+Scene* SceneManager::getCurrentScene() const
 {
 	return currentScene.get();
 }
 
-ssge::SceneClassID ssge::SceneManager::getCurrentSceneClassID() const
+SceneClassID SceneManager::getCurrentSceneClassID() const
 {
 	if (!currentScene)
 	{
-		return ssge::SceneClassID::None;
+		return SceneClassID::None;
 	}
 	else return currentScene->getSceneClassID();
 }
 
-ssge::Scene* ssge::SceneManager::changeScene(std::unique_ptr<ssge::Scene> newScene)
+Scene* SceneManager::changeScene(std::unique_ptr<Scene> newScene)
 {
-	if (ssge::Scene* validScene = newScene.get())
+	if (Scene* validScene = newScene.get())
 	{
 		queuedScene = std::move(newScene);
 		return validScene;
@@ -157,48 +158,48 @@ ssge::Scene* ssge::SceneManager::changeScene(std::unique_ptr<ssge::Scene> newSce
 	}
 }
 
-bool ssge::SceneManager::isSceneInitialized() const
+bool SceneManager::isSceneInitialized() const
 {
 	return sceneInitialized;
 }
 
-bool ssge::SceneManager::isPaused() const
+bool SceneManager::isPaused() const
 {
 	return paused;
 }
 
-uint8_t ssge::SceneManager::getFadeVal() const
+uint8_t SceneManager::getFadeVal() const
 {
 	return fadeVal;
 }
 
-bool ssge::SceneManager::isFadeFinished() const
+bool SceneManager::isFadeFinished() const
 {
 	return (fadeVal == 0);
 }
 
-void ssge::SceneManager::pause()
+void SceneManager::pause()
 {
 	wannaPause = true;
 }
 
-void ssge::SceneManager::unpause()
+void SceneManager::unpause()
 {
 	wannaPause = false;
 }
 
-bool ssge::SceneManager::togglePause()
+bool SceneManager::togglePause()
 {
 	isPaused() ? unpause() : pause();
 	return isPaused();
 }
 
-void ssge::SceneManager::setPause(bool pause)
+void SceneManager::setPause(bool pause)
 {
 	wannaPause = pause;
 }
 
-void ssge::SceneManager::shutdown()
+void SceneManager::shutdown()
 {
 	currentScene = NULL;
 	queuedScene = NULL;

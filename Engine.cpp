@@ -16,7 +16,7 @@ using namespace ssge;
 Engine::Engine(PassKey<Program> pk)
 {
 	window = new WindowManager(PassKey<Engine>());
-	scenes = new SceneManager();
+	scenes = new SceneManager(PassKey<Engine>());
 	inputs = new InputManager();
 	wannaFinish = false;
 	wannaWrapUp = false;

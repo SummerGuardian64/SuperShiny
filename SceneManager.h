@@ -2,17 +2,17 @@
 #include <vector>
 #include <memory>
 #include "Scene.h"
+#include "PassKey.h"
 
 namespace ssge
 {
+	class Engine;
+
 	class StepContext;
 	class DrawContext;
 
 	class SceneManager // Manages Scenes
 	{
-		//TODO: Refactor to friend class Factory
-		friend class Engine;
-	private:
 		std::unique_ptr<Scene> currentScene;
 		bool paused = false;
 		bool wannaPause = false;
@@ -21,12 +21,12 @@ namespace ssge
 		uint8_t fadeVal = 0;
 		bool wannaWrapUp = false;
 
-		SceneManager();
+	public:
+		SceneManager(PassKey<Engine> pk);
 		SceneManager(const SceneManager& toCopy) = delete;
 		SceneManager(SceneManager&& toMove) = delete;
 		~SceneManager();
 
-	public:
 		void step(StepContext& context);
 		void draw(DrawContext& context);
 		void wrapUp();
