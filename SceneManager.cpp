@@ -8,13 +8,7 @@
 
 using namespace ssge;
 
-SceneManager::SceneManager(PassKey<Engine> pk)
-{
-}
-
-SceneManager::~SceneManager()
-{
-}
+SceneManager::SceneManager(PassKey<Engine> pk) {}
 
 void SceneManager::step(StepContext& context)
 {

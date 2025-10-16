@@ -25,7 +25,6 @@ namespace ssge
 		SceneManager(PassKey<Engine> pk);
 		SceneManager(const SceneManager& toCopy) = delete;
 		SceneManager(SceneManager&& toMove) = delete;
-		~SceneManager();
 
 		void step(StepContext& context);
 		void draw(DrawContext& context);

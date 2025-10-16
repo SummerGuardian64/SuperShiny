@@ -13,43 +13,6 @@ namespace ssge
 
 	class Engine // The game engine core
 	{
-	public:
-		Engine(PassKey<Program> pk);
-		Engine(const Engine& toCopy) = delete;
-		Engine(Engine&& toMove) = delete;
-		~Engine();
-
-	public:
-		// Initializes the engine
-		bool init();
-		// Loads all necessary resources without which the Program cannot work.
-		// Returns true on success, false on failure.
-		bool loadInitialResources(SDL_Renderer* renderer);
-		// Prepares the initial state for the first main loop iteration.
-		// Returns true on success, false on failure.
-		bool prepareInitialState();
-		// Runs an iteration of the main loop.
-		// Returns true if the loop should be continued. Otherwise false.
-		bool mainLoop();
-		// Handles event
-		void handleEvents();
-		// Updates the engine
-		bool update(double deltaTime);
-		// Lets the engine draw
-		void render(DrawContext context);
-		// Shut down the engine
-		void shutdown();
-
-		ssge::SceneManager* getSceneManager();
-		ssge::InputManager* getInputManager();
-		ssge::WindowManager* getWindowManager();
-
-		// Engine control from higher levels
-
-		void finish();
-
-		void wrapUp();
-	private:
 		WindowManager* window;
 		// Manages scenes
 		SceneManager* scenes;
@@ -60,5 +23,39 @@ namespace ssge
 
 		bool wannaFinish = false;
 		bool wannaWrapUp = false;
+	public:
+		Engine(PassKey<Program> pk);
+		Engine(const Engine& toCopy) = delete;
+		Engine(Engine&& toMove) = delete;
+		~Engine();
+
+	public:
+		// Initializes the engine
+		bool init(PassKey<Program> pk);
+	private:
+		// Loads all necessary resources without which the Program cannot work.
+		// Returns true on success, false on failure.
+		bool loadInitialResources(SDL_Renderer* renderer);
+		// Prepares the initial state for the first main loop iteration.
+		// Returns true on success, false on failure.
+		bool prepareInitialState();
+	public:
+		// Runs an iteration of the main loop.
+		// Returns true if the loop should be continued. Otherwise false.
+		bool mainLoop(PassKey<Program> pk);
+	private:
+		// Handles event
+		void handleEvents();
+		// Updates the engine
+		bool update(double deltaTime);
+		// Lets the engine draw
+		void render(DrawContext context);
+		// Shut down the engine
+		void shutdown();
+
+	public:
+		// Engine control from higher levels
+		void finish();
+		void wrapUp();
 	};
 }

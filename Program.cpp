@@ -11,8 +11,8 @@ int ssge::Program::run(int argc, char* argv[])
     if (alreadyRunning)return -1;
 
     auto engine = std::make_unique<Engine>(PassKey<Program>());
-    if (engine->init())
-        engine->mainLoop();
+    if (engine->init(PassKey<Program>()))
+        engine->mainLoop(PassKey<Program>());
     else
         return -1;
 }

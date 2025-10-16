@@ -25,7 +25,7 @@ Engine::~Engine()
 	shutdown();
 }
 
-bool Engine::init()
+bool Engine::init(PassKey<Program> pk)
 {
 	std::cout << "initSDL" << std::endl;
 	bool success = true;
@@ -81,7 +81,7 @@ bool Engine::prepareInitialState()
 	return true;
 }
 
-bool Engine::mainLoop()
+bool Engine::mainLoop(PassKey<Program> pk)
 {
 	SDL_Renderer* renderer = window->getRenderer();
 
@@ -182,7 +182,7 @@ bool Engine::update(double deltaTime)
 		EngineAccess(this),
 		ScenesAccess(scenes),
 		InputsAccess(inputs),
-		DrawingAccess(getWindowManager()->getRenderer())
+		DrawingAccess(window->getRenderer())
 	);
 
 	scenes->step(stepContext);
@@ -218,21 +218,6 @@ void Engine::shutdown()
 
 	IMG_Quit();
 	SDL_Quit();
-}
-
-SceneManager* Engine::getSceneManager()
-{
-	return scenes;
-}
-
-InputManager* Engine::getInputManager()
-{
-	return inputs;
-}
-
-WindowManager* Engine::getWindowManager()
-{
-	return window;
 }
 
 void Engine::finish()
