@@ -4,7 +4,6 @@
 #include <memory>
 #include "StepContext.h"
 #include "DrawContext.h"
-#include "Program.h"
 #include "Game.h"
 #include "SDL.h"
 #include "PassKey.h"
@@ -12,7 +11,9 @@
 #include "Accessor.h"
 #include "SplashScreen.h"
 
-ssge::Engine::Engine(ssge::PassKey<ssge::Program> pk, ssge::Program& program) : program(program)
+using namespace ssge;
+
+Engine::Engine(PassKey<Program> pk)
 {
 	window = new WindowManager(PassKey<Engine>());
 	scenes = new SceneManager();
@@ -21,15 +22,34 @@ ssge::Engine::Engine(ssge::PassKey<ssge::Program> pk, ssge::Program& program) : 
 	wannaWrapUp = false;
 }
 
-ssge::Engine::~Engine()
+Engine::~Engine()
 {
 	shutdown();
 }
 
-bool ssge::Engine::init()
+bool Engine::init()
 {
+	std::cout << "initSDL" << std::endl;
+	bool success = true;
+
+	// Initialize SDL
+	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_EVENTS | SDL_INIT_AUDIO |
+		SDL_INIT_JOYSTICK | SDL_INIT_HAPTIC) != 0)
+	{
+		std::cout << "SDL_Init error: ", SDL_GetError();
+		success = false;
+	}
+
+	// Initialize SDL_image for PNG support
+	int imgFlags = IMG_INIT_PNG;
+	if (!(IMG_Init(imgFlags) & imgFlags))
+	{
+		std::cout << "SDL_image could not initialize! SDL_image Error: " << IMG_GetError();
+		return false;
+	}
+
 	// Initialize program window
-	if (auto error = getWindowManager()->init(ssge::Game::APPLICATION_TITLE, 1280, 720))
+	if (auto error = window->init(Game::APPLICATION_TITLE, 1280, 720))
 	{
 		std::cout << error << std::endl;
 		return false;
@@ -43,13 +63,13 @@ bool ssge::Engine::init()
 	return true;
 }
 
-bool ssge::Engine::loadInitialResources(SDL_Renderer* renderer)
+bool Engine::loadInitialResources(SDL_Renderer* renderer)
 {
-	ssge::Game::init(renderer);
+	Game::init(renderer);
 	return true;
 }
 
-bool ssge::Engine::prepareInitialState()
+bool Engine::prepareInitialState()
 {
 	//TODO: Initialize first scene
 	//scenes->changeScene(std::make_unique<GameWorld>());
@@ -63,27 +83,88 @@ bool ssge::Engine::prepareInitialState()
 	return true;
 }
 
-void ssge::Engine::handle(SDL_Event e)
+bool Engine::mainLoop()
 {
-	switch (e.type)
+	SDL_Renderer* renderer = window->getRenderer();
+
+	int virtualWidth = Game::VIRTUAL_WIDTH;
+	int virtualHeight = Game::VIRTUAL_HEIGHT;
+
+	// Create a render target texture for the virtual screen.
+	SDL_Texture* gameScreen =
+		SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET,
+			virtualWidth, virtualHeight);
+	if (!gameScreen) {
+		std::cout << "SDL_CreateTexture (gameScreen) error: " << SDL_GetError();
+		return false;
+	}
+
+	bool done = false;
+	double fps = 60.0f;
+	double frameDuration = 1.0f / fps;
+	Uint32 lastTicks = SDL_GetTicks();
+	while (!done)
 	{
-	case SDL_EventType::SDL_KEYDOWN:
-	case SDL_EventType::SDL_KEYUP:
-	case SDL_EventType::SDL_JOYBUTTONDOWN:
-	case SDL_EventType::SDL_JOYBUTTONUP:
-	case SDL_EventType::SDL_JOYAXISMOTION:
-	case SDL_EventType::SDL_JOYBALLMOTION:
-	case SDL_EventType::SDL_JOYHATMOTION:
-	case SDL_EventType::SDL_JOYDEVICEADDED:
-	case SDL_EventType::SDL_JOYDEVICEREMOVED:
-		inputs->handle(e);
-		break;
-	default:
-		break;
+		handleEvents();
+
+		Uint32 currentTicks = SDL_GetTicks();
+		float deltaTime = (currentTicks - lastTicks) / 1000.0f;
+		if (deltaTime >= frameDuration)
+		{
+			lastTicks -= frameDuration;
+
+			// Update the engine and see if it's done (wants to quit)
+			done |= !update(frameDuration);
+
+			// Render the game onto the virtual gameScreen texture.
+			SDL_SetRenderTarget(renderer, gameScreen);
+			render(DrawContext(renderer));
+			SDL_SetRenderTarget(renderer, NULL);
+
+			// Clear the window (black background for letterboxing).
+			SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+			SDL_RenderClear(renderer);
+
+			// Render the gameScreen texture scaled to best fit the window.
+			SDL_Rect fitRect = window->makeBestFitScale();
+			SDL_RenderCopy(renderer, gameScreen, NULL, &fitRect);
+
+			SDL_RenderPresent(renderer);
+		}
+	}
+	SDL_DestroyTexture(gameScreen);
+
+	return false;
+}
+
+void Engine::handleEvents()
+{
+	SDL_Event event;
+	while (SDL_PollEvent(&event))
+	{
+		switch (event.type)
+		{
+		case SDL_QUIT:
+			wrapUp();
+			break;
+		case SDL_EventType::SDL_KEYDOWN:
+		case SDL_EventType::SDL_KEYUP:
+		case SDL_EventType::SDL_JOYBUTTONDOWN:
+		case SDL_EventType::SDL_JOYBUTTONUP:
+		case SDL_EventType::SDL_JOYAXISMOTION:
+		case SDL_EventType::SDL_JOYBALLMOTION:
+		case SDL_EventType::SDL_JOYHATMOTION:
+		case SDL_EventType::SDL_JOYDEVICEADDED:
+		case SDL_EventType::SDL_JOYDEVICEREMOVED:
+			inputs->handle(event);
+			break;
+		default:
+			break;
+		}
 	}
 }
 
-bool ssge::Engine::update(double deltaTime)
+bool Engine::update(double deltaTime)
 {
 	// Stop updating the engine if it's finished
 	if (wannaFinish)
@@ -98,7 +179,7 @@ bool ssge::Engine::update(double deltaTime)
 	
 	// Step the scenes via SceneManager
 	StepContext stepContext(
-		ssge::PassKey<ssge::Engine>(),
+		PassKey<Engine>(),
 		deltaTime,
 		EngineAccess(this),
 		ScenesAccess(scenes),
@@ -112,13 +193,15 @@ bool ssge::Engine::update(double deltaTime)
 	return !wannaFinish;
 }
 
-void ssge::Engine::render(DrawContext context)
+void Engine::render(DrawContext context)
 {
 	scenes->draw(context);
 }
 
-void ssge::Engine::shutdown()
+void Engine::shutdown()
 {
+	std::cout << "shutdown()" << std::endl;
+
 	if (window)
 	{
 		delete window;
@@ -134,29 +217,32 @@ void ssge::Engine::shutdown()
 		delete inputs;
 		inputs = nullptr;
 	}
+
+	IMG_Quit();
+	SDL_Quit();
 }
 
-ssge::SceneManager* ssge::Engine::getSceneManager()
+SceneManager* Engine::getSceneManager()
 {
 	return scenes;
 }
 
-ssge::InputManager* ssge::Engine::getInputManager()
+InputManager* Engine::getInputManager()
 {
 	return inputs;
 }
 
-ssge::WindowManager* ssge::Engine::getWindowManager()
+WindowManager* Engine::getWindowManager()
 {
 	return window;
 }
 
-void ssge::Engine::finish()
+void Engine::finish()
 {
 	wannaFinish = true;
 }
 
-void ssge::Engine::wrapUp()
+void Engine::wrapUp()
 {
 	wannaWrapUp = true;
 }

@@ -13,10 +13,8 @@ namespace ssge
 
 	class Engine // The game engine core
 	{
-	private:
-		Program& program;
 	public:
-		Engine(ssge::PassKey<ssge::Program> pk, Program& program);
+		Engine(PassKey<Program> pk);
 		Engine(const Engine& toCopy) = delete;
 		Engine(Engine&& toMove) = delete;
 		~Engine();
@@ -30,8 +28,11 @@ namespace ssge
 		// Prepares the initial state for the first main loop iteration.
 		// Returns true on success, false on failure.
 		bool prepareInitialState();
+		// Runs an iteration of the main loop.
+		// Returns true if the loop should be continued. Otherwise false.
+		bool mainLoop();
 		// Handles event
-		void handle(SDL_Event e);
+		void handleEvents();
 		// Updates the engine
 		bool update(double deltaTime);
 		// Lets the engine draw
