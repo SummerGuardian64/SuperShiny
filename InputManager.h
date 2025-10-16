@@ -1,6 +1,7 @@
 #pragma once
 #include "InputBinding.h"
 #include "InputPad.h"
+#include "PassKey.h"
 
 namespace ssge
 {
@@ -8,17 +9,16 @@ namespace ssge
 
 	class InputManager // Manages Inputs
 	{
-		friend class Engine;
-		InputManager();
+	public:
+		InputManager(PassKey<Engine> pk);
 		InputManager(const InputManager& toCopy) = delete;
 		InputManager(InputManager&& toMove) = delete;
-		~InputManager();
 
 		void handle(SDL_Event e);
 		void latch();
 
 		InputBinding bindings[32];
-		uint32_t directInputs;
+		uint32_t directInputs = 0;
 		InputPad pad;
 
 	public:

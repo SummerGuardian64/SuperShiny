@@ -58,7 +58,7 @@ namespace ssge
 		// Manages resources
 		//ResourceManager resources;
 
-		bool wannaFinish;
-		bool wannaWrapUp;
+		bool wannaFinish = false;
+		bool wannaWrapUp = false;
 	};
 }

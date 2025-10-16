@@ -3,14 +3,7 @@
 
 using namespace ssge;
 
-InputManager::InputManager()
-{
-    directInputs = 0;
-}
-
-InputManager::~InputManager()
-{
-}
+InputManager::InputManager(PassKey<Engine> pk) {}
 
 void InputManager::handle(SDL_Event e)
 {

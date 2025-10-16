@@ -17,9 +17,7 @@ Engine::Engine(PassKey<Program> pk)
 {
 	window = new WindowManager(PassKey<Engine>());
 	scenes = new SceneManager(PassKey<Engine>());
-	inputs = new InputManager();
-	wannaFinish = false;
-	wannaWrapUp = false;
+	inputs = new InputManager(PassKey<Engine>());
 }
 
 Engine::~Engine()
