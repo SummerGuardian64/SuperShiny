@@ -41,36 +41,23 @@ inline void applyResolvedWorldAABBToEntity(SDL_FPoint& pos, const SDL_FRect& loc
 
 void Entity::Physics::step(EntityStepContext& context)
 {
-	//// If we wanna process velocity
-	//if (processVelocity)
-	//{
-	//	// Then execute the ordinary step
-	//	SDL_FPoint tempVector = velocity;
-	//	float tempScalar = context.getDeltaTime();
-	//	tempVector.x *= tempScalar;
-	//	tempVector.y *= tempScalar;
-	//	position.x += tempVector.x;
-	//	position.y += tempVector.y;
-	//}
+	// Platformer Physics
 
-    //GML port
+    // Make a snapshot of the current pad
+    InputPad pad;
+    if (auto ctrl = entity.control.get())
+    {
+        pad = ctrl->getPad();
+    }
 
-    //FIXME
-    int fixmeMockupFloor = 650;
-
-    ///Platformer Physics
-    // Copy collision list
-    //ds_list_clear(CollisionsPrevious);
-    //ds_list_copy(CollisionsPrevious, Collisions);
-    //ds_list_clear(Collisions);
     if (enablePhysics)
     {
         // Check direction buttons X
-        side.x = enableHorizontalMove ? context.inputs.isPressed(3) - context.inputs.isPressed(2) : 0;
+        side.x = enableHorizontalMove ? pad.isPressed(3) - pad.isPressed(2) : 0;
         // Check direction buttons Y
-        side.y = enableVerticalMove ? context.inputs.isPressed(1) - context.inputs.isPressed(0) : 0;
+        side.y = enableVerticalMove ? pad.isPressed(1) - pad.isPressed(0) : 0;
         // Reset jump timer if jump isn't pressed
-        if (!context.inputs.isPressed(4))//Jump
+        if (!pad.isPressed(4))//Jump
         {
             jumpTimer = 0;
         }
@@ -98,7 +85,7 @@ void Entity::Physics::step(EntityStepContext& context)
                 // Offer an ability to jump
                 if (enableJump)
                 {
-                    if (context.inputs.isJustPressed(4))//Jump just pressed
+                    if (pad.isJustPressed(4))//Jump just pressed
                     {
                         jumpTimer = jumpStrength;
                     }
@@ -174,7 +161,7 @@ void Entity::Physics::step(EntityStepContext& context)
         {
             if (inWater)
             {
-                if (context.inputs.isJustPressed(4)) // Jump just pressed
+                if (pad.isJustPressed(4)) // Jump just pressed
                 {
                     if (speed.y > -swimPower)
                     {
@@ -364,6 +351,14 @@ Entity::NPC::NPC(Entity& entity) : entity(entity)
 {
 }
 
+void ssge::Entity::latch(EntityStepContext& context)
+{
+    if (auto c = control.get())
+    {
+        c->latch(context);
+    }
+}
+
 void Entity::step(EntityStepContext& context)
 {
 	double deltaTime = context.deltaTime;
@@ -421,4 +416,54 @@ Entity::Control::Control(Entity& entity) : entity(entity)
 	ignore = false;
 	playable = false;
 	playerId = -1;
+}
+
+ssge::Entity::Control* ssge::Entity::getControl()
+{
+    return control.get();
+}
+
+ssge::InputPad ssge::Entity::getPad()
+{
+    if (auto ctrl = getControl())
+    {
+        return ctrl->getPad();
+    }
+    else InputPad();
+}
+
+ssge::Entity::Physics* ssge::Entity::getPhysics()
+{
+    return physics.get();
+}
+
+void ssge::Entity::Control::latch(EntityStepContext& context)
+{
+    uint32_t directButtons = 0;
+
+    switch (mode)
+    {
+    case ssge::Entity::Control::Mode::Player:
+        directButtons = context.inputs.getCurrentButtonsForPlayer(playerId);
+        break;
+    case ssge::Entity::Control::Mode::AI:
+        //TODO: UNIMPLEMENTED!
+        break;
+    case ssge::Entity::Control::Mode::Replay:
+        //TODO: UNIMPLEMENTED!
+        break;
+    case ssge::Entity::Control::Mode::NPC:
+        //TODO: UNIMPLEMENTED!
+        break;
+    case ssge::Entity::Control::Mode::Cutscene:
+        //TODO: UNIMPLEMENTED!
+        break;
+    //case ssge::Entity::Control::Mode::None:
+    //case ssge::Entity::Control::Mode::TOTAL:
+    //TODO: Error handling
+    default:
+        break;
+    }
+
+    pad.latchButtons(directButtons);
 }

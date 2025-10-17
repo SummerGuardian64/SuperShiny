@@ -32,8 +32,10 @@ namespace ssge
 			friend class Game;
 			static bool _init(SDL_Renderer* renderer);
 			static Sprite::Definition sprdefShiny;
+			static Sprite::Definition sprdefOrb;
 		public:
 			static Sprite::Definition& shiny();
+			static Sprite::Definition& orb();
 		};
 
 		class Entities

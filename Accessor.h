@@ -10,7 +10,10 @@ namespace ssge {
     class SceneManager;
     class Level;
     class EntityManager;
+    class Entity;
     class Engine;
+    class EntityReference;           // forward-declare the wrapper type
+    enum class EntityClassID : int;  // forward-declare the enum class
     enum class SceneClassID : int;
     class InputManager;
     class Scene;
@@ -44,6 +47,7 @@ namespace ssge {
         bool isPressed(int buttonIndex);
         bool isJustPressed(int buttonIndex);
         bool isJustReleased(int buttonIndex);
+        uint32_t getCurrentButtonsForPlayer(int playerId);
     };
     
     class DrawingAccess {
@@ -103,6 +107,13 @@ namespace ssge {
         explicit EntitiesAccess(EntityManager* actual) : actual(actual) {}
         //TBA
         //TODO: Spawning in new entities, entity lookup, etc.
+        EntityReference addEntity(EntityClassID entityClassID);
+    };
+
+    class EntitiesAccessWCurrent : public EntitiesAccess {
+    public:
+        Entity& current;
+        explicit EntitiesAccessWCurrent(EntityManager* actual, Entity* current) : EntitiesAccess(actual), current(*current) {}
     };
 
 } // namespace ssge

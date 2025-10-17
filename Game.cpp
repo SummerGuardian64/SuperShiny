@@ -1,5 +1,6 @@
 #include "Game.h"
 #include "Shiny.h"
+#include "Orb.h"
 #include "Level.h"
 
 using namespace ssge;
@@ -34,6 +35,7 @@ Game::Entities::FactoryFn Game::Entities::registry[] =
 {
 	/* 0: EntityClassID::None or Invalid */ nullptr,
 	/* 1: EntityClassID::Shiny           */ []() -> std::shared_ptr<Entity> { return std::make_shared<Shiny>(); },
+	/* 2: EntityCLassID::Orb             */ []() -> std::shared_ptr<Entity> { return std::make_shared<Orb>(); },
 	/* 3: EntityClassID::TOTAL           */ nullptr, // Consistency-sake
 };
 
@@ -56,15 +58,23 @@ bool Game::Sprites::_init(SDL_Renderer* renderer)
 		seq.imageIndexes.push_back(0);
 	}
 
+	sprdefOrb.spritesheet = SdlTexture("Sprites/Orb.png", renderer);
+
+	sprdefOrb.images.push_back(Image(0, 0, 64, 64, 32, 32));
+	{
+		auto& seq = sprdefOrb.addSequence(20, 20, 0);
+		seq.imageIndexes.push_back(0);
+	}
+
 	return true;
 }
 
 Sprite::Definition Game::Sprites::sprdefShiny;
+Sprite::Definition Game::Sprites::sprdefOrb;
 
-Sprite::Definition& Game::Sprites::shiny()
-{
-	return sprdefShiny;
-}
+Sprite::Definition& Game::Sprites::shiny() { return sprdefShiny; }
+
+Sprite::Definition& Game::Sprites::orb() { return sprdefOrb; }
 
 // Example static level data (see below for format & builder)
 extern const unsigned char g_Level_01[] =
@@ -89,8 +99,8 @@ extern const unsigned char g_Level_01[] =
 	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-	0,0,5,1,0,0,5,1,0,0,5,1,5,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+	0,0,5,1,0,0,5,1,0,0,5,1,5,1,0,0,0,0,0,0,0,0,5,1,5,1,5,1,0,0,0,0,
+	0,0,2,1,2,1,2,1,2,1,2,1,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,

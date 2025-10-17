@@ -91,7 +91,7 @@ namespace ssge {
         CurrentSceneAccess currentScene;
         GameWorldAccess gameWorld;
         LevelAccess level;
-        EntitiesAccess entities;
+        EntitiesAccessWCurrent entities;
 
         explicit EntityStepContext(
             PassKey<EntityManager> pk,
@@ -103,7 +103,7 @@ namespace ssge {
             CurrentSceneAccess currentScene,
             GameWorldAccess gameWorld,
             LevelAccess level,
-            EntitiesAccess entities
+            EntitiesAccessWCurrent entitiesAndCurrent
         );
     };
 

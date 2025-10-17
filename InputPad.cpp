@@ -41,6 +41,21 @@ uint32_t InputPad::getReleasedButtons() const
 	return ~this->currentButtons;
 }
 
+bool ssge::InputPad::isPressed(int buttonIndex) const
+{
+	return checkPressed(1 << buttonIndex);
+}
+
+bool ssge::InputPad::isJustPressed(int buttonIndex) const
+{
+	return checkJustPressed(1 << buttonIndex);
+}
+
+bool ssge::InputPad::isJustReleased(int buttonIndex) const
+{
+	return checkJustPressed(1 << buttonIndex);
+}
+
 bool InputPad::checkPressed(uint32_t buttonMask) const
 {
 	return ((getPressedButtons() & buttonMask) == buttonMask);

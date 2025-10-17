@@ -20,9 +20,10 @@ void EntityManager::step(GameWorldStepContext& context)
             context.currentScene,
             context.gameWorld,
             context.level,
-            EntitiesAccess(this)
+            EntitiesAccessWCurrent(this, entityPtr.get())
         );
 
+        entityPtr->latch(entityStepContext);
         entityPtr->step(entityStepContext);
     }
 
@@ -177,7 +178,7 @@ void EntityManager::destroyScheduledEntities(GameWorldStepContext& context)
                 context.currentScene,
                 context.gameWorld,
                 context.level,
-                EntitiesAccess(this)
+                EntitiesAccessWCurrent(this, it->get())
             );
             (*it)->onDestroy(entityStepContext);
             it = entities.erase(it);

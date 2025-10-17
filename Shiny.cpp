@@ -4,6 +4,8 @@
 #include <iostream>
 #include <memory>
 #include "Game.h"
+#include "EntityManager.h"
+#include "Utilities.h"
 
 using namespace ssge;
 
@@ -11,6 +13,11 @@ Shiny::Shiny()
 {
 	sprite = std::make_unique<Sprite>(Game::Sprites::shiny());
 	physics = std::make_unique<Physics>(*this);
+    control = std::make_unique<Control>(*this);
+
+    control->mode = Entity::Control::Mode::Player;
+    control->playable = true;
+    control->playerId = 0;
 
     position.x = 400;
     position.y = 100;
@@ -85,14 +92,21 @@ void Shiny::firstStep(EntityStepContext& context)
 void Shiny::preStep(EntityStepContext& context)
 {
 	std::cout << "scale.. ";
-	/*bool up = context.inputs.isPressed(0);
-	bool down = context.inputs.isPressed(1);
-	bool left = context.inputs.isPressed(2);
-	bool right = context.inputs.isPressed(3);
-	physics->velocity.y -= up * 2;
-	physics->velocity.y += down * 2;
-	physics->velocity.x -= left * 2;
-	physics->velocity.x += right * 2;*/
+
+    if (auto ctrl = control.get())
+    {
+        if (ctrl->getPad().isJustPressed(5))
+        {
+            if (auto orbRef = context.entities.addEntity(EntityClassID::Orb))
+            {
+                auto& orb = *orbRef.get();
+                orb.position = position;
+                orb.position.y -= 40;
+                if(physics->speed.x<0)
+                    orb.getPhysics()->speed.x *= -1;
+            }
+        }
+    }
 }
 
 void Shiny::postStep(EntityStepContext& context)

@@ -76,7 +76,8 @@ bool Engine::prepareInitialState()
 	inputs->bindings[1].bindToKey(SDL_Scancode::SDL_SCANCODE_DOWN);
 	inputs->bindings[2].bindToKey(SDL_Scancode::SDL_SCANCODE_LEFT);
 	inputs->bindings[3].bindToKey(SDL_Scancode::SDL_SCANCODE_RIGHT);
-	inputs->bindings[4].bindToKey(SDL_Scancode::SDL_SCANCODE_RETURN);
+	inputs->bindings[4].bindToKey(SDL_Scancode::SDL_SCANCODE_X);
+	inputs->bindings[5].bindToKey(SDL_Scancode::SDL_SCANCODE_Y);
 
 	return true;
 }

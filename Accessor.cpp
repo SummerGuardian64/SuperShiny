@@ -6,6 +6,7 @@
 #include "Level.h"
 #include "SplashScreen.h"
 #include "GameWorld.h"
+#include "EntityManager.h"
 
 using namespace ssge;
 
@@ -64,17 +65,27 @@ void ScenesAccess::setPause(bool pause)
 
 bool InputsAccess::isPressed(int buttonIndex)
 {
-	return actual->getPad().checkPressed(1 << buttonIndex);
+	return actual->getPad().isPressed(buttonIndex);
 }
 
 bool InputsAccess::isJustPressed(int buttonIndex)
 {
-	return actual->getPad().checkJustPressed(1 << buttonIndex);
+	return actual->getPad().isJustPressed(buttonIndex);
 }
 
 bool InputsAccess::isJustReleased(int buttonIndex)
 {
-	return actual->getPad().checkJustReleased(1 << buttonIndex);
+	return actual->getPad().isJustReleased(buttonIndex);
+}
+
+uint32_t InputsAccess::getCurrentButtonsForPlayer(int playerId)
+{
+	if (playerId == 0)
+	{
+		return actual->getPad().getPressedButtons();
+	}
+	else return 0;
+	//TODO: Support for more players!
 }
 
 SceneClassID CurrentSceneAccess::getSceneClassID() const
@@ -118,8 +129,7 @@ bool LevelAccess::rectInWater(const SDL_FRect& r) const
 	return actual->rectInWater(r);
 }
 
-//auto LevelAccess::sweepAABB(const SDL_FRect& box, SDL_FPoint d) const
-//{
-//	//FIXME: UNIMPLEMENTED!
-//
-//}
+EntityReference ssge::EntitiesAccess::addEntity(EntityClassID entityClassID)
+{
+	return actual->addEntity(entityClassID);
+}

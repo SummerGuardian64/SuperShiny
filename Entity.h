@@ -8,7 +8,8 @@ namespace ssge
 {
 	enum class EntityClassID {
 		UNKNOWN,
-		Shiny, // Currently the only entity we have in the game
+		Shiny,
+		Orb,
 		TOTAL
 	};
 
@@ -70,6 +71,7 @@ namespace ssge
 
 			//TBA: InputManager will call all latch functions
 			//void latch(InputContext context);
+			void latch(EntityStepContext& context);
 		};
 		class NPC
 		{
@@ -197,7 +199,12 @@ namespace ssge
 		SDL_FPoint position{ 0.0f, 0.0f };
 		std::unique_ptr<Sprite> sprite;
 		SDL_FRect hitbox{ 0.0f, 0.0f, 0.0f, 0.0f };
-		
+
+		Control* getControl();
+		InputPad getPad();
+		Physics* getPhysics();
+
+		void latch(EntityStepContext& context);
 		virtual void firstStep(EntityStepContext& context) = 0;
 		virtual void preStep(EntityStepContext& context) = 0;
 		void step(EntityStepContext& context);

@@ -15,6 +15,9 @@ namespace ssge
 		uint32_t getJustPressedButtons() const;
 		uint32_t getJustReleasedButtons() const;
 		uint32_t getReleasedButtons() const;
+		bool isPressed(int buttonIndex) const;
+		bool isJustPressed(int buttonIndex) const;
+		bool isJustReleased(int buttonIndex) const;
 		bool checkPressed(uint32_t buttonMask) const;
 		bool checkJustPressed(uint32_t buttonMask) const;
 		bool checkJustReleased(uint32_t buttonMask) const;

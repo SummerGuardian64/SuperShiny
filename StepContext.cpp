@@ -75,7 +75,7 @@ EntityStepContext::EntityStepContext(
     CurrentSceneAccess currentScene_,
     GameWorldAccess gameWorld_,
     LevelAccess level_,
-    EntitiesAccess entities_
+    EntitiesAccessWCurrent entitiesAndCurrent_
 )
     : StepContextBase(deltaTime),
     engine(std::move(engine_)),
@@ -85,6 +85,6 @@ EntityStepContext::EntityStepContext(
     currentScene(std::move(currentScene_)),
     gameWorld(std::move(gameWorld_)),
     level(std::move(level_)),
-    entities(std::move(entities_))
+    entities(std::move(entitiesAndCurrent_))
 {
 }
