@@ -50,7 +50,8 @@ GameWorldStepContext::GameWorldStepContext(
     InputsAccess inputs_,
     DrawingAccess drawing_,
     CurrentSceneAccess currentScene_,
-    GameWorldAccess gameWorld_
+    GameWorldAccess gameWorld_,
+    LevelAccess level_
 )
     : StepContextBase(deltaTime),
     engine(std::move(engine_)),
@@ -58,7 +59,8 @@ GameWorldStepContext::GameWorldStepContext(
     inputs(std::move(inputs_)),
     drawing(std::move(drawing_)),
     currentScene(std::move(currentScene_)),
-    gameWorld(std::move(gameWorld_))
+    gameWorld(std::move(gameWorld_)),
+    level(std::move(level_))
 {
 }
 
@@ -72,6 +74,7 @@ EntityStepContext::EntityStepContext(
     DrawingAccess drawing_,
     CurrentSceneAccess currentScene_,
     GameWorldAccess gameWorld_,
+    LevelAccess level_,
     EntitiesAccess entities_
 )
     : StepContextBase(deltaTime),
@@ -81,6 +84,7 @@ EntityStepContext::EntityStepContext(
     drawing(std::move(drawing_)),
     currentScene(std::move(currentScene_)),
     gameWorld(std::move(gameWorld_)),
+    level(std::move(level_)),
     entities(std::move(entities_))
 {
 }

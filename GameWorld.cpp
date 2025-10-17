@@ -128,7 +128,8 @@ void GameWorld::step(SceneStepContext& context)
         context.inputs,
         context.drawing,
         context.currentScene,
-        GameWorldAccess(this)
+        GameWorldAccess(this),
+        LevelAccess(level.get())
     );
 
 

@@ -2,6 +2,7 @@
 #include "PassKey.h"
 #include <SDL.h>
 #include <memory>
+#include "Level.h"
 
 namespace ssge {
 
@@ -79,7 +80,21 @@ namespace ssge {
 
         bool valid() const;
         bool rectOverlapsSolid(const SDL_FRect& r) const;  // implemented to forward to Level
-        //auto sweepAABB(const SDL_FRect& box, SDL_FPoint d) const; // forward to Level
+        
+        // Return tile indices overlapped by a rect (clamped to level bounds).
+        void rectToTileSpan(const SDL_FRect& r, int& col0, int& col1, int& row0, int& row1) const;
+
+        // Query a tile (with OOB policy)
+        Level::BlockQuery queryTile(int col, int row) const;
+
+        // Axis-separated sweep: move horizontally by dx, collide with solids.
+        Level::SweepHit sweepHorizontal(const SDL_FRect& rect, float dx) const;
+
+        // Axis-separated sweep: move vertically by dy, collide with solids.
+        Level::SweepHit sweepVertical(const SDL_FRect& rect, float dy) const;
+
+        // Is any overlapped tile "water"?
+        bool rectInWater(const SDL_FRect& r) const;
     };
     
     class EntitiesAccess {

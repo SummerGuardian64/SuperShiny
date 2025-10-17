@@ -19,6 +19,7 @@ void EntityManager::step(GameWorldStepContext& context)
             context.drawing,
             context.currentScene,
             context.gameWorld,
+            context.level,
             EntitiesAccess(this)
         );
 
@@ -175,6 +176,7 @@ void EntityManager::destroyScheduledEntities(GameWorldStepContext& context)
                 context.drawing,
                 context.currentScene,
                 context.gameWorld,
+                context.level,
                 EntitiesAccess(this)
             );
             (*it)->onDestroy(entityStepContext);

@@ -66,6 +66,7 @@ namespace ssge {
         DrawingAccess drawing;
         CurrentSceneAccess currentScene;
         GameWorldAccess gameWorld;
+        LevelAccess level;
 
         explicit GameWorldStepContext(
             PassKey<GameWorld> pk,
@@ -75,7 +76,8 @@ namespace ssge {
             InputsAccess inputs,
             DrawingAccess drawing,
             CurrentSceneAccess currentScene,
-            GameWorldAccess gameWorld
+            GameWorldAccess gameWorld,
+            LevelAccess level
         );
     };
 
@@ -88,6 +90,7 @@ namespace ssge {
         DrawingAccess drawing;
         CurrentSceneAccess currentScene;
         GameWorldAccess gameWorld;
+        LevelAccess level;
         EntitiesAccess entities;
 
         explicit EntityStepContext(
@@ -99,6 +102,7 @@ namespace ssge {
             DrawingAccess drawing,
             CurrentSceneAccess currentScene,
             GameWorldAccess gameWorld,
+            LevelAccess level,
             EntitiesAccess entities
         );
     };

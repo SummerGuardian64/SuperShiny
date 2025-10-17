@@ -24,8 +24,8 @@ Shiny::Shiny()
 	physics->enableHorizontalCollision = true;
 	physics->enableVerticalCollision = true;
 
-    physics->jumpSpeed = 12;
-    physics->jumpStrength = 16;
+    physics->jumpSpeed = 10;
+    physics->jumpStrength = 13;
     physics->swimPower = 5;
     physics->gravity = 0.7;
     physics->gravityInWater = 0.1;
@@ -65,6 +65,11 @@ Shiny::Shiny()
     physics->decAirRun.y = 1;
     physics->decWater.y = 0.5;
     physics->decWaterRun.y = 0.8;
+
+    hitbox.x = -24;
+    hitbox.y = -88;
+    hitbox.w = 48;
+    hitbox.h = 88;
 }
 
 EntityClassID Shiny::getEntityClassID() const

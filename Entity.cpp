@@ -3,6 +3,7 @@
 #include "DrawContext.h"
 #include <iostream>
 #include "Utilities.h"
+#include "Level.h"
 
 using namespace ssge;
 
@@ -26,6 +27,16 @@ Entity::Physics::Physics(Entity& entity)
 	  position(entity.position),
 	  hitbox(entity.hitbox)
 {
+}
+
+inline SDL_FRect makeWorldAABB(const SDL_FPoint& pos, const SDL_FRect& localHitbox) {
+    return SDL_FRect{ pos.x + localHitbox.x, pos.y + localHitbox.y, localHitbox.w, localHitbox.h };
+}
+
+inline void applyResolvedWorldAABBToEntity(SDL_FPoint& pos, const SDL_FRect& localHitbox, const SDL_FRect& worldAABB) {
+    // localHitbox is relative to pos, so pos = worldBox - localOffset
+    pos.x = worldAABB.x - localHitbox.x;
+    pos.y = worldAABB.y - localHitbox.y;
 }
 
 void Entity::Physics::step(EntityStepContext& context)
@@ -226,7 +237,7 @@ void Entity::Physics::step(EntityStepContext& context)
                 speed.y = -jumpSpeed;
             }
         }
-        else
+        else if (side.y == 0)
         {
             if (inWater)
             {
@@ -237,13 +248,8 @@ void Entity::Physics::step(EntityStepContext& context)
                 speed.y += gravity;
             }
         }
+
         // COLLISION
-        // Set solids
-        //for (var i = 0; i < ds_list_size(SolidList); i++)
-        //{
-        //    var se = ds_list_find_value(SolidList, i);
-        //    se.solid = true;
-        //}
 
         // Some slope thing
         /*if(Grounded)
@@ -259,270 +265,98 @@ void Entity::Physics::step(EntityStepContext& context)
             }
           }
         }*/
+
+        // After you compute speed.x, speed.y for this fixed step:
+        float dx = speed.x;   // per-step displacement in world units (you’re already stepping at fixed dt)
+        float dy = speed.y;
+
+        // We'll apply axis-separated resolution: X then Y, using level sweeps.
+        // Build world-space AABB from (position + local hitbox)
+        SDL_FRect box = makeWorldAABB(position, hitbox);
+
+        // HORIZONTAL
         bool applyx = true;
-        bool applyy = true;
-        int oldysign = (speed.y ? (speed.y > 0 ? 1 : -1) : 0);
-        int oldxsign = (speed.x ? (speed.x > 0 ? 1 : -1) : 0);
-        if ((enableHorizontalBounce && enableVerticalBounce) || (enableGMBounce))
+        if (enableHorizontalCollision && !ignoreCollision && dx != 0.f)
         {
-            applyx = false;
-            applyy = false;
-        }
-        // Collision when falling
-        if (enableVerticalCollision && !ignoreCollision)
-        {
-            //FIXME: This is a mockup
-            if (position.y >= fixmeMockupFloor && speed.y>=0)
+            Level::SweepHit hx = context.level.sweepHorizontal(box, dx);
+            if (hx.hit)
             {
-                if (enableVerticalBounce)
+                // We hit a solid tile—resolve at boundary and zero x-speed (or bounce if enabled)
+                box.x = hx.newX;
+                if (enableHorizontalBounce && !enableGMBounce)
                 {
-                    position.y -= (position.y - fixmeMockupFloor);
-                    speed.y *= -1;
-                    applyy = false;
-                    grounded = false;
+                    speed.x = -speed.x;
+                    applyx = false; // bounce handled position; don’t re-apply afterwards
                 }
                 else
                 {
-                    position.y = fixmeMockupFloor;
-                    speed.y = 0;
-                    grounded = true;
+                    speed.x = 0.f;
                 }
+                touchesWall = true;
+                // optional: store hx.tile if you want terraforming later
             }
+            else {
+                box.x = hx.newX;
+            }
+        }
+        if (applyx)
+        {
+            // If we didn’t bounce-position, adopt the new x
+            // Convert resolved world AABB back to entity position (x only)
+            SDL_FRect tmp = box;
+            tmp.y = position.y + hitbox.y; // keep current y for now
+            applyResolvedWorldAABBToEntity(position, hitbox, tmp);
+        }
 
-            //FIXME: Uncomment after removing mockup!
-            //if(place_meeting(x,y+SpeedY,par_Block))
-        //    if (/*!place_free(x, y + SpeedY)*/ false) //TODO: Collision
-        //    {
-        //        if (!enableVerticalBounce)
-        //        {
-        //            if (speed.y != 0) // Prevent infinite loop
-        //            {
-        //                // Just like "Move to Contact"
-        //                //while(!place_meeting(x,y+sign(SpeedY),par_Block)){y+=sign(SpeedY);}
-        //                while (/*place_free(position.x, position.y + sign(speed.x))*/ false) //TODO: Collision
-        //                {
-        //                    position.y += sign(speed.y);
-        //                }
-        //            }
-        //            if (speed.y > 0) { grounded = true; }
-        //            if (speed.y < 0) { jumpTimer = 0; grounded = false; } // Stop the jump
-        //            speed.y = 0;
-        //        }
-        //        else if (!enableGMBounce)
-        //        {
-        //            int steps = 0;
-        //            if (speed.y != 0) // Prevent infinite loop
-        //            {
-        //                //while(!place_meeting(x,y+sign(SpeedY),par_Block))
-        //                while (/*place_free(position.x, position.y + sign(speed.y))*/ false) //TODO: Collision
-        //                {
-        //                    position.y += sign(speed.y);
-        //                    steps++;
-        //                }
-        //                position.y -= sign(speed.y) * (abs(speed.y) - steps);
-        //                if (speed.y > 0)
-        //                {
-        //                    grounded = true;
-        //                }
-        //                speed.y *= -1;
-        //                applyy = false;
-        //            }
-        //            grounded = false;
-        //        }
-        //    }
-        //    else
-        //    {
-        //        oldysign = 0;
-        //        grounded = false;
-        //    }
-        }
-        // Apply speed
-        if (applyy)
+        // VERTICAL
+        bool applyy = true;
+        if (enableVerticalCollision && !ignoreCollision && dy != 0.f)
         {
-            position.y += speed.y;
-        }
-        // Collision when walking
-        if (enableHorizontalCollision && !ignoreCollision)
-        {
-            //if(place_meeting(x+SpeedX,y,par_Block))
-            if (/*!place_free(position.x + speed.x, position.y)*/false)//TODO: Collision
+            Level::SweepHit hy = context.level.sweepVertical(box, dy);
+            if (hy.hit)
             {
-                if (!enableHorizontalBounce)
-                {
-                    if (speed.x != 0) // Prevent infinite loop
-                    {
-                        // Just like "Move to Contact"
-                        //while(!place_meeting(x+sign(SpeedX),y,par_Block)){x+=sign(SpeedX);}
-                        while (/*place_free(position.x + sign(speed.x), position.y)*/ false)//TODO: Collision
-                        {
-                            position.x += sign(speed.x);
-                        }
-                    }
-                    speed.x = 0;
+                box.y = hy.newY;
+                if (enableVerticalBounce && !enableGMBounce) {
+                    speed.y = -speed.y;
+                    applyy = false;
                 }
-                else if (!enableGMBounce)
+                else
                 {
-                    int steps = 0;
-                    if (speed.x != 0) // Prevent infinite loop
-                    {
-                        //while(!place_meeting(x+sign(SpeedX),y,par_Block))
-                        while (/*place_free(position.x + sign(speed.x) : 0), position.y)*/ false)
-                        {
-                            position.x += sign(speed.x);
-                            steps++;
-                        }
-                        position.x -= sign(speed.x) * (abs(speed.x) - steps);
-                        speed.x *= -1;
-                        applyx = false;
-                    }
-                    touchesWall = true;
+                    // landing logic
+                    if (dy > 0.f) { grounded = true; }     // moving down -> ground
+                    if (dy < 0.f) { jumpTimer = 0.0; }     // bonked head -> stop jump
+                    speed.y = 0.f;
                 }
+                // optional: terraforming hook with hy.tile
             }
             else
             {
-                oldxsign = 0;
+                grounded = false; // only set when actually supported by ground hit
+                box.y = hy.newY;
             }
         }
-        // Apply speed
-        if (applyx)
+        if (applyy)
         {
-            position.x += speed.x;
+            // Convert resolved world AABB back to entity position (y now included)
+            applyResolvedWorldAABBToEntity(position, hitbox, box);
         }
-        if (!ignoreCollision)
-        {
-            // Add solids to collision list
-            /*for (var i = 0; i < ds_list_size(SolidList); i++)
-            {
-                var w = ds_list_find_value(SolidList, i);
-                if (ds_list_find_index(Collisions, w) == -1)
-                {
-                    if (place_meeting(x + oldxsign, y + oldysign, w))
-                    {
-                        ds_list_add(Collisions, w);
-                    }
-                }
-            }*/
-            // Do GM's built-in bounce code
-            if (enableGMBounce)
-            {
-                //FIXME: GM bounce replacement, please!
-                
-                //hspeed = SpeedX;
-                //vspeed = SpeedY;
-                //x += hspeed;
-                //y += vspeed;
-                ////var tmpmask=mask_index;
-                ////mask_index=BounceMask;
-                ////par_Block.solid=true;
-                ///*var tmpwalls=ds_queue_create();
-                //for(var i=0;i<instance_number(par_Block);i++)
-                //{
-                //    var wall=instance_find(par_Block,i);
-                //    if(place_meeting(x,y,wall))
-                //    {
-                //        ds_queue_enqueue(tmpwalls,instance_find(par_Block,wall));
-                //        wall.solid=true;
-                //    }
-                //}*/
-                //move_bounce_solid(true);
-                ////event_user(0);
-                ////par_Block.solid=false;
-                ///*while(!ds_queue_empty(tmpwalls))
-                //{
-                //    var wall=ds_queue_dequeue(tmpwalls);
-                //    wall.solid=false;
-                //}
-                //ds_queue_destroy(tmpwalls);*/
-                //SpeedX = hspeed;
-                //SpeedY = vspeed;
-                //hspeed = 0;
-                //vspeed = 0;
-                ////mask_index=tmpmask;
-            }
 
-            //FIXME: MOCKUP
-            if (position.y >= fixmeMockupFloor)
-            {
-                position.y = fixmeMockupFloor;
-            }
+        // Probe 1px below to keep grounded accurate when dy is ~0
+        SDL_FRect probe = box;
+        probe.y += 1;
+        int c0, c1, r0, r1;
+        context.level.rectToTileSpan(probe, c0, c1, r0, r1);
+        bool onSolid = false;
+        for (int r = r0; r <= r1; ++r)
+            for (int c = c0; c <= c1; ++c)
+                if (context.level.queryTile(c, r).coll == Level::Block::Collision::Solid)
+                    onSolid = true;
+        grounded = grounded || onSolid;
 
-            // Break out if stuck inside of a wall
-            //if (place_meeting(x,y,par_Block))
-            if (/*!place_free(position.x, position.y)*/ false) //TODO: Collision
-            {
-                // Make some better code!
-                //while(place_meeting(x,y,par_Block)){y--;}
-                /*hspeed = SpeedX;
-                vspeed = SpeedY;
-                move_outside_solid(direction, sqrt(sqr(hspeed) + sqr(vspeed)))
-                    SpeedX = hspeed;
-                SpeedY = vspeed;
-                hspeed = 0;
-                vspeed = 0;*/
-            }
-            // Add solids to collision list
-            /*for (var i = 0; i < ds_list_size(SolidList); i++)
-            {
-                var w = ds_list_find_value(SolidList, i);
-                if (ds_list_find_index(Collisions, w) == -1)
-                {
-                    if (place_meeting(x + oldxsign, y + oldysign, w))
-                    {
-                        ds_list_add(Collisions, w);
-                    }
-                }
-            }*/
-            if (/*!place_free(x, y)*/ false) //TODO: Collision
-            {
-                while (/*!place_free(position.x, position.y)*/ false)//TODO: Collision
-                {
-                    position.y--;
-                }
-            }
+        // WATER (or other mediums)
+        // Detect if any overlapped tile is water; update state:
+        inWater = context.level.rectInWater(box);
 
-            // Check if touching a wall
-            touchesWall = false;
-            //if(place_meeting(x+1,y,par_Block))||(place_meeting(x-1,y,par_Block))
-            if (/*!place_free(position.x + 1, position.y)) || (!place_free(position.x - 1, position.y)*/ false) //TODO: Collision
-            {
-                touchesWall = true;
-            }
-
-            // Check if grounded
-            // FIXME: UNCOMMENT THIS SNIPPET!
-            //grounded = false;
-            //if (place_meeting(x,y+1,par_Block))
-            //if (/*!place_free(position.x, position.y + 1)*/ false)
-            //{
-            //    grounded = true;
-            //}
-            //// Add solids to collision list
-            //for (var i = 0; i < ds_list_size(SolidList); i++)
-            //{
-            //    var w = ds_list_find_value(SolidList, i);
-            //    if (ds_list_find_index(Collisions, w) == -1)
-            //    {
-            //        if (place_meeting(x + 1, y, w))
-            //        {
-            //            ds_list_add(Collisions, w);
-            //        }
-            //        if (place_meeting(x - 1, y, w))
-            //        {
-            //            ds_list_add(Collisions, w);
-            //        }
-            //        if (place_meeting(x, y + 1, w))
-            //        {
-            //            ds_list_add(Collisions, w);
-            //        }
-            //    }
-            //}
-        }
-        //// Restore solids
-        //for (var i = 0; i < ds_list_size(SolidList); i++)
-        //{
-        //    var se = ds_list_find_value(SolidList, i);
-        //    se.solid = false;
-        //}
     }
 }
 

@@ -93,6 +93,31 @@ bool LevelAccess::rectOverlapsSolid(const SDL_FRect& r) const
 	return false;
 }
 
+void LevelAccess::rectToTileSpan(const SDL_FRect& r, int& col0, int& col1, int& row0, int& row1) const
+{
+	return actual->rectToTileSpan(r, col0, col1, row0, row1);
+}
+
+Level::BlockQuery LevelAccess::queryTile(int col, int row) const
+{
+	return actual->queryTile(col, row);
+}
+
+Level::SweepHit LevelAccess::sweepHorizontal(const SDL_FRect& rect, float dx) const
+{
+	return actual->sweepHorizontal(rect, dx);
+}
+
+Level::SweepHit LevelAccess::sweepVertical(const SDL_FRect& rect, float dy) const
+{
+	return actual->sweepVertical(rect, dy);
+}
+
+bool LevelAccess::rectInWater(const SDL_FRect& r) const
+{
+	return actual->rectInWater(r);
+}
+
 //auto LevelAccess::sweepAABB(const SDL_FRect& box, SDL_FPoint d) const
 //{
 //	//FIXME: UNIMPLEMENTED!
