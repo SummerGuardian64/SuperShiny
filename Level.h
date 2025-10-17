@@ -7,6 +7,16 @@
 
 namespace ssge
 {
+    struct TileIndex { int col = -1, row = -1; };
+
+    inline bool operator==(const TileIndex& a, const TileIndex& b) {
+        return a.col == b.col && a.row == b.row;
+    }
+
+    // Mapping helpers:
+    inline int worldToCol(float x, int tileW) { return (int)std::floor(x / (float)tileW); }
+    inline int worldToRow(float y, int tileH) { return (int)std::floor(y / (float)tileH); }
+
 	class Level
 	{
 	public:
@@ -95,6 +105,21 @@ namespace ssge
 				return rect;
 			}
 		};
+
+		struct BlockQuery {
+			TileIndex tile;                   // which tile we touched/checked
+			Level::Block::Type type = Level::Block::Type::EMPTY;
+			Level::Block::Collision coll = Level::Block::Collision::Air;
+			bool insideLevel = false;
+		};
+
+		struct SweepHit {
+			bool hit = false;
+			TileIndex tile;                   // solid tile we hit
+			float newX = 0.f;                 // resolved x (after axis move)
+			float newY = 0.f;                 // resolved y (after axis move)
+		};
+
 	public:
 		// Level never changes dimensions once constructed.
 		const int columns;
@@ -143,6 +168,21 @@ namespace ssge
 		Block::Collision getCollisionAt(SDL_Point point) const;
 
 		SDL_Rect calculateLevelSize() const; // total pixel rectangle of the level starting at (0,0)
+
+        // Return tile indices overlapped by a rect (clamped to level bounds).
+        void rectToTileSpan(const SDL_FRect& r, int& col0, int& col1, int& row0, int& row1) const;
+
+        // Query a tile (with OOB policy)
+        BlockQuery queryTile(int col, int row) const;
+
+        // Is any overlapped tile "water"?
+        bool rectInWater(const SDL_FRect& r) const;
+
+        // Axis-separated sweep: move horizontally by dx, collide with solids.
+        SweepHit sweepHorizontal(const SDL_FRect& rect, float dx) const;
+
+        // Axis-separated sweep: move vertically by dy, collide with solids.
+        SweepHit sweepVertical(const SDL_FRect& rect, float dy) const;
 
 		const SdlTexture& getTilesetTexture() const;
 		const TilesetMeta getTilesetMeta() const;

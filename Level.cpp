@@ -295,6 +295,174 @@ namespace ssge
 		return r;
 	}
 
+	// Return tile indices overlapped by a rect (clamped to level bounds).
+	inline void Level::rectToTileSpan(const SDL_FRect& r, int& col0, int& col1, int& row0, int& row1) const {
+		const int w = blockSize.w, h = blockSize.h;
+		col0 = std::max(0, worldToCol(r.x, w));
+		row0 = std::max(0, worldToRow(r.y, h));
+		col1 = std::min(columns - 1, worldToCol(r.x + r.w - 1, w));
+		row1 = std::min(rows - 1, worldToRow(r.y + r.h - 1, h));
+	}
+
+	// Query a tile (with OOB policy)
+	inline Level::BlockQuery Level::queryTile(int col, int row) const {
+		BlockQuery q;
+		q.tile = { col,row };
+		if (col < 0 || row < 0 || col >= columns || row >= rows) {
+			q.insideLevel = false;
+			// Decide collision for OOB:
+			// You already have throughTop/Bottom/etc. For simplicity, treat OOB as Solid.
+			q.coll = Level::Block::Collision::Solid;
+			q.type = Level::Block::Type::EMPTY;
+			return q;
+		}
+		q.insideLevel = true;
+		const Block& b = array[row * columns + col];
+		q.coll = b.collision;
+		q.type = b.type;
+		return q;
+	}
+
+	// Is any overlapped tile "water"?
+	inline bool Level::rectInWater(const SDL_FRect& r) const {
+		int c0, c1, r0, r1;
+		rectToTileSpan(r, c0, c1, r0, r1);
+		for (int rI = r0; rI <= r1; ++rI)
+			for (int cI = c0; cI <= c1; ++cI)
+				if (queryTile(cI, rI).coll == Level::Block::Collision::Water)
+					return true;
+		return false;
+	}
+
+	// Axis-separated sweep: move horizontally by dx, collide with solids.
+	inline Level::SweepHit Level::sweepHorizontal(const SDL_FRect& rect, float dx) const {
+		SweepHit out; out.hit = false;
+		if (dx == 0.f) { out.newX = rect.x; out.newY = rect.y; return out; }
+
+		const int w = blockSize.w, h = blockSize.h;
+		SDL_FRect box = rect;
+
+		// Which rows do we span?
+		int col0, col1, row0, row1;
+		rectToTileSpan(box, col0, col1, row0, row1);
+
+		if (dx > 0.f) {
+			// moving right: scan columns we *will enter*
+			float right0 = box.x + box.w;
+			float right1 = right0 + dx;
+			int startCol = worldToCol(right0, w) + 1;              // first column we *enter*
+			int endCol = worldToCol(right1 - 0.001f, w);         // last column possibly entered
+
+			for (int c = startCol; c <= endCol; ++c) {
+				// check the span of rows overlapped by the box
+				for (int rI = row0; rI <= row1; ++rI) {
+					BlockQuery q = queryTile(c, rI);
+					if (q.coll == Level::Block::Collision::Solid) {
+						// resolve to tile boundary at left edge of (c)
+						float tileLeft = (float)(c * w);
+						out.hit = true;
+						out.tile = { c,rI };
+						out.newX = tileLeft - box.w;  // place our right edge at tileLeft
+						out.newY = box.y;
+						return out;
+					}
+				}
+			}
+			// no hit
+			out.newX = rect.x + dx;
+			out.newY = rect.y;
+			return out;
+		}
+		else {
+			// moving left: scan columns we *will enter*
+			float left0 = box.x;
+			float left1 = left0 + dx;
+			int startCol = worldToCol(left0, w) - 1;               // first column we *enter* on the left
+			int endCol = worldToCol(left1 + 0.001f, w);          // last column possibly entered
+
+			for (int c = startCol; c >= endCol; --c) {
+				for (int rI = row0; rI <= row1; ++rI) {
+					BlockQuery q = queryTile(c, rI);
+					if (q.coll == Level::Block::Collision::Solid) {
+						float tileRight = (float)((c + 1) * w);
+						out.hit = true;
+						out.tile = { c,rI };
+						out.newX = tileRight;      // place our left edge at tileRight
+						out.newY = box.y;
+						return out;
+					}
+				}
+			}
+			// no hit
+			out.newX = rect.x + dx;
+			out.newY = rect.y;
+			return out;
+		}
+	}
+
+
+	// Axis-separated sweep: move vertically by dy, collide with solids.
+	inline Level::SweepHit Level::sweepVertical(const SDL_FRect& rect, float dy) const {
+		SweepHit out; out.hit = false;
+		if (dy == 0.f) { out.newX = rect.x; out.newY = rect.y; return out; }
+
+		const int w = blockSize.w, h = blockSize.h;
+		SDL_FRect box = rect;
+
+		// Which cols do we span?
+		int col0, col1, row0, row1;
+		rectToTileSpan(box, col0, col1, row0, row1);
+
+		if (dy > 0.f) {
+			// moving down
+			float bottom0 = box.y + box.h;
+			float bottom1 = bottom0 + dy;
+			int startRow = worldToRow(bottom0, h) + 1;             // first row we enter below
+			int endRow = worldToRow(bottom1 - 0.001f, h);
+
+			for (int rI = startRow; rI <= endRow; ++rI) {
+				for (int cI = col0; cI <= col1; ++cI) {
+					BlockQuery q = queryTile(cI, rI);
+					if (q.coll == Level::Block::Collision::Solid) {
+						float tileTop = (float)(rI * h);
+						out.hit = true;
+						out.tile = { cI,rI };
+						out.newY = tileTop - box.h; // place our bottom at tileTop
+						out.newX = box.x;
+						return out;
+					}
+				}
+			}
+			out.newX = rect.x;
+			out.newY = rect.y + dy;
+			return out;
+		}
+		else {
+			// moving up
+			float top0 = box.y;
+			float top1 = top0 + dy;
+			int startRow = worldToRow(top0, h) - 1;
+			int endRow = worldToRow(top1 + 0.001f, h);
+
+			for (int rI = startRow; rI >= endRow; --rI) {
+				for (int cI = col0; cI <= col1; ++cI) {
+					BlockQuery q = queryTile(cI, rI);
+					if (q.coll == Level::Block::Collision::Solid) {
+						float tileBottom = (float)((rI + 1) * h);
+						out.hit = true;
+						out.tile = { cI,rI };
+						out.newY = tileBottom;     // place our top at tileBottom
+						out.newX = box.x;
+						return out;
+					}
+				}
+			}
+			out.newX = rect.x;
+			out.newY = rect.y + dy;
+			return out;
+		}
+	}
+
 	const SdlTexture& Level::getTilesetTexture() const
 	{
 		return tileset;
