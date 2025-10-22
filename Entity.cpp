@@ -390,7 +390,7 @@ void Entity::step(EntityStepContext& context)
 	//FIXME: THIS NEEDS REFINEMENT!
 	lifespan += deltaTime * 60;
 
-	std::cout << "Entity " << (void*)this << " has been there for " << lifespan << std::endl;
+	//std::cout << "Entity " << (void*)this << " has been there for " << lifespan << std::endl;
 }
 
 void Entity::draw(DrawContext context) const

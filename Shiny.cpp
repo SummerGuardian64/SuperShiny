@@ -86,12 +86,12 @@ EntityClassID Shiny::getEntityClassID() const
 
 void Shiny::firstStep(EntityStepContext& context)
 {
-	std::cout << "Helloy!" << std::endl;
+	//std::cout << "Helloy!" << std::endl;
 }
 
 void Shiny::preStep(EntityStepContext& context)
 {
-	std::cout << "scale.. ";
+	//std::cout << "scale.. ";
 
     if (auto ctrl = control.get())
     {
@@ -111,7 +111,7 @@ void Shiny::preStep(EntityStepContext& context)
 
 void Shiny::postStep(EntityStepContext& context)
 {
-	std::cout << "...floof~" << std::endl;
+	//std::cout << "...floof~" << std::endl;
 }
 
 void Shiny::preDraw(DrawContext& context) const
@@ -124,5 +124,5 @@ void Shiny::postDraw(DrawContext& context) const
 
 void Shiny::onDestroy(EntityStepContext& context)
 {
-	std::cout << "Scalefloof go poof!" << std::endl;
+	//std::cout << "Scalefloof go poof!" << std::endl;
 }

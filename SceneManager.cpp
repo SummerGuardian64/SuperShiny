@@ -12,7 +12,7 @@ SceneManager::SceneManager(PassKey<Engine> pk) {}
 
 void SceneManager::step(StepContext& context)
 {
-	std::cout << "SceneManager::step()" << std::endl;
+	//std::cout << "SceneManager::step()" << std::endl;
 
 	paused = wannaPause;
 
@@ -90,7 +90,7 @@ void SceneManager::step(StepContext& context)
 
 void SceneManager::draw(DrawContext& context)
 {
-	std::cout << "SceneManager::draw()" << std::endl;
+	//std::cout << "SceneManager::draw()" << std::endl;
 	// Draw current scene
 	if (auto scene = getCurrentScene())
 	{

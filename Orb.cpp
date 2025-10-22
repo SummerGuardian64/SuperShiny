@@ -82,7 +82,7 @@ EntityClassID Orb::getEntityClassID() const
 
 void Orb::firstStep(EntityStepContext& context)
 {
-    std::cout << "BORB!" << std::endl;
+    //std::cout << "BORB!" << std::endl;
 }
 
 void Orb::preStep(EntityStepContext& context)
