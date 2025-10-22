@@ -507,14 +507,19 @@ namespace ssge
 		SDL_Renderer* renderer = context.getRenderer();
 		if (!renderer || !array) return;
 
-		auto bounds = context.getBounds();
+		// Mitigate division by zero
+		if (!tilesMeta.isValid())
+			return;
+
+		auto viewport = context.getBounds();
 		auto scroll = context.getScrollOffset();
+		SDL_Rect tile{ 0,0,tilesMeta.tileW,tilesMeta.tileW };
 		int leftOffset = scroll.x;
 		int topOffset = scroll.y;
-		int leftExtent = std::clamp(scroll.x / tilesMeta.tileW, 0, columns);
-		int rightExtent = std::clamp(leftExtent + bounds.w / tilesMeta.tileW + 1, 0, columns);
-		int topExtent = std::clamp(scroll.y / tilesMeta.tileH, 0, rows);
-		int bottomExtent = std::clamp(topExtent + bounds.h / tilesMeta.tileH + 1, 0, rows);
+		int leftExtent = std::clamp(scroll.x / tile.w, 0, columns);
+		int rightExtent = std::clamp(leftExtent + (viewport.w + tile.w - 1) / tile.w + 1, 0, columns);
+		int topExtent = std::clamp(scroll.y / tile.h, 0, rows);
+		int bottomExtent = std::clamp(topExtent + (viewport.h + tile.h - 1) / tile.h + 1, 0, rows);
 
 		if (tileset)
 		{
