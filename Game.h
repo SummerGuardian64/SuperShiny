@@ -51,7 +51,7 @@ namespace ssge
 			// Declared, but not defined here
 			static FactoryFn registry[];
 
-			// We’ll declare a function that returns the array size.
+			// Weï¿½ll declare a function that returns the array size.
 			static int getRegistrySize();
 
 			static std::shared_ptr<Entity> create(EntityClassID id)

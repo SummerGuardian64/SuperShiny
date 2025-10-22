@@ -48,6 +48,10 @@ void SplashScreen::step(SceneStepContext& context)
 	{
 		context.scenes.goToLevel(1);
 	}
+	if (context.inputs.isJustPressed(5))
+	{
+		context.scenes.goToLevel(2);
+	}
 }
 
 void SplashScreen::draw(DrawContext& context)

@@ -58,7 +58,7 @@ namespace ssge
 			int getTypeIndex() const; // index in the tileset (0-based) for draw()
 		};
 
-		class Iterator // (planned) rich iterator — declared for future use
+		class Iterator // (planned) rich iterator ï¿½ declared for future use
 		{
 			Level& level;
 			int column{ 0 };

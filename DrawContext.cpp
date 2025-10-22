@@ -71,8 +71,8 @@ SDL_Point DrawContext::getScrollOffset() const
 SDL_Point DrawContext::calculateAnchorPoint() const
 {
 	SDL_Point anchor = this->origin;
-	anchor.x += scrollOffset.x;
-	anchor.y += scrollOffset.y;
+	anchor.x -= scrollOffset.x;
+	anchor.y -= scrollOffset.y;
 	return anchor;
 }
 

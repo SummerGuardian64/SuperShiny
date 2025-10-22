@@ -4,6 +4,7 @@
 #include "Game.h"
 #include "PassKey.h"
 #include "Accessor.h"
+#include <algorithm>
 
 using namespace ssge;
 
@@ -91,7 +92,9 @@ void GameWorld::init(SceneStepContext& context)
 {
     initLevel(context);
 
-    entities.addEntity(EntityClassID::Shiny);
+    auto shiny = entities.addEntity(EntityClassID::Shiny);
+
+    entityToScrollTo = shiny;
 
     //std::string error;
     //level = LevelLoader::loadLevel(game.progress.getLevel(), error);
@@ -132,8 +135,12 @@ void GameWorld::step(SceneStepContext& context)
         LevelAccess(level.get())
     );
 
-
     entities.step(gameWorldStepContext);
+
+    if (auto e = entityToScrollTo.get())
+    {
+        scrollTarget = e->position;
+    }
 
     //// TODO: game victory/loss criteria check
 
@@ -185,15 +192,63 @@ void GameWorld::draw(DrawContext& context)
     );
     SDL_RenderFillRect(renderer, &context.getBounds());
 
-    // Draw level
+    // Default scroll offset is at half of the screen size
+    SDL_Rect screenSize = context.getBounds();
+    SDL_FRect halfScreen{ 0, 0, screenSize.w / 2,screenSize.h / 2 };
+    SDL_FPoint centerPoint{ halfScreen.w,halfScreen.h };
+
+    // If level exists, base scrolling off of it and draw it.
     if (level)
     {
-        level->draw(context);
+        SDL_Rect levelSize = level->calculateLevelSize();
+
+        // Make sure the center point doesn't nag scrollingOffset out of the screen.
+        // Exceptionally, if the level is shorter than the screen by any axis,
+        // set that axis of the scrollingOffset to half of the level's size by that axis.
+
+        if (levelSize.w < screenSize.w)
+            centerPoint.x = levelSize.w / 2;
+        else
+            centerPoint.x = std::clamp(scrollTarget.x, halfScreen.w, levelSize.w - halfScreen.w);
+
+        if (levelSize.h < screenSize.h)
+            centerPoint.y = levelSize.h / 2;
+        else
+            centerPoint.y = std::clamp(scrollTarget.y, halfScreen.h, levelSize.h - halfScreen.h);
+
+        // View offset (top-left in world)
+        SDL_Point viewOffset{
+            int(centerPoint.x - halfScreen.w + 0.5f),
+            int(centerPoint.y - halfScreen.h + 0.5f)
+        };
+
+        // Derive the current draw context for scrolling with the given offset
+        DrawContext scrolledContext = context.deriveForScrolling(viewOffset);
+
+        // Draw the level
+        level->draw(scrolledContext);
+
+        // Draw all entities
+        entities.draw(scrolledContext);
+    }
+    else
+    {
+        // Draw entities without level-based scrolling
+
+        // View offset (top-left in world)
+        SDL_Point viewOffset{
+            int(centerPoint.x - halfScreen.w + 0.5f),
+            int(centerPoint.y - halfScreen.h + 0.5f)
+        };
+
+        // Derive the current draw context for scrolling with the given offset
+        DrawContext scrolledContext = context.deriveForScrolling(viewOffset);
+
+        // Draw all entities
+        entities.draw(scrolledContext);
     }
 
-    // Draw all entities
-    entities.draw(context);
-
+    // Draw HUD without scrolling
     drawHUD(context);
 }
 

@@ -206,7 +206,7 @@ namespace ssge
 		if (this != &other)
 		{
 			delete[] array;
-			// const members (columns/rows/blockSize) cannot be assigned — but
+			// const members (columns/rows/blockSize) cannot be assigned ï¿½ but
 			// we only allow move on a freshly-constructed temporary in practice.
 			// If you truly need assignment, drop the const on these dims.
 			// Here we just adopt the underlying storage and public resources:
@@ -507,11 +507,20 @@ namespace ssge
 		SDL_Renderer* renderer = context.getRenderer();
 		if (!renderer || !array) return;
 
+		auto bounds = context.getBounds();
+		auto scroll = context.getScrollOffset();
+		int leftOffset = scroll.x;
+		int topOffset = scroll.y;
+		int leftExtent = std::clamp(scroll.x / tilesMeta.tileW, 0, columns);
+		int rightExtent = std::clamp(leftExtent + bounds.w / tilesMeta.tileW + 1, 0, columns);
+		int topExtent = std::clamp(scroll.y / tilesMeta.tileH, 0, rows);
+		int bottomExtent = std::clamp(topExtent + bounds.h / tilesMeta.tileH + 1, 0, rows);
+
 		if (tileset)
 		{
-			for (int r = 0; r < rows; ++r)
-			{
-				for (int c = 0; c < columns; ++c)
+			for (int r = topExtent; r < bottomExtent; ++r)
+			{	
+				for (int c = leftExtent; c < rightExtent; ++c)
 				{
 					const Block& b = array[indexOf(r, c)];
 					if (b.type == Block::Type::EMPTY) continue;
@@ -519,8 +528,8 @@ namespace ssge
 					SDL_Rect src = tilesMeta.makeRectForTile(b.getTypeIndex());
 
 					SDL_Rect dst{
-						c * blockSize.w,
-						r * blockSize.h,
+						c * blockSize.w - leftOffset,
+						r * blockSize.h - topOffset,
 						blockSize.w,
 						blockSize.h
 					};
@@ -532,16 +541,16 @@ namespace ssge
 		}
 		else
 		{
-			for (int r = 0; r < rows; ++r)
+			for (int r = topExtent; r < bottomExtent; ++r)
 			{
-				for (int c = 0; c < columns; ++c)
+				for (int c = leftExtent; c < rightExtent; ++c)
 				{
 					const Block& b = array[indexOf(r, c)];
 					if (b.type == Block::Type::EMPTY) continue;
 
 					SDL_Rect dst{
-						c * blockSize.w,
-						r * blockSize.h,
+						c * blockSize.w - leftOffset,
+						r * blockSize.h - topOffset,
 						blockSize.w,
 						blockSize.h
 					};

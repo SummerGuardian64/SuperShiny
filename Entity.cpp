@@ -254,7 +254,7 @@ void Entity::Physics::step(EntityStepContext& context)
         }*/
 
         // After you compute speed.x, speed.y for this fixed step:
-        float dx = speed.x;   // per-step displacement in world units (you’re already stepping at fixed dt)
+        float dx = speed.x;   // per-step displacement in world units (youï¿½re already stepping at fixed dt)
         float dy = speed.y;
 
         // We'll apply axis-separated resolution: X then Y, using level sweeps.
@@ -268,12 +268,12 @@ void Entity::Physics::step(EntityStepContext& context)
             Level::SweepHit hx = context.level.sweepHorizontal(box, dx);
             if (hx.hit)
             {
-                // We hit a solid tile—resolve at boundary and zero x-speed (or bounce if enabled)
+                // We hit a solid tileï¿½resolve at boundary and zero x-speed (or bounce if enabled)
                 box.x = hx.newX;
                 if (enableHorizontalBounce && !enableGMBounce)
                 {
                     speed.x = -speed.x;
-                    applyx = false; // bounce handled position; don’t re-apply afterwards
+                    applyx = false; // bounce handled position; donï¿½t re-apply afterwards
                 }
                 else
                 {
@@ -288,7 +288,7 @@ void Entity::Physics::step(EntityStepContext& context)
         }
         if (applyx)
         {
-            // If we didn’t bounce-position, adopt the new x
+            // If we didnï¿½t bounce-position, adopt the new x
             // Convert resolved world AABB back to entity position (x only)
             SDL_FRect tmp = box;
             tmp.y = position.y + hitbox.y; // keep current y for now

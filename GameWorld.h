@@ -27,6 +27,8 @@ namespace ssge
         Scene& getAsScene();
         EntityManager entities;
         std::unique_ptr<Level> level;
+        EntityReference entityToScrollTo;
+        SDL_FPoint scrollTarget;
         //HintManager hints;
         bool isGameplayOver() const;
         void finishGameplay();
