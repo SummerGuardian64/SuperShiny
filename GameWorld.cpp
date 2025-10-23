@@ -142,6 +142,12 @@ void GameWorld::step(SceneStepContext& context)
         scrollTarget = e->position;
     }
 
+    if (context.inputs.isJustPressed(7))
+    {
+        context.scenes.pause();
+        context.menus.openPauseMenu();
+    }
+
     //// TODO: game victory/loss criteria check
 
     //// If the gameplay isn't over yet, process the game

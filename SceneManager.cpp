@@ -27,6 +27,7 @@ void SceneManager::step(StepContext& context)
 				context.scenes,
 				context.inputs,
 				context.drawing,
+				context.menus,
 				CurrentSceneAccess(scene)
 			);
 			scene->init(sceneStepContext);
@@ -41,6 +42,7 @@ void SceneManager::step(StepContext& context)
 				context.scenes,
 				context.inputs,
 				context.drawing,
+				context.menus,
 				CurrentSceneAccess(scene)
 			);
 			scene->step(sceneStepContext);
@@ -80,6 +82,7 @@ void SceneManager::step(StepContext& context)
 			queuedScene = NULL;
 			sceneInitialized = false;
 			paused = false; // New scenes shouldn't start paused!
+			wannaPause = false;
 		}
 	}
 	else if (fadeVal > 0)

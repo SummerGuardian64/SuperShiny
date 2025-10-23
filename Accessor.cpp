@@ -7,6 +7,8 @@
 #include "SplashScreen.h"
 #include "GameWorld.h"
 #include "EntityManager.h"
+#include "MenuManager.h"
+#include "TitleScreen.h"
 
 using namespace ssge;
 
@@ -29,7 +31,7 @@ void ScenesAccess::changeScene(SceneClassID sceneClassID)
 		newScene = std::make_unique<SplashScreen>();
 		break;
 	case SceneClassID::TitleScreen:
-		//newScene = std::make_unique<TitleScreen>();
+		newScene = std::make_unique<TitleScreen>();
 		break;
 	case SceneClassID::GameWorld:
 		newScene = std::make_unique<GameWorld>();
@@ -61,6 +63,11 @@ bool ScenesAccess::isPaused() const
 void ScenesAccess::setPause(bool pause)
 {
 	return actual->setPause(pause);
+}
+
+bool ssge::ScenesAccess::isFadeFinished() const
+{
+	return actual->isFadeFinished();
 }
 
 bool InputsAccess::isPressed(int buttonIndex)
@@ -132,4 +139,24 @@ bool LevelAccess::rectInWater(const SDL_FRect& r) const
 EntityReference ssge::EntitiesAccess::addEntity(EntityClassID entityClassID)
 {
 	return actual->addEntity(entityClassID);
+}
+
+bool ssge::MenusAccess::isOpen() const
+{
+	return actual->isOpen();
+}
+
+void ssge::MenusAccess::openMainMenu()
+{
+	actual->pushMenu(0);
+}
+
+void ssge::MenusAccess::openPauseMenu()
+{
+	actual->pushMenu(2);
+}
+
+void ssge::MenusAccess::close()
+{
+	actual->close();
 }

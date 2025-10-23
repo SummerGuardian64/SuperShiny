@@ -14,6 +14,7 @@
 #include <SDL_ttf.h>
 #include "MenuRenderer.h"
 #include "GameWorld.h"
+#include "TitleScreen.h"
 
 using namespace ssge;
 
@@ -97,8 +98,20 @@ bool Engine::loadInitialResources(SDL_Renderer* renderer)
 			{"Back",              true,true,false, MenuCommand::Pop()}
 		}
 		});
-
-	menus->pushMenu(0);
+	const int pauseId = menus->registerMenu(Menu{
+		"Paused",
+		{
+			{"Continue", true,true,false,MenuCommand::Unpause()},
+			{"Back to Main Menu", true,true,false,MenuCommand::PushMenu(3)}
+		}
+		});
+	const int areYouSureId = menus->registerMenu(Menu{
+		"Are you sure?",
+		{
+			{"Yes", true,true,false,MenuCommand::GoToTitleScreen()},
+			{"No", true,true,false,MenuCommand::Pop()}
+		}
+		});
 
 	return true;
 }
@@ -112,8 +125,10 @@ bool Engine::prepareInitialState()
 	inputs->bindings[1].bindToKey(SDL_Scancode::SDL_SCANCODE_DOWN);
 	inputs->bindings[2].bindToKey(SDL_Scancode::SDL_SCANCODE_LEFT);
 	inputs->bindings[3].bindToKey(SDL_Scancode::SDL_SCANCODE_RIGHT);
-	inputs->bindings[4].bindToKey(SDL_Scancode::SDL_SCANCODE_J);
-	inputs->bindings[5].bindToKey(SDL_Scancode::SDL_SCANCODE_K);
+	inputs->bindings[4].bindToKey(SDL_Scancode::SDL_SCANCODE_X);
+	inputs->bindings[5].bindToKey(SDL_Scancode::SDL_SCANCODE_Z);
+	inputs->bindings[6].bindToKey(SDL_Scancode::SDL_SCANCODE_C);
+	inputs->bindings[7].bindToKey(SDL_Scancode::SDL_SCANCODE_ESCAPE);
 
 	return true;
 }
@@ -219,7 +234,8 @@ bool Engine::update(double deltaTime)
 		EngineAccess(this),
 		ScenesAccess(scenes),
 		InputsAccess(inputs),
-		DrawingAccess(window->getRenderer())
+		DrawingAccess(window->getRenderer()),
+		MenusAccess(menus)
 	);
 
 	scenes->step(stepContext);
@@ -301,6 +317,14 @@ void Engine::onMenuCommand(const MenuCommand& cmd)
 	case MenuCommandType::GoToLevel:
 		scenes->changeScene(std::make_unique<GameWorld>(cmd.param));
 		menus->close();
+		break;
+	case MenuCommandType::Unpause:
+		menus->close();
+		scenes->unpause();
+		break;
+	case MenuCommandType::GoToTitleScreen:
+		menus->close();
+		scenes->changeScene(std::make_unique<TitleScreen>());
 		break;
 	case MenuCommandType::Pop:
 		menus->popMenu();

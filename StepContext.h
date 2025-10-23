@@ -14,6 +14,7 @@ namespace ssge {
     class Scene;
     class GameWorld;
     class EntityManager;
+    class MenuManager;
     
     class StepContextBase {
     public:
@@ -28,6 +29,7 @@ namespace ssge {
         ScenesAccess scenes;
         InputsAccess inputs;
         DrawingAccess drawing;
+        MenusAccess menus;
 
         explicit StepContext(
             PassKey<Engine> pk,
@@ -35,7 +37,8 @@ namespace ssge {
             EngineAccess engine,
             ScenesAccess scenes,
             InputsAccess inputs,
-            DrawingAccess drawing
+            DrawingAccess drawing,
+            MenusAccess menus
         );
     };
 
@@ -45,6 +48,7 @@ namespace ssge {
         ScenesAccess scenes;
         InputsAccess inputs;
         DrawingAccess drawing;
+        MenusAccess menus;
         CurrentSceneAccess currentScene;
 
         explicit SceneStepContext(
@@ -54,6 +58,7 @@ namespace ssge {
             ScenesAccess scenes,
             InputsAccess inputs,
             DrawingAccess drawing,
+            MenusAccess menus,
             CurrentSceneAccess currentScene
         );
     };

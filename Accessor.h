@@ -39,6 +39,7 @@ namespace ssge {
         bool togglePause();
         bool isPaused() const;
         void setPause(bool pause);
+        bool isFadeFinished() const;
     };
 
     class InputsAccess {
@@ -121,11 +122,10 @@ namespace ssge {
         MenuManager* actual;
     public:
         explicit MenusAccess(MenuManager* actual) : actual(actual) {}
-        //TODO
-        /*bool isOpen() const;
+        bool isOpen() const;
         void openMainMenu();
         void openPauseMenu();
-        void close();*/
+        void close();
     };
 
 } // namespace ssge

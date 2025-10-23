@@ -41,7 +41,7 @@ add_executable (SuperShiny
   "Accessor.h" "Accessor.cpp"
   "Orb.cpp" "Orb.h"
   "MenuManager.cpp" "MenuManager.h" "Menu.h" "MenuItem.h"  "MenuRenderer.h" "MenuRenderer.cpp"
- "MenuCommand.h")
+ "MenuCommand.h" "TitleScreen.cpp" "TitleScreen.h")
 
 # Link against SDL2 and SDL2_image
 # SDL2main is needed on Windows to provide a main() wrapper

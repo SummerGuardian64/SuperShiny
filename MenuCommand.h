@@ -7,6 +7,8 @@ namespace ssge {
 		None,
 		NewGame,
 		GoToLevel,
+		Unpause,
+		GoToTitleScreen,
 		PushMenu,
 		Option,
 		Pop,
@@ -21,6 +23,8 @@ namespace ssge {
 		int direction = 0; // for rightleftable
 		static MenuCommand NewGame() { return { MenuCommandType::NewGame }; }
 		static MenuCommand GoToLevel(int lvl) { return { MenuCommandType::GoToLevel, lvl }; }
+		static MenuCommand Unpause() { return { MenuCommandType::Unpause }; }
+		static MenuCommand GoToTitleScreen() { return { MenuCommandType::GoToTitleScreen }; }
 		static MenuCommand PushMenu(int id) { return { MenuCommandType::PushMenu, id }; }
 		static MenuCommand Option(int option, int direction) { return { MenuCommandType::Option, option, direction }; }
 		static MenuCommand Pop() { return { MenuCommandType::Pop }; }

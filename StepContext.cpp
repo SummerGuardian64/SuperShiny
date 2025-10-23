@@ -12,13 +12,15 @@ StepContext::StepContext(
     EngineAccess engine_,
     ScenesAccess scenes_,
     InputsAccess inputs_,
-    DrawingAccess drawing_
+    DrawingAccess drawing_,
+    MenusAccess menus_
 )
     : StepContextBase(deltaTime),
     engine(std::move(engine_)),
     scenes(std::move(scenes_)),
     inputs(std::move(inputs_)),
-    drawing(std::move(drawing_))
+    drawing(std::move(drawing_)),
+    menus(std::move(menus_))
 {
 }
 
@@ -30,6 +32,7 @@ SceneStepContext::SceneStepContext(
     ScenesAccess scenes_,
     InputsAccess inputs_,
     DrawingAccess drawing_,
+    MenusAccess menus_,
     CurrentSceneAccess currentScene_
 )
     : StepContextBase(deltaTime),
@@ -37,6 +40,7 @@ SceneStepContext::SceneStepContext(
     scenes(std::move(scenes_)),
     inputs(std::move(inputs_)),
     drawing(std::move(drawing_)),
+    menus(std::move(menus_)),
     currentScene(std::move(currentScene_))
 {
 }
