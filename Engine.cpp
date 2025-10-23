@@ -5,11 +5,15 @@
 #include "StepContext.h"
 #include "DrawContext.h"
 #include "Game.h"
-#include "SDL.h"
+#include <SDL.h>
 #include "PassKey.h"
+#include "MenuManager.h"
 #include "WindowManager.h"
 #include "Accessor.h"
 #include "SplashScreen.h"
+#include <SDL_ttf.h>
+#include "MenuRenderer.h"
+#include "GameWorld.h"
 
 using namespace ssge;
 
@@ -18,6 +22,7 @@ Engine::Engine(PassKey<Program> pk)
 	window = new WindowManager(PassKey<Engine>());
 	scenes = new SceneManager(PassKey<Engine>());
 	inputs = new InputManager(PassKey<Engine>());
+	menus = new MenuManager(PassKey<Engine>(), *this);
 }
 
 Engine::~Engine()
@@ -53,6 +58,11 @@ bool Engine::init(PassKey<Program> pk)
 		return false;
 	}
 
+	if (TTF_Init() != 0)
+	{
+		std::cout << TTF_GetError() << std::endl;
+	}
+
 	//TODO: Better error handling
 	loadInitialResources(window->getRenderer());
 
@@ -64,6 +74,32 @@ bool Engine::init(PassKey<Program> pk)
 bool Engine::loadInitialResources(SDL_Renderer* renderer)
 {
 	Game::init(renderer);
+
+	// load fonts once (SDL_ttf already initialized by Program)
+	menuTitle = TTF_OpenFont("Fonts/VCR_OSD_MONO.ttf", 28);
+	menuItem = TTF_OpenFont("Fonts/VCR_OSD_MONO.ttf", 22);
+
+	// register your menus here (or in a helper)
+	const int mainId = menus->registerMenu(Menu{
+		"SUPER SHINY",
+		{
+			{"Play",    true,true,false, MenuCommand{MenuCommandType::NewGame}},
+			{"Levels",  true,true,false, MenuCommand::PushMenu(/*level id*/1)},
+			{"Options", true,false,false, MenuCommand::PushMenu(/*opts id*/2)},
+			{"Exit",    true,true,false, MenuCommand{MenuCommandType::ExitProgram}}
+		}
+		});
+	const int levelId = menus->registerMenu(Menu{
+		"Select Level",
+		{
+			{"Radical Sunshine",  true,true,false, MenuCommand::GoToLevel(1)},
+			{"Extreme Moonlight", true,true,false, MenuCommand::GoToLevel(2)},
+			{"Back",              true,true,false, MenuCommand::Pop()}
+		}
+		});
+
+	menus->pushMenu(0);
+
 	return true;
 }
 
@@ -76,8 +112,8 @@ bool Engine::prepareInitialState()
 	inputs->bindings[1].bindToKey(SDL_Scancode::SDL_SCANCODE_DOWN);
 	inputs->bindings[2].bindToKey(SDL_Scancode::SDL_SCANCODE_LEFT);
 	inputs->bindings[3].bindToKey(SDL_Scancode::SDL_SCANCODE_RIGHT);
-	inputs->bindings[4].bindToKey(SDL_Scancode::SDL_SCANCODE_X);
-	inputs->bindings[5].bindToKey(SDL_Scancode::SDL_SCANCODE_Y);
+	inputs->bindings[4].bindToKey(SDL_Scancode::SDL_SCANCODE_J);
+	inputs->bindings[5].bindToKey(SDL_Scancode::SDL_SCANCODE_K);
 
 	return true;
 }
@@ -188,6 +224,19 @@ bool Engine::update(double deltaTime)
 
 	scenes->step(stepContext);
 
+	// map inputs to menu intents (replace with your real buttons)
+	const bool openPause = inputs->pad.isJustPressed(7);   // e.g. Esc/Start
+	const bool up = inputs->pad.isJustPressed(0);
+	const bool down = inputs->pad.isJustPressed(1);
+	const bool left = inputs->pad.isJustPressed(2);
+	const bool right = inputs->pad.isJustPressed(3);
+	const bool accept = inputs->pad.isJustPressed(4);
+	const bool back = inputs->pad.isJustPressed(5);
+
+	menus->handleInput(up, down, left, right, accept, back);
+
+	//menus->step(stepContext);
+
 	// Let this be the final update if we're finished
 	return !wannaFinish;
 }
@@ -195,6 +244,16 @@ bool Engine::update(double deltaTime)
 void Engine::render(DrawContext context)
 {
 	scenes->draw(context);
+	
+	if (menus->isOpen())
+	{
+		// Draw menu over scene (HUD layer)
+		// Either give MenuManager a renderer or build a MenuRenderer here:
+		MenuRenderer mr(context.getRenderer(), menuTitle, menuItem, {/*colors/sizes*/ });
+		if (const Menu* m = menus->current()) {
+			mr.draw(*m, { 0, 80 }, context.getBounds().w);
+		}
+	}
 }
 
 void Engine::shutdown()
@@ -217,6 +276,7 @@ void Engine::shutdown()
 		inputs = nullptr;
 	}
 
+	TTF_Quit();
 	IMG_Quit();
 	SDL_Quit();
 }
@@ -229,4 +289,32 @@ void Engine::finish()
 void Engine::wrapUp()
 {
 	wannaWrapUp = true;
+}
+
+void Engine::onMenuCommand(const MenuCommand& cmd)
+{
+	switch (cmd.type) {
+	case MenuCommandType::NewGame:
+		scenes->changeScene(std::make_unique<GameWorld>(1));
+		menus->close(); // or pop stack if you prefer
+		break;
+	case MenuCommandType::GoToLevel:
+		scenes->changeScene(std::make_unique<GameWorld>(cmd.param));
+		menus->close();
+		break;
+	case MenuCommandType::Pop:
+		menus->popMenu();
+		break;
+	case MenuCommandType::PushMenu:
+		menus->pushMenu(cmd.param);
+		break;
+	case MenuCommandType::ExitProgram:
+		this->wrapUp(); // your graceful shutdown
+		break;
+	case MenuCommandType::Option:
+		// apply +/- adjustment to config (volume, controls) deterministically
+		// e.g. config.volume = clamp(config.volume + cmd.param, 0, 10);
+		break;
+	default: break;
+	}
 }

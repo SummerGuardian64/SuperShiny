@@ -1,17 +1,20 @@
 #pragma once
 #include "SDL.h"
 #include "PassKey.h"
+#include "MenuCommand.h"
+#include <SDL_ttf.h>
 
 namespace ssge
 {
 	class SceneManager;
 	class WindowManager;
 	class InputManager;
+	class MenuManager;
 	class Scene;
 	class Program;
 	class DrawContext;
 
-	class Engine // The game engine core
+	class Engine : public IMenuCommandSink // The game engine core
 	{
 		WindowManager* window;
 		// Manages scenes
@@ -20,6 +23,12 @@ namespace ssge
 		InputManager* inputs;
 		// Manages resources
 		//ResourceManager resources;
+		// Manages menus
+		MenuManager* menus;
+
+		// fonts for menus (init once)
+		TTF_Font* menuTitle = nullptr;
+		TTF_Font* menuItem = nullptr;
 
 		bool wannaFinish = false;
 		bool wannaWrapUp = false;
@@ -57,5 +66,8 @@ namespace ssge
 		// Engine control from higher levels
 		void finish();
 		void wrapUp();
+
+		// Inherited via IMenuCommandSink
+		void onMenuCommand(const MenuCommand& cmd) override;
 	};
 }

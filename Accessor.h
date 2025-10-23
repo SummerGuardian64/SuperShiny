@@ -18,6 +18,7 @@ namespace ssge {
     class InputManager;
     class Scene;
     class GameWorld;
+    class MenuManager;
 
     class EngineAccess {
         Engine* actual;
@@ -114,6 +115,17 @@ namespace ssge {
     public:
         Entity& current;
         explicit EntitiesAccessWCurrent(EntityManager* actual, Entity* current) : EntitiesAccess(actual), current(*current) {}
+    };
+
+    class MenusAccess {
+        MenuManager* actual;
+    public:
+        explicit MenusAccess(MenuManager* actual) : actual(actual) {}
+        //TODO
+        /*bool isOpen() const;
+        void openMainMenu();
+        void openPauseMenu();
+        void close();*/
     };
 
 } // namespace ssge

@@ -11,6 +11,7 @@ project ("SuperShiny")
 # Find SDL2 and SDL2_image using CMAKE_PREFIX_PATH
 find_package(SDL2 REQUIRED)
 find_package(SDL2_image REQUIRED)
+find_package(SDL2_ttf REQUIRED)
 
 # Add source to this project's executable.
 add_executable (SuperShiny
@@ -38,7 +39,9 @@ add_executable (SuperShiny
   "Utilities.h" "Utilities.cpp"
   "PassKey.h"
   "Accessor.h" "Accessor.cpp"
- "Orb.cpp" "Orb.h")
+  "Orb.cpp" "Orb.h"
+  "MenuManager.cpp" "MenuManager.h" "Menu.h" "MenuItem.h"  "MenuRenderer.h" "MenuRenderer.cpp"
+ "MenuCommand.h")
 
 # Link against SDL2 and SDL2_image
 # SDL2main is needed on Windows to provide a main() wrapper
@@ -48,6 +51,7 @@ target_link_libraries(SuperShiny
   SDL2::SDL2
   SDL2::SDL2main
   SDL2_image::SDL2_image
+  SDL2_ttf::SDL2_ttf
 )
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
@@ -65,5 +69,8 @@ add_custom_command(TARGET SuperShiny POST_BUILD
     "$<TARGET_FILE_DIR:SuperShiny>"
   COMMAND ${CMAKE_COMMAND} -E copy_if_different
     "$<TARGET_FILE:SDL2_image::SDL2_image>"
+    "$<TARGET_FILE_DIR:SuperShiny>"
+  COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    "$<TARGET_FILE:SDL2_ttf::SDL2_ttf>"
     "$<TARGET_FILE_DIR:SuperShiny>"
 )
