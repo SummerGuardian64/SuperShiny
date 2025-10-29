@@ -224,12 +224,10 @@ int Sprite::calculateImageIndex() const
 		// Ensure that there is at least one image in the sequence
 		if (auto imgCount = static_cast<int>(seq.imageIndexes.size()))
 		{
-			if (imgCount == 0)
-			{
-				// Ensure that the frame index is valid.
-				if (animation.frameIdx < 0 || animation.frameIdx >= imgCount)
-					return 0; // Fallback to first image in the sequence
-			}
+			// Ensure that the frame index is valid.
+			if (animation.frameIdx < 0 || animation.frameIdx >= imgCount)
+				return 0; // Fallback to first image in the sequence
+
 			return seq.imageIndexes[animation.frameIdx];
 		}
 		else return -1; // No images in sequence - Invalid index
@@ -258,7 +256,7 @@ void Sprite::update(float deltaTime)
 		animation.finished = false;
 
 		int effectiveSpeed = animation.calculateEffectiveSpeed();
-		animation.timer += static_cast<int>(deltaTime * effectiveSpeed);
+		animation.timer += static_cast<int>(deltaTime * effectiveSpeed * 100);
 
 		auto& currentSequence = definition.sequences[animation.seqIdx];
 		int nOFrames = currentSequence.imageIndexes.size();
@@ -267,8 +265,12 @@ void Sprite::update(float deltaTime)
 		while (animation.timer > 100) {
 			animation.timer -= 100;
 
-			if (++animation.frameIdx > nOFrames) {
+			animation.frameIdx++;
+
+			if (animation.frameIdx >= nOFrames) {
 				animation.frameIdx = currentSequence.loopTo;
+				if (animation.frameIdx >= nOFrames)
+					animation.frameIdx = 0;
 				animation.finished = true;
 			}
 		}
