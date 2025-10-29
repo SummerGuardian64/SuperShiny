@@ -118,25 +118,35 @@ void Shiny::postStep(EntityStepContext& context)
         if (direction > 0) sprite->xscale = 1;
         else if (direction < 0) sprite->xscale = -1;
 
+        // Declare current situation
+
         bool grounded = physics->grounded;
         bool walking = grounded && direction;
+
+        // Declare current and wanted sequence
 
         int currentSequence = sprite->getSeqIdx();
         int wantedSequence = currentSequence;
 
         if (walking)
         {
-            wantedSequence = 1;
+            // Linear-interpolate walking animation speed
+            int lerp = abs(physics->speed.x) / physics->maxSpeedHor * 100;
+            sprite->setLerp(lerp);
+
+            // We wanna walk
+            wantedSequence = 1; //TODO: Refactor me!
         }
         else if (grounded)
         {
-            wantedSequence = 0;
+            wantedSequence = 0; //TODO: Refactor me!
         }
         else
         {
             //TODO: Other animations
         }
 
+        // Play wanted sequence. DON'T REPLAY!
         if (currentSequence != wantedSequence)
         {
             sprite->setSequence(wantedSequence);

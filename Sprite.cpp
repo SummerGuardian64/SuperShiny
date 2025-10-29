@@ -261,16 +261,22 @@ void Sprite::update(float deltaTime)
 		auto& currentSequence = definition.sequences[animation.seqIdx];
 		int nOFrames = currentSequence.imageIndexes.size();
 
-		// Dummy threshold: when timer exceeds 100, advance the frame.
-		while (animation.timer > 100) {
+		// When timer exceeds 100, advance the frame.
+		while (animation.timer > 100)
+		{
+			// Deplete time(r)
 			animation.timer -= 100;
 
-			animation.frameIdx++;
-
-			if (animation.frameIdx >= nOFrames) {
+			// Advance with reroll
+			if (++animation.frameIdx >= nOFrames)
+			{
 				animation.frameIdx = currentSequence.loopTo;
+
+				// Don't allow broken reroll to go out of bounds
 				if (animation.frameIdx >= nOFrames)
 					animation.frameIdx = 0;
+				//TODO: Log this!
+
 				animation.finished = true;
 			}
 		}
