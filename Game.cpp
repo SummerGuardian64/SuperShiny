@@ -52,10 +52,24 @@ bool Game::Sprites::_init(SDL_Renderer* renderer)
 
 	sprdefShiny.spritesheet = SdlTexture("Sprites/Shiny.png", renderer);
 
-	sprdefShiny.images.push_back(Image(0, 0, 128, 128, 64, 115));
+	for (int y = 0; y < 1024 - 102; y += 102)
+	{
+		for (int x = 0; x <= 1024 - 77; x += 77)
+		{
+			sprdefShiny.images.push_back(Image(x, y, 77, 102, 41, 96));
+		}
+	}
+
 	{
 		auto& seq = sprdefShiny.addSequence(20, 20, 0);
 		seq.imageIndexes.push_back(0);
+	}
+	{
+		auto& seq = sprdefShiny.addSequence(20, 10, 0);
+		for (int i = 1; i <= 14; i++)
+		{
+			seq.imageIndexes.push_back(i);
+		}
 	}
 
 	sprdefOrb.spritesheet = SdlTexture("Sprites/Orb.png", renderer);
