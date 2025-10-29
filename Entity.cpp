@@ -50,12 +50,12 @@ void Entity::Physics::step(EntityStepContext& context)
         pad = ctrl->getPad();
     }
 
-    if (enablePhysics)
+    if (abilities.physicsEnabled())
     {
         // Check direction buttons X
-        side.x = enableHorizontalMove ? pad.isPressed(3) - pad.isPressed(2) : 0;
+        side.x = abilities.horzMove() ? pad.isPressed(3) - pad.isPressed(2) : 0;
         // Check direction buttons Y
-        side.y = enableVerticalMove ? pad.isPressed(1) - pad.isPressed(0) : 0;
+        side.y = abilities.vertMove() ? pad.isPressed(1) - pad.isPressed(0) : 0;
         // Reset jump timer if jump isn't pressed
         if (!pad.isPressed(4))//Jump
         {
@@ -63,177 +63,199 @@ void Entity::Physics::step(EntityStepContext& context)
         }
         // Set accelleration, deccelleration and maximum speeds
         // And also, offer jump
-        if (grounded)
+        int situation = grounded | (inWater << 2);
+        switch (situation)
         {
-            if (inWater)
+        case 0: // In air
+            // TODO: Obtain abilities in air
+            break;
+        case 1: // Grounded
+            // TODO: Obtain abilities when on ground
+            break;
+        case 2: // In water
+            // TODO: Obtain abilities in water
+            break;
+        case 3: // At bottom of water
+            // TODO: Obtain abilities at bottom of water
+            break;
+        }
+
+        //if (grounded)
+        //{
+        //    if (inWater)
+        //    {
+        //        if (running)
+        //        {
+        //            acc.x = accWaterRun.x;
+        //            dec.x = decWaterRun.x;
+        //            maxSpeedHor = maxRunInWaterSpeed;
+        //        }
+        //        else
+        //        {
+        //            acc.x = accWaterWalk.x;
+        //            dec.x = decWaterWalk.x;
+        //            maxSpeedHor = maxWalkInWaterSpeed;
+        //        }
+        //    }
+        //    else
+        //    {
+        //        // Offer an ability to jump
+        //        if (enableJump)
+        //        {
+        //            if (pad.isJustPressed(4))//Jump just pressed
+        //            {
+        //                jumpTimer = jumpStrength;
+        //            }
+        //        }
+        //        if (running)
+        //        {
+        //            acc.x = accRun.x;
+        //            dec.x = decRun.x;
+        //            maxSpeedHor = maxRunSpeed;
+        //        }
+        //        else
+        //        {
+        //            acc.x = accWalk.x;
+        //            dec.x = decWalk.x;
+        //            maxSpeedHor = maxWalkSpeed;
+        //        }
+        //    }
+        //}
+        //else
+        //{
+        //    if (inWater)
+        //    {
+        //        acc.x = accWater.x;
+        //        dec.x = decWater.x;
+        //        maxSpeedHor = maxSwimSpeed;
+        //        maxSpeedUp = maxWaterJumpSpeed;
+        //        maxSpeedDown = maxWaterFallSpeed;
+        //    }
+        //    else
+        //    {
+        //        acc.x = accAir.x;
+        //        dec.x = decAir.x;
+        //        if (running)
+        //        {
+        //            maxSpeedHor = maxAirRunSpeed;
+        //        }
+        //        else
+        //        {
+        //            maxSpeedHor = maxAirWalkSpeed;
+        //        }
+        //        maxSpeedUp = maxAirJumpSpeed;
+        //        maxSpeedDown = maxAirFallSpeed;
+        //    }
+        //}
+        //if (inWater)
+        //{
+        //    if (running)
+        //    {
+        //        acc.x = accWaterRun.x;
+        //        dec.y = decWaterRun.y;
+        //    }
+        //    else
+        //    {
+        //        acc.y = accWater.y;
+        //        dec.y = decWater.y;
+        //    }
+        //}
+        //else
+        //{
+        //    if (running)
+        //    {
+        //        acc.y = accAirRun.y;
+        //        dec.y = decAirRun.y;
+        //    }
+        //    else
+        //    {
+        //        acc.y = accAir.y;
+        //        dec.y = decAir.y;
+        //    }
+        //}
+
+        // Jump button makes a jump on ground and swim in water
+        if (pad.isJustPressed(4))
+        {
+            // Try swimming in water
+            if (inWater && abilities.canSwim())
             {
-                if (running)
+                int swimSpeed = -abilities.swimPower;
+                if (speed.y > swimSpeed)
                 {
-                    acc.x = accWaterRun.x;
-                    dec.x = decWaterRun.x;
-                    maxSpeedHor = maxRunInWaterSpeed;
-                }
-                else
-                {
-                    acc.x = accWaterWalk.x;
-                    dec.x = decWaterWalk.x;
-                    maxSpeedHor = maxWalkInWaterSpeed;
+                    speed.y = swimSpeed;
                 }
             }
-            else
+            else if (grounded && abilities.canJump()) // Otherwise use the ground-based jump
             {
-                // Offer an ability to jump
-                if (enableJump)
-                {
-                    if (pad.isJustPressed(4))//Jump just pressed
-                    {
-                        jumpTimer = jumpStrength;
-                    }
-                }
-                if (running)
-                {
-                    acc.x = accRun.x;
-                    dec.x = decRun.x;
-                    maxSpeedHor = maxRunSpeed;
-                }
-                else
-                {
-                    acc.x = accWalk.x;
-                    dec.x = decWalk.x;
-                    maxSpeedHor = maxWalkSpeed;
-                }
+                jumpTimer = abilities.jumpStrength;
             }
         }
-        else
-        {
-            if (inWater)
-            {
-                acc.x = accWater.x;
-                dec.x = decWater.x;
-                maxSpeedHor = maxSwimSpeed;
-                maxSpeedUp = maxWaterJumpSpeed;
-                maxSpeedDown = maxWaterFallSpeed;
-            }
-            else
-            {
-                acc.x = accAir.x;
-                dec.x = decAir.x;
-                if (running)
-                {
-                    maxSpeedHor = maxAirRunSpeed;
-                }
-                else
-                {
-                    maxSpeedHor = maxAirWalkSpeed;
-                }
-                maxSpeedUp = maxAirJumpSpeed;
-                maxSpeedDown = maxAirFallSpeed;
-            }
-        }
-        if (inWater)
-        {
-            if (running)
-            {
-                acc.x = accWaterRun.x;
-                dec.y = decWaterRun.y;
-            }
-            else
-            {
-                acc.y = accWater.y;
-                dec.y = decWater.y;
-            }
-        }
-        else
-        {
-            if (running)
-            {
-                acc.y = accAirRun.y;
-                dec.y = decAirRun.y;
-            }
-            else
-            {
-                acc.y = accAir.y;
-                dec.y = decAir.y;
-            }
-        }
-        // Offer the ability to swim
-        if (enableSwim)
-        {
-            if (inWater)
-            {
-                if (pad.isJustPressed(4)) // Jump just pressed
-                {
-                    if (speed.y > -swimPower)
-                    {
-                        speed.y = -swimPower;
-                    }
-                }
-            }
-        }
+
         // Offer the ability to move horizontally
-        if (enableHorizontalMove)
+        if (abilities.horzMove())
         {
-            speed.x += sign(side.x) * acc.x;
-            if (abs(speed.x) > maxSpeedHor)
+            speed.x += sign(side.x) * abilities.acc.x;
+            if (abs(speed.x) > abilities.maxSpeedHor)
             {
-                speed.x = sign(speed.x) * maxSpeedHor;
+                speed.x = sign(speed.x) * abilities.maxSpeedHor;
             }
         }
         // Offer the ability to move vertically
-        if (enableVerticalMove)
+        if (abilities.vertMove())
         {
-            speed.y += sign(side.y) * acc.y;
-            if ((speed.y < 0) && (-speed.y > maxSpeedUp))
+            speed.y += sign(side.y) * abilities.acc.y;
+            if ((speed.y < 0) && (-speed.y > abilities.maxSpeedUp))
             {
-                speed.y = sign(speed.y) * maxSpeedUp;
+                speed.y = sign(speed.y) * abilities.maxSpeedUp;
             }
-            if (speed.y > maxSpeedDown)
+            if (speed.y > abilities.maxSpeedDown)
             {
-                speed.y = sign(speed.y) * maxSpeedDown;
+                speed.y = sign(speed.y) * abilities.maxSpeedDown;
             }
         }
         // Deccellerate
         if (side.x == 0)
         {
-            if (dec.x > abs(speed.x))
+            if (abilities.dec.x > abs(speed.x))
             {
                 speed.x = 0;
             }
             else
             {
-                speed.x -= sign(speed.x) * dec.x;
+                speed.x -= sign(speed.x) * abilities.dec.x;
             }
         }
-        if (side.y == 0 && jumpTimer == 0 && gravity == 0)
+        if (side.y == 0 && jumpTimer == 0 && abilities.gravity == 0)
         {
-            if (dec.y > abs(speed.y))
+            if (abilities.dec.y > abs(speed.y))
             {
                 speed.y = 0;
             }
             else
             {
-                speed.y -= sign(speed.y) * dec.y;
+                speed.y -= sign(speed.y) * abilities.dec.y;
             }
         }
         // Apply jump
         if (jumpTimer > 0)
         {
-            if (speed.y >= -jumpSpeed)
+            if (speed.y >= -abilities.jumpSpeed)
             {
                 jumpTimer--;
-                speed.y = -jumpSpeed;
+                speed.y = -abilities.jumpSpeed;
             }
         }
         else if (side.y == 0)
         {
-            if (inWater)
-            {
-                speed.y += gravityInWater;
-            }
-            else
-            {
-                speed.y += gravity;
-            }
+            //if (inWater)
+            //{
+            //    speed.y += gravityInWater;
+            //}
+            //else
+            //{
+                speed.y += abilities.gravity;
+            //}
         }
 
         // COLLISION
@@ -263,14 +285,14 @@ void Entity::Physics::step(EntityStepContext& context)
 
         // HORIZONTAL
         bool applyx = true;
-        if (enableHorizontalCollision && !ignoreCollision && dx != 0.f)
+        if (abilities.horzCollision() && !abilities.collisionIgnored() && dx != 0.f)
         {
             Level::SweepHit hx = context.level.sweepHorizontal(box, dx);
             if (hx.hit)
             {
                 // We hit a solid tile�resolve at boundary and zero x-speed (or bounce if enabled)
                 box.x = hx.newX;
-                if (enableHorizontalBounce && !enableGMBounce)
+                if (abilities.horzBounce() && !abilities.gmBounce())
                 {
                     speed.x = -speed.x;
                     applyx = false; // bounce handled position; don�t re-apply afterwards
@@ -297,13 +319,14 @@ void Entity::Physics::step(EntityStepContext& context)
 
         // VERTICAL
         bool applyy = true;
-        if (enableVerticalCollision && !ignoreCollision && dy != 0.f)
+        if (abilities.vertCollision() && !abilities.collisionIgnored() && dy != 0.f)
         {
             Level::SweepHit hy = context.level.sweepVertical(box, dy);
             if (hy.hit)
             {
                 box.y = hy.newY;
-                if (enableVerticalBounce && !enableGMBounce) {
+                if (abilities.vertBounce() && !abilities.gmBounce())
+                {
                     speed.y = -speed.y;
                     applyy = false;
                 }

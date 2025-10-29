@@ -23,55 +23,67 @@ Shiny::Shiny()
     position.y = 100;
 
 	physics->processVelocity = true;
-	physics->enablePhysics = true;
-	physics->enableHorizontalMove = true;
-    //physics->enableVerticalBounce = true;
-    //physics->enableVerticalMove = true;
-	physics->enableJump = true;
-	physics->enableHorizontalCollision = true;
-	physics->enableVerticalCollision = true;
 
-    physics->jumpSpeed = 10;
-    physics->jumpStrength = 13;
-    physics->swimPower = 5;
-    physics->gravity = 0.7;
-    physics->gravityInWater = 0.1;
+    using Ability = Entity::Physics::Abilities::Flag;
+    auto& abilities = physics->abilities;
+    abilities.set(Ability::EnablePhysics);
+    abilities.set(Ability::EnableHorizontalMove);
+    //abilities.set(Ability::EnableVerticalBounce);
+    //abilities.set(Ability::EnableVerticalMove);
+    abilities.set(Ability::EnableJump);
+    abilities.set(Ability::EnableHorizontalCollision);
+    abilities.set(Ability::EnableVerticalCollision);
 
-    physics->maxWalkSpeed = 8;
-    physics->maxRunSpeed = 10;
-    physics->maxAirWalkSpeed = 7;
-    physics->maxAirRunSpeed = 4;
-    physics->maxAirJumpSpeed = 7;
-    physics->maxAirFallSpeed = 10;
-    physics->maxWalkInWaterSpeed = 3;
-    physics->maxRunInWaterSpeed = 4;
-    physics->maxWaterJumpSpeed = 4;
-    physics->maxWaterFallSpeed = 5;
-    physics->maxSwimSpeed = 8;
-
-    physics->accWalk.x = 0.5;
-    physics->accRun.x = 0.5;
-    physics->accAir.x = 0.3;
-    physics->accWater.x = 0.4;
-    physics->accWaterWalk.x = 0.3;
-    physics->accWaterRun.x = 0.35;
-
-    physics->decWalk.x = 0.5;
-    physics->decRun.x = 1;
-    physics->decAir.x = 0.25;
-    physics->decWater.x = 0.1;
-    physics->decWaterWalk.x = 0.5;
-    physics->decWaterRun.x = 0.5;
+    abilities.maxSpeedHor = 8;
+    abilities.maxSpeedUp = 10;
+    abilities.maxSpeedDown = 7;
+    abilities.acc = { 0.5,0.5 };
+    abilities.dec = { 0.5,0.5 };
     
-    physics->accAir.y = 0.5;
-    physics->accAirRun.y = 0.75;
-    physics->accWater.y = 0.75;
-    physics->accWaterRun.y = 1;
+    abilities.jumpSpeed = 10;
+    abilities.jumpStrength = 13;
+    abilities.swimPower = 5;
+    abilities.gravity = 0.7;
     
-    physics->decAir.y = 0.75;
-    physics->decAirRun.y = 1;
-    physics->decWater.y = 0.5;
-    physics->decWaterRun.y = 0.8;
+    // Refactor these into their own abilities
+
+    //physics->gravityInWater = 0.1;
+
+    //physics->maxWalkSpeed = 8;
+    //physics->maxRunSpeed = 10;
+    //physics->maxAirWalkSpeed = 7;
+    //physics->maxAirRunSpeed = 4;
+    //physics->maxAirJumpSpeed = 7;
+    //physics->maxAirFallSpeed = 10;
+    //physics->maxWalkInWaterSpeed = 3;
+    //physics->maxRunInWaterSpeed = 4;
+    //physics->maxWaterJumpSpeed = 4;
+    //physics->maxWaterFallSpeed = 5;
+    //physics->maxSwimSpeed = 8;
+
+    //physics->accWalk.x = 0.5;
+    //physics->accRun.x = 0.5;
+    //physics->accAir.x = 0.3;
+    //physics->accWater.x = 0.4;
+    //physics->accWaterWalk.x = 0.3;
+    //physics->accWaterRun.x = 0.35;
+
+    //physics->decWalk.x = 0.5;
+    //physics->decRun.x = 1;
+    //physics->decAir.x = 0.25;
+    //physics->decWater.x = 0.1;
+    //physics->decWaterWalk.x = 0.5;
+    //physics->decWaterRun.x = 0.5;
+    //
+    //physics->accAir.y = 0.5;
+    //physics->accAirRun.y = 0.75;
+    //physics->accWater.y = 0.75;
+    //physics->accWaterRun.y = 1;
+    //
+    //physics->decAir.y = 0.75;
+    //physics->decAirRun.y = 1;
+    //physics->decWater.y = 0.5;
+    //physics->decWaterRun.y = 0.8;
 
     hitbox.x = -15;
     hitbox.y = -86;
@@ -131,7 +143,7 @@ void Shiny::postStep(EntityStepContext& context)
         if (walking)
         {
             // Linear-interpolate walking animation speed
-            int lerp = abs(physics->speed.x) / physics->maxSpeedHor * 100;
+            int lerp = abs(physics->speed.x) / physics->abilities.maxSpeedHor * 100;
             sprite->setLerp(lerp);
 
             // We wanna walk

@@ -21,29 +21,41 @@ Orb::Orb()
     physics->speed.x = 4;
 
     physics->processVelocity = true;
-    physics->enablePhysics = true;
-    physics->enableHorizontalBounce = true;
-    physics->enableHorizontalMove = true;
-    physics->enableVerticalBounce = true;
-    physics->enableVerticalMove = true;
-    physics->enableJump = true;
-    physics->enableHorizontalCollision = true;
-    physics->enableVerticalCollision = true;
 
-    physics->gravity = 0.7;
-    physics->gravityInWater = 0.1;
+    using Ability = Entity::Physics::Abilities::Flag;
+    auto& abilities = physics->abilities;
+    abilities.set(Ability::EnablePhysics);
+    abilities.set(Ability::EnableHorizontalMove);
+    abilities.set(Ability::EnableVerticalMove);
+    abilities.set(Ability::EnableVerticalBounce);
+    abilities.set(Ability::EnableJump);
+    abilities.set(Ability::EnableHorizontalCollision);
+    abilities.set(Ability::EnableVerticalCollision);
 
-    physics->maxWalkSpeed = 8;
-    physics->maxRunSpeed = 10;
-    physics->maxAirWalkSpeed = 7;
-    physics->maxAirRunSpeed = 4;
-    physics->maxAirJumpSpeed = 7;
-    physics->maxAirFallSpeed = 10;
-    physics->maxWalkInWaterSpeed = 3;
-    physics->maxRunInWaterSpeed = 4;
-    physics->maxWaterJumpSpeed = 4;
-    physics->maxWaterFallSpeed = 5;
-    physics->maxSwimSpeed = 8;
+    abilities.maxSpeedHor = 7;
+    abilities.maxSpeedUp = 10;
+    abilities.maxSpeedDown = 10;
+    abilities.acc = { 0.0,0.5 };
+    abilities.dec = { 0.0,0.5 };
+
+    abilities.jumpSpeed = 10;
+    abilities.jumpStrength = 13;
+    abilities.swimPower = 5;
+    abilities.gravity = 0.7;
+
+    //physics->gravityInWater = 0.1;
+
+    //physics->maxWalkSpeed = 8;
+    //physics->maxRunSpeed = 10;
+    //physics->maxAirWalkSpeed = 7;
+    //physics->maxAirRunSpeed = 4;
+    //physics->maxAirJumpSpeed = 7;
+    //physics->maxAirFallSpeed = 10;
+    //physics->maxWalkInWaterSpeed = 3;
+    //physics->maxRunInWaterSpeed = 4;
+    //physics->maxWaterJumpSpeed = 4;
+    //physics->maxWaterFallSpeed = 5;
+    //physics->maxSwimSpeed = 8;
 
     //physics->accWalk.x = 0.5;
     //physics->accRun.x = 0.5;
