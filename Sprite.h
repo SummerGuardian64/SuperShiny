@@ -55,6 +55,9 @@ namespace ssge
 			// refresh rate or draw-wise FPS
 			static const int SPEED_FRAME_PER_FRAME = -1;
 
+			// Setting for lerp. Disables linear interpolation.
+			static const int LERP_DISABLE = -1;
+
 		private:
 			friend class Sprite; // Only Sprite may access these
 

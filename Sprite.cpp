@@ -22,10 +22,10 @@ Sprite::Animation::Animation()
 	seqIdx = 0;
 	frameIdx = 0;
 	timer = 0;
-	overrideSpeed = Sprite::Animation::OVERRIDE_SPEED_DISABLE;
-	highSpeed = 10; // Default value; adjust as needed
-	lowSpeed = 5;   // Default value; adjust as needed
-	lerp = -1;      // Disabled lerp by default
+	overrideSpeed = OVERRIDE_SPEED_DISABLE;
+	highSpeed = 100; // Default value; adjust as needed
+	lowSpeed = 100;  // Default value; adjust as needed
+	lerp = LERP_DISABLE; // Disabled lerp by default
 	finished = false;
 }
 
@@ -35,16 +35,19 @@ Sprite::Animation::Animation()
 
 // Calculates the effective speed.
 // If overrideSpeed is not disabled (i.e. not equal to OVERRIDE_SPEED_DISABLE),
-// that value is returned. Otherwise, if lerp is enabled (not -1), a linear
+// it is returned. Otherwise, if lerp is enabled (not LERP_DISABLE), a linear
 // interpolation between lowSpeed and highSpeed is computed.
 int Sprite::Animation::calculateEffectiveSpeed() const
 {
-	if (overrideSpeed != OVERRIDE_SPEED_DISABLE) {
+	if (overrideSpeed != OVERRIDE_SPEED_DISABLE)
+	{
 		return overrideSpeed;
 	}
 
-	if (lerp != -1) {
-		return lowSpeed + static_cast<int>((highSpeed - lowSpeed) * (lerp / 100.0f));
+	if (lerp != LERP_DISABLE)
+	{
+		return lowSpeed + static_cast<int>(
+			(highSpeed - lowSpeed) * (lerp / 100.0f));
 	}
 
 	return highSpeed;
@@ -88,13 +91,13 @@ int Sprite::getAnimationSpeed() const { return animation.calculateEffectiveSpeed
 Sprite& Sprite::play()
 {
 	animation.paused = false;
-	return *this;
+	return *this; // Setters return object by reference (U++ standard)
 }
 
 Sprite& Sprite::stop()
 {
 	animation.paused = true;
-	return *this;
+	return *this; // Setters return object by reference (U++ standard)
 }
 
 Sprite& Sprite::rewind()
@@ -102,19 +105,33 @@ Sprite& Sprite::rewind()
 	animation.frameIdx = 0;
 	animation.timer = 0;
 	animation.finished = false;
-	return *this;
+	return *this; // Setters return object by reference (U++ standard)
 }
 
 Sprite& Sprite::nextFrame()
 {
 	auto& sequence = definition.sequences[animation.seqIdx];
 
-	if (++animation.frameIdx >= sequence.imageIndexes.size()) {
-		animation.seqIdx = static_cast<int>(sequence.loopTo);
+	int nOFrames = static_cast<int>(sequence.imageIndexes.size());
+	int& frame = animation.frameIdx;
+
+	// Advance frame with loop wrap
+	if (++frame >= nOFrames)
+	{
+		frame = sequence.loopTo;
+
+		// Handle faulty loop
+		if (frame >= nOFrames)
+		{
+			// Fallback to first frame
+			frame = 0;
+			//TODO: Log error
+		}
 	}
 
 	animation.timer = 0; // Reset timer on manual frame change
-	return *this;
+
+	return *this; // Setters return object by reference (U++ standard)
 }
 
 Sprite& Sprite::prevFrame()
@@ -125,62 +142,80 @@ Sprite& Sprite::prevFrame()
 			definition.sequences[animation.seqIdx].imageIndexes.size() - 1);
 	}
 	animation.timer = 0;
-	return *this;
+
+	return *this; // Setters return object by reference (U++ standard)
 }
 
 Sprite& Sprite::setSequence(int seqIdx)
 {
-	if (seqIdx < 0 || seqIdx >= static_cast<int>(definition.sequences.size())) {
+	int nOSequences = static_cast<int>(definition.sequences.size());
+
+	// Fallback to first sequence
+	if (seqIdx < 0 || seqIdx >= nOSequences)
+	{
 		seqIdx = 0;
+		//TODO: Log error
 	}
 
+	// Fetch sequence definition
 	auto& sequence = definition.sequences[seqIdx];
 
-	animation.finished = false;
-	animation.paused = false;
-	animation.seqIdx = seqIdx; // Current sequence index
-	animation.frameIdx = 0;    // Current frame (used as sequence.imageIndexes[frame])
+	// Initialize animation parameters to play this new sequence
+	animation.finished = false; // We're just getting started
+	animation.paused = false;   // Play on start
+	animation.seqIdx = seqIdx;  // Current sequence index
+	animation.frameIdx = 0;     // Current frame
+								// (used as sequence.imageIndexes[frame])
 	animation.timer = 0;
-	animation.overrideSpeed =
-		Animation::OVERRIDE_SPEED_DISABLE;  // Overrides speed. -2 to disable
+	animation.overrideSpeed =               // Overrides speed
+		Animation::OVERRIDE_SPEED_DISABLE;  // (disabled by default)
 	animation.highSpeed = sequence.speed;   // Speed when lerp is 100
 	animation.lowSpeed = sequence.altSpeed; // Speed when lerp is 0
-	animation.lerp = 100; // For variable speed (0-100). -1 to disable (highSpeed will be used)
-	animation.finished = false; // Flag turns on when animation finishes
+	animation.lerp =             // For variable speed (0-100).
+		Animation::LERP_DISABLE; // If disabled, highSpeed will be used.
 
-	return *this;
+	return *this; // Setters return object by reference (U++ standard)
 }
 
 Sprite& Sprite::setFrame(int frame)
 {
-	if (frame < 0 || frame >= definition.sequences[animation.seqIdx].imageIndexes.size())
+	auto& sequence = definition.sequences[animation.seqIdx];
+	int nOFrames = sequence.imageIndexes.size();
+
+	// Handle out-of-bounds parameter
+	if (frame < 0 || frame >= nOFrames)
 	{
+		// Fallback to first frame
 		animation.frameIdx = 0;
+		//TODO: Log error
 	}
 	else
 	{
 		animation.frameIdx = frame;
 	}
+
+	// Restart timer
 	animation.timer = 0;
-	return *this;
+
+	return *this; // Setters return object by reference (U++ standard)
 }
 
 Sprite& Sprite::setSpeed(int speed)
 {
 	animation.overrideSpeed = speed;
-	return *this;
+	return *this; // Setters return object by reference (U++ standard)
 }
 
 Sprite& Sprite::setLerp(int lerpVal)
 {
 	animation.lerp = lerpVal;
-	return *this;
+	return *this; // Setters return object by reference (U++ standard)
 }
 
 Sprite& Sprite::resetSpeed()
 {
 	animation.overrideSpeed = Sprite::Animation::OVERRIDE_SPEED_DISABLE;
-	return *this;
+	return *this; // Setters return object by reference (U++ standard)
 }
 
 SDL_Rect Sprite::getBounds() const
