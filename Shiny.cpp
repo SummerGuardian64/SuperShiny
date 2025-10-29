@@ -73,10 +73,10 @@ Shiny::Shiny()
     physics->decWater.y = 0.5;
     physics->decWaterRun.y = 0.8;
 
-    hitbox.x = -24;
-    hitbox.y = -88;
-    hitbox.w = 48;
-    hitbox.h = 88;
+    hitbox.x = -15;
+    hitbox.y = -86;
+    hitbox.w = 30;
+    hitbox.h = 86;
 }
 
 EntityClassID Shiny::getEntityClassID() const
