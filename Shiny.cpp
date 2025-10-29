@@ -112,6 +112,13 @@ void Shiny::preStep(EntityStepContext& context)
 void Shiny::postStep(EntityStepContext& context)
 {
 	//std::cout << "...floof~" << std::endl;
+    if (sprite && physics)
+    {
+        // Flip the sprite according to entity's facing direction (side)
+        auto direction = physics->side.x;
+        if (direction > 0) sprite->xscale = 1;
+        else if (direction < 0) sprite->xscale = -1;
+    }
 }
 
 void Shiny::preDraw(DrawContext& context) const
