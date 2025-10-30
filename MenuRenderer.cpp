@@ -6,7 +6,6 @@ using namespace ssge;
 void MenuRenderer::drawText(const char* s, TTF_Font* font, SDL_Color c, int x, int y, bool center)
 {
     SDL_Surface* surf = TTF_RenderUTF8_Blended(font, s, c);
-    std::cout << SDL_GetError() << std::endl;
     if (!surf) return;
     SDL_Texture* tex = SDL_CreateTextureFromSurface(r_, surf);
     SDL_Rect dst{ x, y, surf->w, surf->h };
