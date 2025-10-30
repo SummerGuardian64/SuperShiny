@@ -39,9 +39,9 @@ namespace ssge
 		using C = Level::Block::Collision;
 		return (v < (uint8_t)C::TOTAL) ? (C)v : C::Air;
 	}
-	inline Level::Block::Type toType(uint8_t v) {
-		using T = Level::Block::Type;
-		return (v < (uint8_t)T::TOTAL) ? (T)v : T::EMPTY;
+	inline Level::Block::Type toType(uint8_t v)
+	{
+		return Level::Block::Type(v);
 	}
 
 
@@ -141,6 +141,8 @@ namespace ssge
 		return lvl;
 	}
 
+	const Level::Block::Type Level::Block::Type::EMPTY{ 0 };
+
 
 	// ---------------- Block ----------------
 	// Transforms Level::Block::Type of this block into a 0-based index.
@@ -148,17 +150,7 @@ namespace ssge
 	// -1 means empty block or out-of-scope block
 	int Level::Block::getTypeIndex() const
 	{
-		// Map enum Type to a 0-based tileset index. Adjust to your tileset layout.
-		switch (type)
-		{
-			case Type::EMPTY:         return -1; // nothing to draw
-			case Type::Grass:         return 0;
-			case Type::Ground:        return 1;
-			case Type::RedBricks:     return 2;
-			case Type::StoneFloor:    return 3;
-			case Type::PuzzlePavement:return 4;
-			default:                   return -1;
-		}
+		return type.makeTileIndex();
 	}
 
 	// -------------- Iterator ---------------
@@ -541,40 +533,6 @@ namespace ssge
 
 					SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 					SDL_RenderCopy(renderer, tileset, &src, &dst);
-				}
-			}
-		}
-		else
-		{
-			for (int r = topExtent; r < bottomExtent; ++r)
-			{
-				for (int c = leftExtent; c < rightExtent; ++c)
-				{
-					const Block& b = array[indexOf(r, c)];
-					if (b.type == Block::Type::EMPTY) continue;
-
-					SDL_Rect dst{
-						c * blockSize.w - leftOffset,
-						r * blockSize.h - topOffset,
-						blockSize.w,
-						blockSize.h
-					};
-
-					// Simple color coding for now; replace with tileset blit when integrated
-					Uint8 R = 200, G = 200, B = 200;
-					switch (b.type)
-					{
-					case Block::Type::Grass: R = 80; G = 180; B = 80; break;
-					case Block::Type::Ground: R = 150; G = 120; B = 70; break;
-					case Block::Type::RedBricks: R = 180; G = 60; B = 60; break;
-					case Block::Type::StoneFloor: R = 120; G = 120; B = 130; break;
-					case Block::Type::PuzzlePavement: R = 100; G = 80; B = 150; break;
-					default: break;
-					}
-
-					SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
-					SDL_SetRenderDrawColor(renderer, R, G, B, 255);
-					SDL_RenderFillRect(renderer, &dst);
 				}
 			}
 		}

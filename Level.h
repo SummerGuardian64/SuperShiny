@@ -36,15 +36,64 @@ namespace ssge
 				TOTAL
 			};
 
-			enum class Type
+			class Definition
 			{
-				EMPTY,
-				Grass,
-				Ground,
-				RedBricks,
-				StoneFloor,
-				PuzzlePavement,
-				TOTAL
+
+			};
+
+			// inside Level::Block, or wherever you keep it
+			class Type
+			{
+				int index;
+
+			public:
+				// default = empty
+				constexpr Type() : index(0) {}
+
+				// explicit to avoid accidental narrowing from pointers
+				explicit constexpr Type(int idx) : index(idx) {}
+
+				// copy/move are fine as default
+				Type(const Type&) = default;
+				Type(Type&&) = default;
+
+				// assignment from another Type
+				Type& operator=(const Type&) = default;
+				Type& operator=(Type&&) = default;
+
+				// assignment from int
+				Type& operator=(int value)
+				{
+					index = value;
+					return *this;
+				}
+
+				// accessors
+				
+				int getIndex() const { return index; }
+				int toInt()   const { return index; }
+				int asInt()   const { return index; }
+
+				// Use this to make a tile index
+				int makeTileIndex() const { return index - 1; }
+
+				// comparisons
+				
+				bool operator==(int value) const { return index == value; }
+				bool operator!=(int value) const { return index != value; }
+
+				bool operator==(const Type& other) const { return index == other.index; }
+				bool operator!=(const Type& other) const { return index != other.index; }
+
+				// this is the magic so you can do: if (blockType) ...
+				// "non-empty" == "true"
+				explicit operator bool() const
+				{
+					return index != 0;
+				}
+
+				// static EMPTY
+				static const Type EMPTY;				
 			};
 
 			Type type{ Type::EMPTY };
