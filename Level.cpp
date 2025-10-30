@@ -145,12 +145,10 @@ namespace ssge
 
 
 	// ---------------- Block ----------------
-	// Transforms Level::Block::Type of this block into a 0-based index.
-	// Use this for tileset layout indexing.
-	// -1 means empty block or out-of-scope block
+
 	int Level::Block::getTypeIndex() const
 	{
-		return type.makeTileIndex();
+		return type.getIndex();
 	}
 
 	// -------------- Iterator ---------------
@@ -167,6 +165,23 @@ namespace ssge
 		array = (count > 0) ? new Block[count] : nullptr;
 		tilesMeta.tileW = blockSize.w;
 		tilesMeta.tileH = blockSize.h;
+
+		for (std::size_t i = 0; i < MAX_BLOCK_DEFINITIONS; i++)
+		{
+			blockDefinitions[i] = Block::Definition();
+		}
+
+		//HARDCODED PLACEHOLDER
+
+		blockDefinitions[0].tileIndex = -1;
+		blockDefinitions[1].tileIndex = 0;
+		blockDefinitions[2].tileIndex = 1;
+		blockDefinitions[3].tileIndex = 2;
+		blockDefinitions[4].tileIndex = 3;
+		blockDefinitions[5].tileIndex = 4;
+		blockDefinitions[6].tileIndex = 5;
+		blockDefinitions[7].tileIndex = 6;
+
 	}
 
 	Level::~Level()
@@ -191,6 +206,11 @@ namespace ssge
 		, throughBottomRight(other.throughBottomRight)
 	{
 		other.array = nullptr;
+
+		for (std::size_t i = 0; i < MAX_BLOCK_DEFINITIONS; i++)
+		{
+			blockDefinitions[i] = std::move(other.blockDefinitions[i]);
+		}
 	}
 
 	Level& Level::operator=(Level&& other) noexcept
@@ -213,6 +233,10 @@ namespace ssge
 			throughBottom = other.throughBottom;
 			throughBottomRight = other.throughBottomRight;
 			other.array = nullptr;
+			for (std::size_t i = 0; i < MAX_BLOCK_DEFINITIONS; i++)
+			{
+				blockDefinitions[i] = std::move(other.blockDefinitions[i]);
+			}
 		}
 		return *this;
 	}
@@ -519,10 +543,20 @@ namespace ssge
 			{	
 				for (int c = leftExtent; c < rightExtent; ++c)
 				{
+					// Fetch the block
 					const Block& b = array[indexOf(r, c)];
-					if (b.type == Block::Type::EMPTY) continue;
+					if (b.type.isEmpty())
+						continue; // Empty block is invisible
 
-					SDL_Rect src = tilesMeta.makeRectForTile(b.getTypeIndex());
+					// Get block type index
+					auto blockTypeIndex = b.getTypeIndex();
+					if (blockTypeIndex < 0 || blockTypeIndex >= MAX_BLOCK_DEFINITIONS)
+						continue; // Out of bounds. Skip.
+
+					// Get index of the tile that we should draw
+					auto blockTileIndex = blockDefinitions[blockTypeIndex].tileIndex;
+
+					SDL_Rect src = tilesMeta.makeRectForTile(blockTileIndex);
 
 					SDL_Rect dst{
 						c * blockSize.w - leftOffset,

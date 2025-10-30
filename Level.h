@@ -36,16 +36,10 @@ namespace ssge
 				TOTAL
 			};
 
-			class Definition
-			{
-
-			};
-
 			// inside Level::Block, or wherever you keep it
 			class Type
 			{
 				int index;
-
 			public:
 				// default = empty
 				constexpr Type() : index(0) {}
@@ -74,10 +68,9 @@ namespace ssge
 				int toInt()   const { return index; }
 				int asInt()   const { return index; }
 
-				// Use this to make a tile index
-				int makeTileIndex() const { return index - 1; }
-
 				// comparisons
+
+				bool isEmpty() const { return *this == EMPTY; }
 				
 				bool operator==(int value) const { return index == value; }
 				bool operator!=(int value) const { return index != value; }
@@ -94,6 +87,17 @@ namespace ssge
 
 				// static EMPTY
 				static const Type EMPTY;				
+			};
+
+			struct Definition
+			{
+				// Tile to draw. -1 = Don't draw
+				int tileIndex = -1;
+				Collision collision;
+				//TODO: Callback implementation
+				uint8_t callback;
+				//TODO: Harden with PassKey
+				Definition() = default;
 			};
 
 			Type type{ Type::EMPTY };
@@ -143,7 +147,7 @@ namespace ssge
 			}
 			SDL_Rect makeRectForTile(int index) const
 			{
-				if (columns == 0)
+				if (columns == 0 || index == -1)
 					return SDL_Rect{ 0,0,0,0 };
 
 				SDL_Rect rect;
@@ -177,6 +181,8 @@ namespace ssge
 	private:
 		SdlTexture tileset;
 		TilesetMeta tilesMeta;
+		static const int MAX_BLOCK_DEFINITIONS = 94;
+		Block::Definition blockDefinitions[MAX_BLOCK_DEFINITIONS];
 
 	private:
 		// Flat array allocated with columns * rows elements.
