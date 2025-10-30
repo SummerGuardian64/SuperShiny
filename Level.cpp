@@ -345,26 +345,60 @@ namespace ssge
 	}
 
 	// Query a tile (with OOB policy)
-	inline Level::BlockQuery Level::queryTile(int col, int row) const {
+	Level::BlockQuery Level::queryTile(int col, int row) const
+	{
+		using Collision = Level::Block::Collision;
+
 		BlockQuery q;
 		q.tile = { col,row };
-		if (col < 0 || row < 0 || col >= columns || row >= rows) {
+
+		// OOB is like a Tic-Tac-Toe index here, hehe
+		// 012
+		// 345
+		// 678
+		// 4 means in level
+		int oob = 4;
+		if (col < 0)        oob -= 1; // OOB to the left
+		if (col >= columns) oob += 1; // OOB to the right
+		if (row < 0)        oob -= 3; // OOB upwards
+		if (row >= rows)    oob += 3; // OOB downwards
+
+		const Collision* oobLut[] =
+		{
+			&throughTopLeft,
+			&throughTop,
+			&throughTopRight,
+			&throughLeft,
+			nullptr, // Not out of bounds, but inside of level
+			&throughRight,
+			&throughBottomLeft,
+			&throughBottom,
+			&throughBottomRight
+		};
+
+		const Collision* collision = oobLut[oob];
+
+		if (collision) // Out of bounds
+		{
 			q.insideLevel = false;
-			// Decide collision for OOB:
-			// You already have throughTop/Bottom/etc. For simplicity, treat OOB as Solid.
-			q.coll = Level::Block::Collision::Solid;
+			// Decide collision for OOB
+			q.coll = *collision;
 			q.type = Level::Block::Type::EMPTY;
 			return q;
 		}
-		q.insideLevel = true;
-		const Block& b = array[row * columns + col];
-		q.coll = b.collision;
-		q.type = b.type;
+		else // Not out of bounds
+		{
+			q.insideLevel = true;
+			const Block& b = array[row * columns + col];
+			q.coll = b.collision;
+			q.type = b.type;
+		}
 		return q;
 	}
 
 	// Is any overlapped tile "water"?
-	bool Level::rectInWater(const SDL_FRect& r) const {
+	bool Level::rectInWater(const SDL_FRect& r) const
+	{
 		int c0, c1, r0, r1;
 		rectToTileSpan(r, c0, c1, r0, r1);
 		for (int rI = r0; rI <= r1; ++rI)
@@ -386,17 +420,21 @@ namespace ssge
 		int col0, col1, row0, row1;
 		rectToTileSpan(box, col0, col1, row0, row1);
 
-		if (dx > 0.f) {
+		if (dx > 0.f)
+		{
 			float right0 = box.x + box.w;
 			float right1 = right0 + dx;
 			// INCLUDE boundary tile at right0
 			int startCol = worldToCol(right0, w);
 			int endCol = worldToCol(right1 - EPS, w);
 
-			for (int c = startCol; c <= endCol; ++c) {
-				for (int rI = row0; rI <= row1; ++rI) {
+			for (int c = startCol; c <= endCol; ++c)
+			{
+				for (int rI = row0; rI <= row1; ++rI)
+				{
 					auto q = queryTile(c, rI);
-					if (q.coll == Block::Collision::Solid) {
+					if (q.coll == Block::Collision::Solid)
+					{
 						float tileLeft = float(c * w);
 						out.hit = true;
 						out.tile = { c,rI };
@@ -410,17 +448,21 @@ namespace ssge
 			out.newY = rect.y;
 			return out;
 		}
-		else if (dx < 0.f) {
+		else if (dx < 0.f)
+		{
 			float left0 = box.x;
 			float left1 = left0 + dx;
 			// For left, step into columns we cross moving left; use a tiny -EPS to include boundary
 			int startCol = worldToCol(left0 - EPS, w);
 			int endCol = worldToCol(left1 + EPS, w);
 
-			for (int c = startCol; c >= endCol; --c) {
-				for (int rI = row0; rI <= row1; ++rI) {
+			for (int c = startCol; c >= endCol; --c)
+			{
+				for (int rI = row0; rI <= row1; ++rI)
+				{
 					auto q = queryTile(c, rI);
-					if (q.coll == Block::Collision::Solid) {
+					if (q.coll == Block::Collision::Solid)
+					{
 						float tileRight = float((c + 1) * w);
 						out.hit = true;
 						out.tile = { c,rI };
@@ -434,14 +476,16 @@ namespace ssge
 			out.newY = rect.y;
 			return out;
 		}
-		else {
+		else
+		{
 			out.newX = rect.x; out.newY = rect.y; return out;
 		}
 	}
 
 
 	// Axis-separated sweep: move vertically by dy, collide with solids.
-	Level::SweepHit Level::sweepVertical(const SDL_FRect& rect, float dy) const {
+	Level::SweepHit Level::sweepVertical(const SDL_FRect& rect, float dy) const
+	{
 		SweepHit out; out.hit = false;
 		const int w = blockSize.w, h = blockSize.h;
 		SDL_FRect box = rect;
@@ -449,17 +493,21 @@ namespace ssge
 		int col0, col1, row0, row1;
 		rectToTileSpan(box, col0, col1, row0, row1);
 
-		if (dy > 0.f) {
+		if (dy > 0.f)
+		{
 			float bottom0 = box.y + box.h;
 			float bottom1 = bottom0 + dy;
 			// INCLUDE boundary tile at bottom0
 			int startRow = worldToRow(bottom0, h);
 			int endRow = worldToRow(bottom1 - EPS, h);
 
-			for (int rI = startRow; rI <= endRow; ++rI) {
-				for (int cI = col0; cI <= col1; ++cI) {
+			for (int rI = startRow; rI <= endRow; ++rI)
+			{
+				for (int cI = col0; cI <= col1; ++cI)
+				{
 					auto q = queryTile(cI, rI);
-					if (q.coll == Block::Collision::Solid) {
+					if (q.coll == Block::Collision::Solid)
+					{
 						float tileTop = float(rI * h);
 						out.hit = true;
 						out.tile = { cI,rI };
@@ -473,17 +521,21 @@ namespace ssge
 			out.newY = rect.y + dy;
 			return out;
 		}
-		else if (dy < 0.f) {
+		else if (dy < 0.f)
+		{
 			float top0 = box.y;
 			float top1 = top0 + dy;
 			// For up, include boundary with -EPS
 			int startRow = worldToRow(top0 - EPS, h);
 			int endRow = worldToRow(top1 + EPS, h);
 
-			for (int rI = startRow; rI >= endRow; --rI) {
-				for (int cI = col0; cI <= col1; ++cI) {
+			for (int rI = startRow; rI >= endRow; --rI)
+			{
+				for (int cI = col0; cI <= col1; ++cI)
+				{
 					auto q = queryTile(cI, rI);
-					if (q.coll == Block::Collision::Solid) {
+					if (q.coll == Block::Collision::Solid)
+					{
 						float tileBottom = float((rI + 1) * h);
 						out.hit = true;
 						out.tile = { cI,rI };
@@ -497,7 +549,8 @@ namespace ssge
 			out.newY = rect.y + dy;
 			return out;
 		}
-		else {
+		else
+		{
 			out.newX = rect.x; out.newY = rect.y; return out;
 		}
 	}
