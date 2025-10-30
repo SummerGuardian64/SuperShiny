@@ -101,7 +101,6 @@ namespace ssge
 			};
 
 			Type type{ Type::EMPTY };
-			Collision collision{ Collision::Air };
 
 			Block() = default;
 			Block(const Block&) = default;
@@ -221,6 +220,7 @@ namespace ssge
 		const Block* getConstBlockAt(SDL_Point point) const;
 
 		Block::Collision getCollisionAt(SDL_Point point) const;
+		Block::Collision getBlockCollisionType(const Block& block) const;
 
 		SDL_Rect calculateLevelSize() const; // total pixel rectangle of the level starting at (0,0)
 

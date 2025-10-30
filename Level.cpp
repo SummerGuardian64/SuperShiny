@@ -126,11 +126,10 @@ namespace ssge
 			for (uint32_t c = 0; c < cols; ++c) {
 				uint8_t t = 0, co = 0;
 				read_u8(p, end, t);
-				read_u8(p, end, co);
+				read_u8(p, end, co); // REMOVE ME WHEN YOU REMOVE COLLISION DATA!
 				Block* b = lvl->getBlockAt((int)r, (int)c);
 				if (b) {
 					b->type = toType(t);
-					b->collision = toCollision(co);
 				}
 			}
 		}
@@ -181,6 +180,15 @@ namespace ssge
 		blockDefinitions[5].tileIndex = 4;
 		blockDefinitions[6].tileIndex = 5;
 		blockDefinitions[7].tileIndex = 6;
+
+		blockDefinitions[0].collision = Block::Collision::Air;
+		blockDefinitions[1].collision = Block::Collision::Solid;
+		blockDefinitions[2].collision = Block::Collision::Solid;
+		blockDefinitions[3].collision = Block::Collision::Solid;
+		blockDefinitions[4].collision = Block::Collision::Solid;
+		blockDefinitions[5].collision = Block::Collision::Solid;
+		blockDefinitions[6].collision = Block::Collision::Solid;
+		blockDefinitions[7].collision = Block::Collision::Solid;
 
 	}
 
@@ -300,7 +308,19 @@ namespace ssge
 		if (point.x >= size.w) return throughRight;
 
 		const Block* b = getConstBlockAt(point);
-		return b ? b->collision : Block::Collision::Air;
+		return b ? getBlockCollisionType(*b) : Block::Collision::Air;
+	}
+
+	Level::Block::Collision Level::getBlockCollisionType(const Block& block) const
+	{
+		// Get the block's type index
+		auto blockTypeIndex = block.getTypeIndex();
+
+		// Treat invalid index same way as 0-index
+		if (blockTypeIndex < 0 || blockTypeIndex >= MAX_BLOCK_DEFINITIONS)
+			blockTypeIndex = 0; // FALLBACK!
+
+		return blockDefinitions[blockTypeIndex].collision;
 	}
 
 	SDL_Rect Level::calculateLevelSize() const
@@ -390,7 +410,7 @@ namespace ssge
 		{
 			q.insideLevel = true;
 			const Block& b = array[row * columns + col];
-			q.coll = b.collision;
+			q.coll = getBlockCollisionType(b);
 			q.type = b.type;
 		}
 		return q;
