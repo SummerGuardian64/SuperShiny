@@ -101,9 +101,13 @@ namespace ssge
 		}
 
 		const std::size_t cellCount = (std::size_t)cols * (std::size_t)rows;
-		const std::size_t needed = cellCount * 2u;
+		const std::size_t needed = cellCount * 1u;
 		if ((std::size_t)(end - p) < needed) {
 			if (outError) *outError = "Level bytes: truncated block data";
+			return nullptr;
+		}
+		if ((std::size_t)(end - p) > needed) {
+			if (outError) *outError = "Level bytes: block data overflow";
 			return nullptr;
 		}
 
@@ -124,9 +128,8 @@ namespace ssge
 		// Block payload
 		for (uint32_t r = 0; r < rows; ++r) {
 			for (uint32_t c = 0; c < cols; ++c) {
-				uint8_t t = 0, co = 0;
+				uint8_t t = 0;
 				read_u8(p, end, t);
-				read_u8(p, end, co); // REMOVE ME WHEN YOU REMOVE COLLISION DATA!
 				Block* b = lvl->getBlockAt((int)r, (int)c);
 				if (b) {
 					b->type = toType(t);
@@ -352,10 +355,10 @@ namespace ssge
 		int r1 = worldToRow(r.y + r.h - eps, h);
 
 		// Clamp to level bounds
-		c0 = std::max(0, std::min(columns - 1, c0));
+		/*c0 = std::max(0, std::min(columns - 1, c0));
 		c1 = std::max(0, std::min(columns - 1, c1));
 		r0 = std::max(0, std::min(rows - 1, r0));
-		r1 = std::max(0, std::min(rows - 1, r1));
+		r1 = std::max(0, std::min(rows - 1, r1));*/
 
 		// Normalize if inverted due to rounding
 		if (c1 < c0) std::swap(c0, c1);
@@ -402,7 +405,7 @@ namespace ssge
 		{
 			q.insideLevel = false;
 			// Decide collision for OOB
-			q.coll = *collision;
+ 			q.coll = *collision;
 			q.type = Level::Block::Type::EMPTY;
 			return q;
 		}

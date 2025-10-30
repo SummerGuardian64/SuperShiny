@@ -8,7 +8,7 @@
 
 using namespace ssge;
 
-void ssge::GameWorld::initLevel(SceneStepContext& context)
+bool ssge::GameWorld::initLevel(SceneStepContext& context)
 {
     if (!level)
     {
@@ -34,6 +34,10 @@ void ssge::GameWorld::initLevel(SceneStepContext& context)
             }
         }
     }
+
+    // Return true if the level is initialized successfully.
+    // Return false if there's a problem
+    return (level != nullptr);
 }
 
 GameWorld::GameWorld()
@@ -90,11 +94,21 @@ SceneClassID GameWorld::getSceneClassID() const
 
 void GameWorld::init(SceneStepContext& context)
 {
-    initLevel(context);
+    bool levelSuccessful = initLevel(context);
 
-    auto shiny = entities.addEntity(EntityClassID::Shiny);
+    if (!levelSuccessful)
+    {
+        // ERROR! Get out of there!
+        // TODO! Report the error
+        context.scenes.pause();
+        context.scenes.changeScene(SceneClassID::TitleScreen);
+    }
+    else
+    {
+        auto shiny = entities.addEntity(EntityClassID::Shiny);
 
-    entityToScrollTo = shiny;
+        entityToScrollTo = shiny;
+    }
 
     //std::string error;
     //level = LevelLoader::loadLevel(game.progress.getLevel(), error);
