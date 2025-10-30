@@ -12,26 +12,22 @@ bool ssge::GameWorld::initLevel(SceneStepContext& context)
 {
     if (!level)
     {
-        std::size_t sz = 0;
-        const unsigned char* bytes = ssge::Game::Levels::getBytes(wantedLevel, sz);
-        if (bytes && sz > 0)
+        std::string tilesetPath;
+        std::string error;
+        std::string path = "Levels/level" + std::to_string(wantedLevel) + ".lvl";
+        auto lvl = ssge::Level::loadFromFile(path.c_str(), &tilesetPath, &error);
+        if (!lvl)
         {
-            std::string tilesetPath;
-            std::string error;
-            auto lvl = ssge::Level::loadFromBytes(bytes, sz, &tilesetPath, &error);
-            if (!lvl)
+            std::cout << error << std::endl;
+        }
+        else
+        {
+            // If you want, load the tileset here using tilesetPath:
+            if (!tilesetPath.empty())
             {
-                std::cout << error << std::endl;
+                lvl->setTileset(SdlTexture(tilesetPath.c_str(), context.drawing.getRenderer()));
             }
-            else
-            {
-                // If you want, load the tileset here using tilesetPath:
-                if (!tilesetPath.empty())
-                {
-                    lvl->setTileset(SdlTexture(tilesetPath.c_str(), context.drawing.getRenderer()));
-                }
-                level = std::move(lvl);
-            }
+            level = std::move(lvl);
         }
     }
 

@@ -245,7 +245,11 @@ namespace ssge
 
 		void draw(DrawContext context) const; // conservative draw (no templates)
 
-		// Add near the end of class Level (public):
+		static std::unique_ptr<Level> loadFromFile(
+			const char* path,
+			std::string* outTilesetPath = nullptr,
+			std::string* outError = nullptr);
+
 		static std::unique_ptr<Level> loadFromBytes(
 			const unsigned char* data,
 			std::size_t size,

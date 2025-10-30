@@ -3,6 +3,8 @@
 #include <algorithm>
 #include <string>
 #include "SdlTexture.h"
+#include <fstream>
+#include <vector>
 
 namespace ssge
 {
@@ -44,6 +46,22 @@ namespace ssge
 		return Level::Block::Type(v);
 	}
 
+	std::unique_ptr<Level> Level::loadFromFile(const char* path, std::string* outTilesetPath, std::string* outError)
+	{
+		std::ifstream f(path, std::ios::binary);
+		if (!f)
+		{
+			if (outError) *outError = std::string("Cannot open level file: ") + path;
+			return nullptr;
+		}
+		std::vector<unsigned char> buf((std::istreambuf_iterator<char>(f)), std::istreambuf_iterator<char>());
+		if (buf.empty())
+		{
+			if (outError) *outError = "Level file is empty.";
+			return nullptr;
+		}
+		return Level::loadFromBytes(buf.data(), buf.size(), outTilesetPath, outError);
+	}
 
 	std::unique_ptr<Level> Level::loadFromBytes(
 		const unsigned char* data,
