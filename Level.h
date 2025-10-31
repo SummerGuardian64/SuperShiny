@@ -7,18 +7,10 @@
 
 namespace ssge
 {
-    struct TileIndex { int col = -1, row = -1; };
-
-    inline bool operator==(const TileIndex& a, const TileIndex& b) {
-        return a.col == b.col && a.row == b.row;
-    }
-
-    // Mapping helpers:
-    inline int worldToCol(float x, int tileW) { return (int)std::floor(x / (float)tileW); }
-    inline int worldToRow(float y, int tileH) { return (int)std::floor(y / (float)tileH); }
-
-	class Level
+    class Level
 	{
+		static inline int worldToCol(float x, int tileW) { return (int)std::floor(x / (float)tileW); }
+		static inline int worldToRow(float y, int tileH) { return (int)std::floor(y / (float)tileH); }
 	public:
 		class Block
 		{
@@ -35,6 +27,15 @@ namespace ssge
 				Warp,
 				TOTAL
 			};
+
+			struct TileIndex
+			{
+				int col = -1, row = -1;
+				inline bool operator==(const TileIndex& other) {
+					return col == other.col && row == other.row;
+				}
+			};
+
 
 			// inside Level::Block, or wherever you keep it
 			class Type
@@ -158,16 +159,18 @@ namespace ssge
 			}
 		};
 
-		struct BlockQuery {
-			TileIndex tile;                   // which tile we touched/checked
+		struct BlockQuery
+		{
+			Level::Block::TileIndex tile;                   // which tile we touched/checked
 			Level::Block::Type type = Level::Block::Type::EMPTY;
 			Level::Block::Collision coll = Level::Block::Collision::Air;
 			bool insideLevel = false;
 		};
 
-		struct SweepHit {
+		struct SweepHit
+		{
 			bool hit = false;
-			TileIndex tile;                   // solid tile we hit
+			Level::Block::TileIndex tile;                   // solid tile we hit
 			float newX = 0.f;                 // resolved x (after axis move)
 			float newY = 0.f;                 // resolved y (after axis move)
 		};

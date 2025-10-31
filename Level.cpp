@@ -9,38 +9,46 @@
 namespace ssge
 {
 	// read helpers (little-endian, bounds-checked)
-	inline bool read_u32(const unsigned char*& p, const unsigned char* end, uint32_t& out) {
+	inline bool read_u32(const unsigned char*& p, const unsigned char* end, uint32_t& out)
+	{
 		if (end - p < 4) return false;
 		out = (uint32_t)p[0] | ((uint32_t)p[1] << 8) | ((uint32_t)p[2] << 16) | ((uint32_t)p[3] << 24);
 		p += 4; return true;
 	}
-	inline bool read_s32(const unsigned char*& p, const unsigned char* end, int32_t& out) {
+	inline bool read_s32(const unsigned char*& p, const unsigned char* end, int32_t& out)
+	{
 		uint32_t u; if (!read_u32(p, end, u)) return false; out = (int32_t)u; return true;
 	}
-	inline bool read_u16(const unsigned char*& p, const unsigned char* end, uint16_t& out) {
+	inline bool read_u16(const unsigned char*& p, const unsigned char* end, uint16_t& out)
+	{
 		if (end - p < 2) return false;
 		out = (uint16_t)p[0] | ((uint16_t)p[1] << 8);
 		p += 2; return true;
 	}
-	inline bool read_u8(const unsigned char*& p, const unsigned char* end, uint8_t& out) {
+	inline bool read_u8(const unsigned char*& p, const unsigned char* end, uint8_t& out)
+	{
 		if (end - p < 1) return false; out = *p++; return true;
 	}
-	inline bool read_bytes(const unsigned char*& p, const unsigned char* end, char* dst, std::size_t n) {
+	inline bool read_bytes(const unsigned char*& p, const unsigned char* end, char* dst, std::size_t n)
+	{
 		if ((std::size_t)(end - p) < n) return false;
 		std::memcpy(dst, p, n); p += n; return true;
 	}
 
-	inline bool check_magic(const unsigned char*& p, const unsigned char* end) {
+	inline bool check_magic(const unsigned char*& p, const unsigned char* end)
+	{
 		static const char kMagic[8] = { 'S','S','G','E','L','E','V','1' };
 		if (end - p < 8) return false;
 		if (std::memcmp(p, kMagic, 8) != 0) return false;
 		p += 8; return true;
 	}
 
-	inline Level::Block::Collision toCollision(uint8_t v) {
+	inline Level::Block::Collision toCollision(uint8_t v)
+	{
 		using C = Level::Block::Collision;
 		return (v < (uint8_t)C::TOTAL) ? (C)v : C::Air;
 	}
+
 	inline Level::Block::Type toType(uint8_t v)
 	{
 		return Level::Block::Type(v);
@@ -70,7 +78,8 @@ namespace ssge
 		std::string* outError)
 	{
 		if (outTilesetPath) outTilesetPath->clear();
-		if (!data || size < 8) {
+		if (!data || size < 8)
+		{
 			if (outError) *outError = "Level bytes: null/too small";
 			return nullptr;
 		}
@@ -78,40 +87,48 @@ namespace ssge
 		const unsigned char* p = data;
 		const unsigned char* end = data + size;
 
-		if (!check_magic(p, end)) {
+		if (!check_magic(p, end))
+		{
 			if (outError) *outError = "Level bytes: bad magic (expect SSGELEV1)";
 			return nullptr;
 		}
 
 		uint32_t cols = 0, rows = 0; int32_t bw = 0, bh = 0;
 		if (!read_u32(p, end, cols) || !read_u32(p, end, rows) ||
-			!read_s32(p, end, bw) || !read_s32(p, end, bh)) {
+			!read_s32(p, end, bw) || !read_s32(p, end, bh))
+		{
 			if (outError) *outError = "Level bytes: header truncated";
 			return nullptr;
 		}
-		if (cols == 0 || rows == 0 || bw <= 0 || bh <= 0) {
+		if (cols == 0 || rows == 0 || bw <= 0 || bh <= 0)
+		{
 			if (outError) *outError = "Level bytes: invalid dimensions/block size";
 			return nullptr;
 		}
 
 		uint8_t oc[8] = { 0 };
-		for (int i = 0; i < 8; ++i) {
-			if (!read_u8(p, end, oc[i])) {
+		for (int i = 0; i < 8; ++i)
+		{
+			if (!read_u8(p, end, oc[i]))
+			{
 				if (outError) *outError = "Level bytes: outside-collision truncated";
 				return nullptr;
 			}
 		}
 
 		uint16_t pathLen = 0;
-		if (!read_u16(p, end, pathLen)) {
+		if (!read_u16(p, end, pathLen))
+		{
 			if (outError) *outError = "Level bytes: missing tileset path length";
 			return nullptr;
 		}
 
 		std::string tilesetPath;
-		if (pathLen > 0) {
+		if (pathLen > 0)
+		{
 			tilesetPath.resize(pathLen);
-			if (!read_bytes(p, end, &tilesetPath[0], pathLen)) {
+			if (!read_bytes(p, end, &tilesetPath[0], pathLen))
+			{
 				if (outError) *outError = "Level bytes: truncated tileset path";
 				return nullptr;
 			}
@@ -120,11 +137,13 @@ namespace ssge
 
 		const std::size_t cellCount = (std::size_t)cols * (std::size_t)rows;
 		const std::size_t needed = cellCount * 1u;
-		if ((std::size_t)(end - p) < needed) {
+		if ((std::size_t)(end - p) < needed)
+		{
 			if (outError) *outError = "Level bytes: truncated block data";
 			return nullptr;
 		}
-		if ((std::size_t)(end - p) > needed) {
+		if ((std::size_t)(end - p) > needed)
+		{
 			if (outError) *outError = "Level bytes: block data overflow";
 			return nullptr;
 		}
@@ -144,12 +163,15 @@ namespace ssge
 		lvl->throughBottomRight = toCollision(oc[7]);
 
 		// Block payload
-		for (uint32_t r = 0; r < rows; ++r) {
-			for (uint32_t c = 0; c < cols; ++c) {
+		for (uint32_t r = 0; r < rows; ++r) 
+		{
+			for (uint32_t c = 0; c < cols; ++c)
+			{
 				uint8_t t = 0;
 				read_u8(p, end, t);
 				Block* b = lvl->getBlockAt((int)r, (int)c);
-				if (b) {
+				if (b)
+				{
 					b->type = toType(t);
 				}
 			}
@@ -358,7 +380,8 @@ namespace ssge
 		const float eps = 0.0001f;
 		const int w = blockSize.w, h = blockSize.h;
 
-		if (r.w <= 0.f || r.h <= 0.f) {
+		if (r.w <= 0.f || r.h <= 0.f)
+		{
 			// Degenerate rect -> clamp to a single tile under r.x,r.y
 			int c = std::max(0, std::min(columns - 1, worldToCol(r.x, w)));
 			int rI = std::max(0, std::min(rows - 1, worldToRow(r.y, h)));
@@ -372,6 +395,7 @@ namespace ssge
 		int r0 = worldToRow(r.y, h);
 		int r1 = worldToRow(r.y + r.h - eps, h);
 
+		// Won't need this anymore
 		// Clamp to level bounds
 		/*c0 = std::max(0, std::min(columns - 1, c0));
 		c1 = std::max(0, std::min(columns - 1, c1));
