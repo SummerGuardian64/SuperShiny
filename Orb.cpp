@@ -25,6 +25,7 @@ Orb::Orb()
     using Ability = Entity::Physics::Abilities::Flag;
     auto& abilities = physics->abilities;
     abilities.set(Ability::EnablePhysics);
+    abilities.set(Ability::EnableHorizontalBounce);
     abilities.set(Ability::EnableHorizontalMove);
     abilities.set(Ability::EnableVerticalMove);
     abilities.set(Ability::EnableVerticalBounce);
