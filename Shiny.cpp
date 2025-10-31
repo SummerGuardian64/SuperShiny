@@ -127,6 +127,7 @@ void Shiny::postStep(EntityStepContext& context)
     {
         // Flip the sprite according to entity's facing direction (side)
         auto direction = physics->side.x;
+        if (direction == 0) { sign(physics->speed.x); }
         if (direction > 0) sprite->xscale = 1;
         else if (direction < 0) sprite->xscale = -1;
 
@@ -134,13 +135,18 @@ void Shiny::postStep(EntityStepContext& context)
 
         bool grounded = physics->grounded;
         bool walking = grounded && direction;
+        bool jumpingOrFalling = physics->speed.y <= 0;
 
         // Declare current and wanted sequence
 
         int currentSequence = sprite->getSeqIdx();
         int wantedSequence = currentSequence;
 
-        if (walking)
+        if (context.inputs.isPressed(6))
+        { // ONLY FOR TESTING
+            wantedSequence = 2;
+        }
+        else if (walking)
         {
             // Linear-interpolate walking animation speed
             int lerp = abs(physics->speed.x) / physics->abilities.maxSpeedHor * 100;
@@ -153,9 +159,13 @@ void Shiny::postStep(EntityStepContext& context)
         {
             wantedSequence = 0; //TODO: Refactor me!
         }
+        else if (jumpingOrFalling)
+        {
+            wantedSequence = 2;
+        }
         else
         {
-            //TODO: Other animations
+            wantedSequence = 3;
         }
 
         // Play wanted sequence. DON'T REPLAY!
