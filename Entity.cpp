@@ -281,13 +281,17 @@ void Entity::Physics::step(EntityStepContext& context)
         float dx = velocity.x;   // per-step displacement in world units (you�re already stepping at fixed dt)
         float dy = velocity.y;
 
+        bool collisionEnabled = !abilities.collisionIgnored();
+        bool horzCollision = abilities.horzCollision() && collisionEnabled;
+        bool vertCollision = abilities.vertCollision() && collisionEnabled;
+
         // We'll apply axis-separated resolution: X then Y, using level sweeps.
         // Build world-space AABB from (position + local hitbox)
         SDL_FRect box = makeWorldAABB(position, hitbox);
 
         // HORIZONTAL
         bool applyx = true;
-        if (abilities.horzCollision() && !abilities.collisionIgnored() && dx != 0.f)
+        if (horzCollision && dx != 0.f)
         {
             Level::SweepHit hx = context.level.sweepHorizontal(box, dx);
             if (hx.hit)
@@ -306,22 +310,31 @@ void Entity::Physics::step(EntityStepContext& context)
                 touchesWall = true;
                 // optional: store hx.tile if you want terraforming later
             }
-            else {
+            else
+            {
                 box.x = hx.newX;
             }
+            if (applyx)
+            {
+                // If we didn't bounce-position, adopt the new x
+                // Convert resolved world AABB back to entity position (x only)
+                SDL_FRect tmp = box;
+                tmp.y = position.y + hitbox.y; // keep current y for now
+                applyResolvedWorldAABBToEntity(position, hitbox, tmp);
+            }
         }
-        if (applyx)
+        else
         {
-            // If we didn�t bounce-position, adopt the new x
-            // Convert resolved world AABB back to entity position (x only)
-            SDL_FRect tmp = box;
-            tmp.y = position.y + hitbox.y; // keep current y for now
-            applyResolvedWorldAABBToEntity(position, hitbox, tmp);
+            touchesWall = false;
+            if (applyx)
+            {
+                position.x += velocity.x;
+            }
         }
 
         // VERTICAL
         bool applyy = true;
-        if (abilities.vertCollision() && !abilities.collisionIgnored() && dy != 0.f)
+        if (vertCollision && !abilities.collisionIgnored() && dy != 0.f)
         {
             Level::SweepHit hy = context.level.sweepVertical(box, dy);
             if (hy.hit)
@@ -346,29 +359,42 @@ void Entity::Physics::step(EntityStepContext& context)
                 grounded = false; // only set when actually supported by ground hit
                 box.y = hy.newY;
             }
+            if (applyy)
+            {
+                // Convert resolved world AABB back to entity position (y now included)
+                applyResolvedWorldAABBToEntity(position, hitbox, box);
+            }
         }
-        if (applyy)
+        else
         {
-            // Convert resolved world AABB back to entity position (y now included)
-            applyResolvedWorldAABBToEntity(position, hitbox, box);
+            grounded = false;
+            if (applyy)
+            {
+                position.y += velocity.y;
+            }
         }
 
-        // Probe 1px below to keep grounded accurate when dy is ~0
-        SDL_FRect probe = box;
-        probe.y += 1;
-        int c0, c1, r0, r1;
-        context.level.rectToBlockSpan(probe, c0, c1, r0, r1);
-        bool onSolid = false;
-        for (int r = r0; r <= r1; ++r)
-            for (int c = c0; c <= c1; ++c)
-                if (context.level.queryBlock(c, r).coll == Level::Block::Collision::Solid)
-                    onSolid = true;
-        grounded = grounded || onSolid;
+        if (vertCollision)
+        {
+            // Probe 1px below to keep grounded accurate when dy is ~0
+            SDL_FRect probe = box;
+            probe.y += 1;
+            int c0, c1, r0, r1;
+            context.level.rectToBlockSpan(probe, c0, c1, r0, r1);
+            bool onSolid = false;
+            for (int r = r0; r <= r1; ++r)
+                for (int c = c0; c <= c1; ++c)
+                    if (context.level.queryBlock(c, r).coll == Level::Block::Collision::Solid)
+                        onSolid = true;
+            grounded = grounded || onSolid;
+        }
 
-        // WATER (or other mediums)
-        // Detect if any overlapped tile is water; update state:
-        inWater = context.level.rectInWater(box);
-
+        if (collisionEnabled)
+        {
+            // WATER (or other mediums)
+            // Detect if any overlapped tile is water; update state:
+            inWater = context.level.rectInWater(box);
+        }
     }
 }
 

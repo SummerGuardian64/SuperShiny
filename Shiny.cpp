@@ -139,6 +139,21 @@ void Shiny::postStep(EntityStepContext& context)
             }
         }
     }
+    if (atClawbs.type == 5)
+    {
+        if (physics)
+        {
+            if (physics->abilities.vertCollision() && !physics->abilities.collisionIgnored())
+            {
+                physics->velocity.x = 0;
+                physics->velocity.y = -20;
+                physics->abilities.maxSpeedUp = 20;
+                physics->abilities.acc.x = 0;
+                physics->abilities.disable(Entity::Physics::Abilities::Flag::EnableHorizontalCollision);
+                physics->abilities.disable(Entity::Physics::Abilities::Flag::EnableVerticalCollision);
+            }
+        }
+    }
 
     if (sprite && physics)
     {
