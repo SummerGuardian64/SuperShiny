@@ -121,42 +121,42 @@ namespace ssge
 		return (r >= 0 && r < rows && c >= 0 && c < columns);
 	}
 
-	bool Level::inBoundsPt(SDL_Point p) const
+	bool Level::inBoundsPt(SDL_FPoint p) const
 	{
 		if (p.x < 0 || p.y < 0) return false;
 		const SDL_Rect size = calculateLevelSize();
 		return p.x < size.w && p.y < size.h;
 	}
 
-	Level::Block* Level::getBlockAt(int row, int column)
+	Level::Block* Level::getBlockAt(Level::Block::Coords coords)
 	{
-		if (!array || !inBoundsRC(row, column)) return nullptr;
-		return &array[indexOf(row, column)];
+		if (!array || !inBoundsRC(coords.row, coords.column)) return nullptr;
+		return &array[indexOf(coords.row, coords.column)];
 	}
 
-	const Level::Block* Level::getConstBlockAt(int row, int column) const
+	const Level::Block* Level::getConstBlockAt(Level::Block::Coords coords) const
 	{
-		if (!array || !inBoundsRC(row, column)) return nullptr;
-		return &array[indexOf(row, column)];
+		if (!array || !inBoundsRC(coords.row, coords.column)) return nullptr;
+		return &array[indexOf(coords.row, coords.column)];
 	}
 
-	Level::Block* Level::getBlockAt(SDL_Point point)
-	{
-		if (!array || !inBoundsPt(point)) return nullptr;
-		const int c = point.x / blockSize.w;
-		const int r = point.y / blockSize.h;
-		return getBlockAt(r, c);
-	}
-
-	const Level::Block* Level::getConstBlockAt(SDL_Point point) const
+	Level::Block* Level::getBlockAt(SDL_FPoint point)
 	{
 		if (!array || !inBoundsPt(point)) return nullptr;
 		const int c = point.x / blockSize.w;
 		const int r = point.y / blockSize.h;
-		return getConstBlockAt(r, c);
+		return getBlockAt(Block::Coords(c, r));
 	}
 
-	Level::Block::Collision Level::getCollisionAt(SDL_Point point) const
+	const Level::Block* Level::getConstBlockAt(SDL_FPoint point) const
+	{
+		if (!array || !inBoundsPt(point)) return nullptr;
+		const int c = point.x / blockSize.w;
+		const int r = point.y / blockSize.h;
+		return getConstBlockAt(Block::Coords(c, r));
+	}
+
+	Level::Block::Collision Level::getCollisionAt(SDL_FPoint point) const
 	{
 		const SDL_Rect size = calculateLevelSize();
 		if (point.y < 0)
@@ -190,6 +190,18 @@ namespace ssge
 		return blockDefinitions[blockTypeIndex].collision;
 	}
 
+	std::string Level::getBlockCallbackString(const Block& block) const
+	{
+		// Get the block's type index
+		auto blockTypeIndex = block.getTypeIndex();
+
+		// Treat invalid index same way as 0-index
+		if (blockTypeIndex < 0 || blockTypeIndex >= MAX_BLOCK_DEFINITIONS)
+			blockTypeIndex = 0; // FALLBACK!
+
+		return blockDefinitions[blockTypeIndex].callback;
+	}
+
 	SDL_Rect Level::calculateLevelSize() const
 	{
 		SDL_Rect r{0, 0, 0, 0};
@@ -199,7 +211,7 @@ namespace ssge
 	}
 
 	// Return tile indices overlapped by a rect (clamped to level bounds).
-	void Level::rectToTileSpan(const SDL_FRect& r, int& col0, int& col1, int& row0, int& row1) const
+	void Level::rectToBlockSpan(const SDL_FRect& r, int& col0, int& col1, int& row0, int& row1) const
 	{
 		const float eps = 0.0001f;
 		const int w = blockSize.w, h = blockSize.h;
@@ -234,12 +246,12 @@ namespace ssge
 	}
 
 	// Query a tile (with OOB policy)
-	Level::BlockQuery Level::queryTile(int col, int row) const
+	Level::BlockQuery Level::queryBlock(int col, int row) const
 	{
 		using Collision = Level::Block::Collision;
 
 		BlockQuery q;
-		q.tile = { col,row };
+		q.coords = { col,row };
 
 		// OOB is like a Tic-Tac-Toe index here, hehe
 		// 012
@@ -281,18 +293,26 @@ namespace ssge
 			const Block& b = array[row * columns + col];
 			q.coll = getBlockCollisionType(b);
 			q.type = b.type;
+			q.callback = getBlockCallbackString(b);
 		}
 		return q;
+	}
+
+	Level::BlockQuery Level::queryBlock(SDL_FPoint positionInLevel) const
+	{
+		int column = worldToCol((int)positionInLevel.x, blockSize.w);
+		int row = worldToRow((int)positionInLevel.y, blockSize.h);
+		return queryBlock(column, row);
 	}
 
 	// Is any overlapped tile "water"?
 	bool Level::rectInWater(const SDL_FRect& r) const
 	{
 		int c0, c1, r0, r1;
-		rectToTileSpan(r, c0, c1, r0, r1);
+		rectToBlockSpan(r, c0, c1, r0, r1);
 		for (int rI = r0; rI <= r1; ++rI)
 			for (int cI = c0; cI <= c1; ++cI)
-				if (queryTile(cI, rI).coll == Level::Block::Collision::Water)
+				if (queryBlock(cI, rI).coll == Level::Block::Collision::Water)
 					return true;
 		return false;
 	}
@@ -307,7 +327,7 @@ namespace ssge
 		SDL_FRect box = rect;
 
 		int col0, col1, row0, row1;
-		rectToTileSpan(box, col0, col1, row0, row1);
+		rectToBlockSpan(box, col0, col1, row0, row1);
 
 		if (dx > 0.f)
 		{
@@ -321,12 +341,12 @@ namespace ssge
 			{
 				for (int rI = row0; rI <= row1; ++rI)
 				{
-					auto q = queryTile(c, rI);
+					auto q = queryBlock(c, rI);
 					if (q.coll == Block::Collision::Solid)
 					{
 						float tileLeft = float(c * w);
 						out.hit = true;
-						out.tile = { c,rI };
+						out.coords = { c,rI };
 						out.newX = tileLeft - box.w;
 						out.newY = box.y;
 						return out;
@@ -349,12 +369,12 @@ namespace ssge
 			{
 				for (int rI = row0; rI <= row1; ++rI)
 				{
-					auto q = queryTile(c, rI);
+					auto q = queryBlock(c, rI);
 					if (q.coll == Block::Collision::Solid)
 					{
 						float tileRight = float((c + 1) * w);
 						out.hit = true;
-						out.tile = { c,rI };
+						out.coords = { c,rI };
 						out.newX = tileRight;
 						out.newY = box.y;
 						return out;
@@ -380,7 +400,7 @@ namespace ssge
 		SDL_FRect box = rect;
 
 		int col0, col1, row0, row1;
-		rectToTileSpan(box, col0, col1, row0, row1);
+		rectToBlockSpan(box, col0, col1, row0, row1);
 
 		if (dy > 0.f)
 		{
@@ -394,12 +414,12 @@ namespace ssge
 			{
 				for (int cI = col0; cI <= col1; ++cI)
 				{
-					auto q = queryTile(cI, rI);
+					auto q = queryBlock(cI, rI);
 					if (q.coll == Block::Collision::Solid)
 					{
 						float tileTop = float(rI * h);
 						out.hit = true;
-						out.tile = { cI,rI };
+						out.coords = { cI,rI };
 						out.newY = tileTop - box.h;
 						out.newX = box.x;
 						return out;
@@ -422,12 +442,12 @@ namespace ssge
 			{
 				for (int cI = col0; cI <= col1; ++cI)
 				{
-					auto q = queryTile(cI, rI);
+					auto q = queryBlock(cI, rI);
 					if (q.coll == Block::Collision::Solid)
 					{
 						float tileBottom = float((rI + 1) * h);
 						out.hit = true;
-						out.tile = { cI,rI };
+						out.coords = { cI,rI };
 						out.newY = tileBottom;
 						out.newX = box.x;
 						return out;

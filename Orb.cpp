@@ -18,9 +18,7 @@ Orb::Orb()
     position.x = 400;
     position.y = 100;
 
-    physics->speed.x = 4;
-
-    physics->processVelocity = true;
+    physics->velocity.x = 4;
 
     using Ability = Entity::Physics::Abilities::Flag;
     auto& abilities = physics->abilities;

@@ -184,8 +184,6 @@ namespace ssge
 			// References Entity's hitbox
 			SDL_FRect& hitbox;
 
-			SDL_FPoint velocity{ 0.0f, 0.0f };
-			bool processVelocity{ true };
 			SDL_FPoint setVelocityMagnitude(const SDL_FPoint& v, float speed);
 			//std::unique_ptr<Collider> collider; //TODO: May be not needed
 			float getLeftEdge() const { return hitbox.x; }
@@ -199,23 +197,6 @@ namespace ssge
 			float getDistance(const Entity& other) const; //TODO: Refactor with EntityReference!
 			//std::shared_ptr<Collision> collideWith(Entity& other); //TODO: May be not needed
 
-			//GML port:
-
-			// Flags
-			/*bool enablePhysics = false;
-			bool enableHorizontalMove = false;
-			bool enableVerticalMove = false;
-			bool enableJump = false;
-			bool enableRun = false;
-			bool enableSwim = false;
-			bool enableHorizontalCollision = false;
-			bool enableVerticalCollision = false;
-			bool ignoreCollision = false;
-			bool enableHorizontalBounce = false;
-			bool enableVerticalBounce = false;
-			bool enableGMBounce = false;
-			bool enableGMCollision = false;*/
-
 			// Current abilities
 			Abilities abilities;
 			
@@ -227,10 +208,11 @@ namespace ssge
 
 			// Current variables
 
-			SDL_FPoint speed = { 0,0 }; // Current speed as a vector
+			SDL_FPoint velocity = { 0,0 }; // Current speed as a vector
 			double jumpTimer = 0;       // Time remaining for holding jump
 			SDL_Point dir = { 0,0 };    // Direction of movement
 			SDL_Point side = { 0,0 };   // Side that's being pushed
+			SDL_FPoint oldVelocity = { 0,0 };
 
 			//float gravityInWater = 0;
 

@@ -22,8 +22,6 @@ Shiny::Shiny()
     position.x = 400;
     position.y = 100;
 
-	physics->processVelocity = true;
-
     using Ability = Entity::Physics::Abilities::Flag;
     auto& abilities = physics->abilities;
     abilities.set(Ability::EnablePhysics);
@@ -114,8 +112,8 @@ void Shiny::preStep(EntityStepContext& context)
                 auto& orb = *orbRef.get();
                 orb.position = position;
                 orb.position.y -= 40;
-                if(physics->speed.x<0)
-                    orb.getPhysics()->speed.x *= -1;
+                if(physics->velocity.x<0)
+                    orb.getPhysics()->velocity.x *= -1;
             }
         }
     }
@@ -123,11 +121,30 @@ void Shiny::preStep(EntityStepContext& context)
 
 void Shiny::postStep(EntityStepContext& context)
 {
+    auto clawbSpot = SDL_FPoint{ position.x, position.y + 1 };
+    auto atClawbs = context.level.queryBlock(clawbSpot);
+    if (atClawbs.callback == "Box")
+    {
+        auto* block = context.level.getBlockAt(atClawbs.coords);
+        if (block)
+        {
+            if (physics)
+            {
+                if (physics->oldVelocity.y > 0)
+                {
+                    physics->velocity.y = -physics->abilities.jumpSpeed;
+                    physics->jumpTimer = physics->abilities.jumpStrength;
+                    block->type = 0;
+                }
+            }
+        }
+    }
+
     if (sprite && physics)
     {
         // Flip the sprite according to entity's facing direction (side)
         auto direction = physics->side.x;
-        if (direction == 0) { sign(physics->speed.x); }
+        if (direction == 0) { sign(physics->velocity.x); }
         if (direction > 0) sprite->xscale = 1;
         else if (direction < 0) sprite->xscale = -1;
 
@@ -135,7 +152,7 @@ void Shiny::postStep(EntityStepContext& context)
 
         bool grounded = physics->grounded;
         bool walking = grounded && direction;
-        bool jumpingOrFalling = physics->speed.y <= 0;
+        bool jumpingOrFalling = physics->velocity.y <= 0;
 
         // Declare current and wanted sequence
 
@@ -149,7 +166,7 @@ void Shiny::postStep(EntityStepContext& context)
         else if (walking)
         {
             // Linear-interpolate walking animation speed
-            int lerp = abs(physics->speed.x) / physics->abilities.maxSpeedHor * 100;
+            int lerp = abs(physics->velocity.x) / physics->abilities.maxSpeedHor * 100;
             sprite->setLerp(lerp);
 
             // We wanna walk

@@ -88,10 +88,17 @@ namespace ssge {
         bool rectOverlapsSolid(const SDL_FRect& r) const;  // implemented to forward to Level
         
         // Return tile indices overlapped by a rect (clamped to level bounds).
-        void rectToTileSpan(const SDL_FRect& r, int& col0, int& col1, int& row0, int& row1) const;
+        void rectToBlockSpan(const SDL_FRect& r, int& col0, int& col1, int& row0, int& row1) const;
 
-        // Query a tile (with OOB policy)
-        Level::BlockQuery queryTile(int col, int row) const;
+        Level::Block* getBlockAt(Level::Block::Coords coords);
+
+        const Level::Block* getConstBlockAt(Level::Block::Coords coords) const;
+
+        // Query a block (with OOB policy)
+        Level::BlockQuery queryBlock(int col, int row) const;
+
+        // Query a block at specific position in level
+        Level::BlockQuery queryBlock(SDL_FPoint positionInLevel) const;
 
         // Axis-separated sweep: move horizontally by dx, collide with solids.
         Level::SweepHit sweepHorizontal(const SDL_FRect& rect, float dx) const;

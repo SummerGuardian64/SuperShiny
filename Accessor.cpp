@@ -111,14 +111,29 @@ bool LevelAccess::rectOverlapsSolid(const SDL_FRect& r) const
 	return false;
 }
 
-void LevelAccess::rectToTileSpan(const SDL_FRect& r, int& col0, int& col1, int& row0, int& row1) const
+void LevelAccess::rectToBlockSpan(const SDL_FRect& r, int& col0, int& col1, int& row0, int& row1) const
 {
-	return actual->rectToTileSpan(r, col0, col1, row0, row1);
+	return actual->rectToBlockSpan(r, col0, col1, row0, row1);
 }
 
-Level::BlockQuery LevelAccess::queryTile(int col, int row) const
+Level::Block* ssge::LevelAccess::getBlockAt(Level::Block::Coords coords)
 {
-	return actual->queryTile(col, row);
+	return actual->getBlockAt(coords);
+}
+
+const Level::Block* ssge::LevelAccess::getConstBlockAt(Level::Block::Coords coords) const
+{
+	return actual->getBlockAt(coords);
+}
+
+Level::BlockQuery LevelAccess::queryBlock(int col, int row) const
+{
+	return actual->queryBlock(col, row);
+}
+
+Level::BlockQuery LevelAccess::queryBlock(SDL_FPoint positionInLevel) const
+{
+	return actual->queryBlock(positionInLevel);
 }
 
 Level::SweepHit LevelAccess::sweepHorizontal(const SDL_FRect& rect, float dx) const

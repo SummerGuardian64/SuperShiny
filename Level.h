@@ -31,12 +31,14 @@ namespace ssge
 				TOTAL
 			};
 
-			struct TileIndex
+			struct Coords
 			{
-				int col = -1, row = -1;
-				inline bool operator==(const TileIndex& other) {
-					return col == other.col && row == other.row;
+				int column = -1, row = -1;
+				inline bool operator==(const Coords& other) {
+					return column == other.column && row == other.row;
 				}
+				Coords() = default;
+				Coords(int c, int r) : column(c), row(r) {};
 			};
 
 
@@ -163,16 +165,17 @@ namespace ssge
 
 		struct BlockQuery
 		{
-			Level::Block::TileIndex tile;                   // which tile we touched/checked
+			Level::Block::Coords coords;     // which block we touched/checked
 			Level::Block::Type type = Level::Block::Type::EMPTY;
 			Level::Block::Collision coll = Level::Block::Collision::Air;
+			std::string callback;
 			bool insideLevel = false;
 		};
 
 		struct SweepHit
 		{
 			bool hit = false;
-			Level::Block::TileIndex tile;                   // solid tile we hit
+			Level::Block::Coords coords;      // solid block we hit
 			float newX = 0.f;                 // resolved x (after axis move)
 			float newY = 0.f;                 // resolved y (after axis move)
 		};
@@ -216,24 +219,28 @@ namespace ssge
 		// Access
 		inline int indexOf(int r, int c) const { return r * columns + c; }
 		bool inBoundsRC(int r, int c) const;
-		bool inBoundsPt(SDL_Point p) const;
+		bool inBoundsPt(SDL_FPoint p) const;
 
-		Block* getBlockAt(int row, int column);
-		const Block* getConstBlockAt(int row, int column) const;
+		Block* getBlockAt(Level::Block::Coords coords);
+		const Block* getConstBlockAt(Level::Block::Coords coordsn) const;
 
-		Block* getBlockAt(SDL_Point point);
-		const Block* getConstBlockAt(SDL_Point point) const;
+		Block* getBlockAt(SDL_FPoint point);
+		const Block* getConstBlockAt(SDL_FPoint point) const;
 
-		Block::Collision getCollisionAt(SDL_Point point) const;
+		Block::Collision getCollisionAt(SDL_FPoint positionInLevel) const;
 		Block::Collision getBlockCollisionType(const Block& block) const;
+		std::string getBlockCallbackString(const Block& block) const;
 
 		SDL_Rect calculateLevelSize() const; // total pixel rectangle of the level starting at (0,0)
 
-        // Return tile indices overlapped by a rect (clamped to level bounds).
-        void rectToTileSpan(const SDL_FRect& r, int& col0, int& col1, int& row0, int& row1) const;
+        // Return block indices overlapped by a rect (clamped to level bounds).
+        void rectToBlockSpan(const SDL_FRect& r, int& col0, int& col1, int& row0, int& row1) const;
 
-        // Query a tile (with OOB policy)
-        BlockQuery queryTile(int col, int row) const;
+        // Query a block (with OOB policy)
+        BlockQuery queryBlock(int col, int row) const;
+
+		// Query a block at specific position in level
+		BlockQuery queryBlock(SDL_FPoint positionInLevel) const;
 
         // Is any overlapped tile "water"?
         bool rectInWater(const SDL_FRect& r) const;

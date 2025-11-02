@@ -52,6 +52,8 @@ void Entity::Physics::step(EntityStepContext& context)
 
     if (abilities.physicsEnabled())
     {
+        // Store old velocity
+        oldVelocity = velocity;
         // Check direction buttons X
         side.x = abilities.horzMove() ? pad.isPressed(3) - pad.isPressed(2) : 0;
         // Check direction buttons Y
@@ -181,9 +183,9 @@ void Entity::Physics::step(EntityStepContext& context)
             if (inWater && abilities.canSwim())
             {
                 int swimSpeed = -abilities.swimPower;
-                if (speed.y > swimSpeed)
+                if (velocity.y > swimSpeed)
                 {
-                    speed.y = swimSpeed;
+                    velocity.y = swimSpeed;
                 }
             }
             else if (grounded && abilities.canJump()) // Otherwise use the ground-based jump
@@ -195,66 +197,66 @@ void Entity::Physics::step(EntityStepContext& context)
         // Offer the ability to move horizontally
         if (abilities.horzMove())
         {
-            speed.x += sign(side.x) * abilities.acc.x;
-            if (abs(speed.x) > abilities.maxSpeedHor)
+            velocity.x += sign(side.x) * abilities.acc.x;
+            if (abs(velocity.x) > abilities.maxSpeedHor)
             {
-                speed.x = sign(speed.x) * abilities.maxSpeedHor;
+                velocity.x = sign(velocity.x) * abilities.maxSpeedHor;
             }
         }
         // Offer the ability to move vertically
         if (abilities.vertMove())
         {
-            speed.y += sign(side.y) * abilities.acc.y;
-            if ((speed.y < 0) && (-speed.y > abilities.maxSpeedUp))
+            velocity.y += sign(side.y) * abilities.acc.y;
+            if ((velocity.y < 0) && (-velocity.y > abilities.maxSpeedUp))
             {
-                speed.y = sign(speed.y) * abilities.maxSpeedUp;
+                velocity.y = sign(velocity.y) * abilities.maxSpeedUp;
             }
-            if (speed.y > abilities.maxSpeedDown)
+            if (velocity.y > abilities.maxSpeedDown)
             {
-                speed.y = sign(speed.y) * abilities.maxSpeedDown;
+                velocity.y = sign(velocity.y) * abilities.maxSpeedDown;
             }
         }
         // Deccellerate
         if (side.x == 0)
         {
-            if (abilities.dec.x > abs(speed.x))
+            if (abilities.dec.x > abs(velocity.x))
             {
-                speed.x = 0;
+                velocity.x = 0;
             }
             else
             {
-                speed.x -= sign(speed.x) * abilities.dec.x;
+                velocity.x -= sign(velocity.x) * abilities.dec.x;
             }
         }
         if (side.y == 0 && jumpTimer == 0 && abilities.gravity == 0)
         {
-            if (abilities.dec.y > abs(speed.y))
+            if (abilities.dec.y > abs(velocity.y))
             {
-                speed.y = 0;
+                velocity.y = 0;
             }
             else
             {
-                speed.y -= sign(speed.y) * abilities.dec.y;
+                velocity.y -= sign(velocity.y) * abilities.dec.y;
             }
         }
         // Apply jump
         if (jumpTimer > 0)
         {
-            if (speed.y >= -abilities.jumpSpeed)
+            if (velocity.y >= -abilities.jumpSpeed)
             {
                 jumpTimer--;
-                speed.y = -abilities.jumpSpeed;
+                velocity.y = -abilities.jumpSpeed;
             }
         }
         else if (side.y == 0)
         {
             //if (inWater)
             //{
-            //    speed.y += gravityInWater;
+            //    velocity.y += gravityInWater;
             //}
             //else
             //{
-                speed.y += abilities.gravity;
+                velocity.y += abilities.gravity;
             //}
         }
 
@@ -275,9 +277,9 @@ void Entity::Physics::step(EntityStepContext& context)
           }
         }*/
 
-        // After you compute speed.x, speed.y for this fixed step:
-        float dx = speed.x;   // per-step displacement in world units (you�re already stepping at fixed dt)
-        float dy = speed.y;
+        // After you compute velocity.x, velocity.y for this fixed step:
+        float dx = velocity.x;   // per-step displacement in world units (you�re already stepping at fixed dt)
+        float dy = velocity.y;
 
         // We'll apply axis-separated resolution: X then Y, using level sweeps.
         // Build world-space AABB from (position + local hitbox)
@@ -290,16 +292,16 @@ void Entity::Physics::step(EntityStepContext& context)
             Level::SweepHit hx = context.level.sweepHorizontal(box, dx);
             if (hx.hit)
             {
-                // We hit a solid tile�resolve at boundary and zero x-speed (or bounce if enabled)
+                // We hit a solid tile�resolve at boundary and zero x-velocity (or bounce if enabled)
                 box.x = hx.newX;
                 if (abilities.horzBounce() && !abilities.gmBounce())
                 {
-                    speed.x = -speed.x;
+                    velocity.x = -velocity.x;
                     applyx = false; // bounce handled position; don�t re-apply afterwards
                 }
                 else
                 {
-                    speed.x = 0.f;
+                    velocity.x = 0.f;
                 }
                 touchesWall = true;
                 // optional: store hx.tile if you want terraforming later
@@ -327,7 +329,7 @@ void Entity::Physics::step(EntityStepContext& context)
                 box.y = hy.newY;
                 if (abilities.vertBounce() && !abilities.gmBounce())
                 {
-                    speed.y = -speed.y;
+                    velocity.y = -velocity.y;
                     applyy = false;
                 }
                 else
@@ -335,7 +337,7 @@ void Entity::Physics::step(EntityStepContext& context)
                     // landing logic
                     if (dy > 0.f) { grounded = true; }     // moving down -> ground
                     if (dy < 0.f) { jumpTimer = 0.0; }     // bonked head -> stop jump
-                    speed.y = 0.f;
+                    velocity.y = 0.f;
                 }
                 // optional: terraforming hook with hy.tile
             }
@@ -355,11 +357,11 @@ void Entity::Physics::step(EntityStepContext& context)
         SDL_FRect probe = box;
         probe.y += 1;
         int c0, c1, r0, r1;
-        context.level.rectToTileSpan(probe, c0, c1, r0, r1);
+        context.level.rectToBlockSpan(probe, c0, c1, r0, r1);
         bool onSolid = false;
         for (int r = r0; r <= r1; ++r)
             for (int c = c0; c <= c1; ++c)
-                if (context.level.queryTile(c, r).coll == Level::Block::Collision::Solid)
+                if (context.level.queryBlock(c, r).coll == Level::Block::Collision::Solid)
                     onSolid = true;
         grounded = grounded || onSolid;
 
