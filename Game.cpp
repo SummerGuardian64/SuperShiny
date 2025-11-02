@@ -59,7 +59,6 @@ bool Game::Sprites::_init(SDL_Renderer* renderer)
 			sprdefShiny.images.push_back(Image(x, y, 77, 102, 41, 96));
 		}
 	}
-	sprdefShiny.images[15]=Image(154, 102, 57, 92, 30, 98);
 
 	{ // Stopped
 		auto& seq = sprdefShiny.addSequence(20, 20, 0);
@@ -73,13 +72,21 @@ bool Game::Sprites::_init(SDL_Renderer* renderer)
 		}
 	}
 	{ // Jumping
+		sprdefShiny.images[15] = Image(154, 102, 57, 92, 30, 98);
 		auto& seq = sprdefShiny.addSequence(20, 20, 0);
 		seq.imageIndexes.push_back(15);
 	}
 	{ // Falling
+		sprdefShiny.images[16] = Image(212, 102, 48, 104, 25, 104);
 		auto& seq = sprdefShiny.addSequence(20, 20, 0);
-		seq.imageIndexes.push_back(15);
+		seq.imageIndexes.push_back(16);
 	}
+	{ // Deadth
+		sprdefShiny.images[17] = Image(260, 102, 65, 96, 33, 96);
+		auto& seq = sprdefShiny.addSequence(20, 20, 0);
+		seq.imageIndexes.push_back(17);
+	}
+
 
 	sprdefOrb.spritesheet = SdlTexture("Sprites/Orb.png", renderer);
 

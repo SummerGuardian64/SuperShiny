@@ -20,6 +20,7 @@ namespace ssge
         SDL_FRect confines;
         bool gameplayOver;
         int wantedLevel;
+        bool heroDied = false;
         bool initLevel(SceneStepContext& context);
         Level::Loader levelLoader;
     public:
@@ -31,8 +32,10 @@ namespace ssge
         EntityReference entityToScrollTo;
         SDL_FPoint scrollTarget;
         //HintManager hints;
+        void reportHeroDeadth();
         bool isGameplayOver() const;
         void finishGameplay();
+        int getWantedLevel() const;
         SDL_FRect getConstConfines() const;
         SDL_FRect getConfines();
         void setConfines(SDL_FRect confines);

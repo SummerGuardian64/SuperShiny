@@ -40,6 +40,7 @@ namespace ssge {
         bool isPaused() const;
         void setPause(bool pause);
         bool isFadeFinished() const;
+        void restart();
     };
 
     class InputsAccess {
@@ -76,6 +77,7 @@ namespace ssge {
         GameWorld* currentGameWorld;
     public:
         explicit GameWorldAccess(GameWorld* current) : currentGameWorld(current) {}
+        void reportHeroDeadth();
         //TBA
     };
 
@@ -94,11 +96,16 @@ namespace ssge {
 
         const Level::Block* getConstBlockAt(Level::Block::Coords coords) const;
 
+        SDL_Rect calculateLevelSize() const;
+
         // Query a block (with OOB policy)
         Level::BlockQuery queryBlock(int col, int row) const;
 
         // Query a block at specific position in level
         Level::BlockQuery queryBlock(SDL_FPoint positionInLevel) const;
+
+        // Queries all blocks that overlap the specified collider
+        std::vector<Level::BlockQuery> queryBlocksUnderCollider(SDL_FRect collider) const;
 
         // Axis-separated sweep: move horizontally by dx, collide with solids.
         Level::SweepHit sweepHorizontal(const SDL_FRect& rect, float dx) const;

@@ -245,6 +245,25 @@ namespace ssge
 		col0 = c0; col1 = c1; row0 = r0; row1 = r1;
 	}
 
+	std::vector<Level::BlockQuery> Level::queryBlocksUnderCollider(SDL_FRect collider) const
+	{
+		std::vector<Level::BlockQuery> bigQuery;
+
+		int col0, col1, row0, row1;
+		rectToBlockSpan(collider, col0, col1, row0, row1);
+
+		for (int r = row0; r <= row1; r++)
+		{
+			for (int c = col0; c <= col1; c++)
+			{
+				auto q = queryBlock(c, r);
+				bigQuery.push_back(q);
+			}
+		}
+
+		return bigQuery;
+	}
+
 	// Query a tile (with OOB policy)
 	Level::BlockQuery Level::queryBlock(int col, int row) const
 	{
@@ -398,6 +417,7 @@ namespace ssge
 		SweepHit out; out.hit = false;
 		const int w = blockSize.w, h = blockSize.h;
 		SDL_FRect box = rect;
+		box.w -= 1; // FIXME: This apparently fixes a faulty jumpstucky problem
 
 		int col0, col1, row0, row1;
 		rectToBlockSpan(box, col0, col1, row0, row1);

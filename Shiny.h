@@ -5,8 +5,26 @@ using namespace ssge;
 
 class Shiny : public Entity
 {
+	bool dying = false;
+
+	void animate(EntityStepContext& context);
+
 public:
+	
+	enum class Sequences : int
+	{
+		Stopped = 0,
+		Walking = 1,
+		Jumping = 2,
+		Falling = 3,
+		Dying = 4
+	};
+
 	Shiny();
+
+	bool isDying() const;
+	void die();
+
 	// Inherited via Entity
 	EntityClassID getEntityClassID() const override;
 	void firstStep(EntityStepContext& context) override;

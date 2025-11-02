@@ -9,6 +9,66 @@
 
 using namespace ssge;
 
+void Shiny::animate(EntityStepContext& context)
+{
+    if (sprite && physics)
+    {
+        // Flip the sprite according to entity's facing direction (side)
+        auto direction = physics->side.x;
+        if (direction == 0) { sign(physics->velocity.x); }
+        if (direction > 0) sprite->xscale = 1;
+        else if (direction < 0) sprite->xscale = -1;
+
+        // Declare current situation
+
+        bool grounded = physics->grounded;
+        bool walking = grounded && direction;
+        bool jumping = physics->velocity.y <= 0;
+
+        // Declare current and wanted sequence
+
+        int currentSequence = sprite->getSeqIdx();
+        int wantedSequence = currentSequence;
+
+        if (context.inputs.isPressed(6))
+        { // ONLY FOR TESTING
+            wantedSequence = (int)Sequences::Dying;
+        }
+        else if (isDying())
+        {
+            wantedSequence = (int)Sequences::Dying;
+        }
+        else if (walking)
+        {
+            // Linear-interpolate walking animation speed
+            // FIXME: Tweak me!
+            int lerp = abs(physics->velocity.x) / physics->abilities.maxSpeedHor * 100;
+            sprite->setLerp(lerp);
+
+            // We wanna walk
+            wantedSequence = (int)Sequences::Walking;
+        }
+        else if (grounded)
+        {
+            wantedSequence = (int)Sequences::Stopped;
+        }
+        else if (jumping)
+        {
+            wantedSequence = (int)Sequences::Jumping;
+        }
+        else // Not grounded and not jumping means falling
+        {
+            wantedSequence = (int)Sequences::Falling;
+        }
+
+        // Play wanted sequence. DON'T REPLAY!
+        if (currentSequence != wantedSequence)
+        {
+            sprite->setSequence(wantedSequence);
+        }
+    }
+}
+
 Shiny::Shiny()
 {
 	sprite = std::make_unique<Sprite>(Game::Sprites::shiny());
@@ -89,6 +149,27 @@ Shiny::Shiny()
     hitbox.h = 86;
 }
 
+bool Shiny::isDying() const
+{
+    return dying;
+}
+
+void Shiny::die()
+{
+    // Cannot die twice
+    if (dying)
+        return;
+
+    dying = true;
+
+    // Boing up into the air and have no control over it
+    physics->velocity.x = 0;
+    physics->velocity.y = -20;
+    physics->abilities.maxSpeedUp = 20;
+    physics->abilities.enable(Entity::Physics::Abilities::Flag::IgnoreCollision);
+    control->ignore = true;
+}
+
 EntityClassID Shiny::getEntityClassID() const
 {
 	return EntityClassID::Shiny;
@@ -117,95 +198,104 @@ void Shiny::preStep(EntityStepContext& context)
             }
         }
     }
+
+    if (isDying())
+    {
+        SDL_Rect levelBounds = context.level.calculateLevelSize();
+        int tipOfTheHead = position.y + hitbox.y;
+        if (tipOfTheHead >= levelBounds.h)
+        {
+            context.gameWorld.reportHeroDeadth();
+        }
+    }
 }
 
 void Shiny::postStep(EntityStepContext& context)
 {
-    auto clawbSpot = SDL_FPoint{ position.x, position.y + 1 };
-    auto atClawbs = context.level.queryBlock(clawbSpot);
-    if (atClawbs.callback == "Box")
+    bool amIDeadYet = false;
+    float tipOfTheHead = position.y + hitbox.y;
+    float clawbHeight = tipOfTheHead + hitbox.h;
+
+    if (physics)
     {
-        auto* block = context.level.getBlockAt(atClawbs.coords);
-        if (block)
+        if (!physics->abilities.collisionIgnored())
         {
-            if (physics)
+            // Overal collisions
             {
-                if (physics->oldVelocity.y > 0)
+                SDL_FRect collider{
+                    position.x + hitbox.x - 1,
+                    position.y + hitbox.y - 1,
+                    hitbox.w + 2,
+                    hitbox.h + 2
+                };
+                auto allCollisions = context.level.queryBlocksUnderCollider(collider);
+                for (auto& collision : allCollisions)
                 {
-                    physics->velocity.y = -physics->abilities.jumpSpeed;
-                    physics->jumpTimer = physics->abilities.jumpStrength;
-                    block->type = 0;
+                    auto* block = context.level.getBlockAt(collision.coords);
+                    if (collision.coll == Level::Block::Collision::Hazard
+                        || collision.coll == Level::Block::Collision::DeathOnTouch
+                        || collision.coll == Level::Block::Collision::DeathIfFullyOutside)
+                    {
+                        amIDeadYet = true;
+                    }
+                    if (collision.callback == "Collectable")
+                    {
+                        block->type = 0;
+                    }
+                }
+            }
+            // Foot collisions
+            {
+                SDL_FRect footCollider{
+                    position.x + hitbox.x,
+                    clawbHeight + 1,
+                    hitbox.w,
+                    1
+                };
+                auto footCollisions = context.level.queryBlocksUnderCollider(footCollider);
+                for (auto& collision : footCollisions)
+                {
+                    auto* block = context.level.getBlockAt(collision.coords);
+                    if (collision.callback.substr(0, 3) == "Box")
+                    {
+                        if (physics->oldVelocity.y > 0)
+                        {
+                            physics->velocity.y = -physics->abilities.jumpSpeed;
+                            physics->jumpTimer = physics->abilities.jumpStrength;
+                            block->type = 0;
+                        }
+                    }
+                }
+            }
+            // Head collisions
+            {
+                SDL_FRect headCollider{
+                    position.x + hitbox.x,
+                    tipOfTheHead - 1,
+                    hitbox.w,
+                    1
+                };
+                auto headCollisions = context.level.queryBlocksUnderCollider(headCollider);
+                for (auto& collision : headCollisions)
+                {
+                    auto* block = context.level.getBlockAt(collision.coords);
+                    if (collision.callback.substr(0, 3) == "Box")
+                    {
+                        if (physics->oldVelocity.y < 0)
+                        {
+                            physics->velocity.y = -physics->oldVelocity.y;
+                            block->type = 0;
+                        }
+                    }
                 }
             }
         }
     }
-    if (atClawbs.type == 5)
-    {
-        if (physics)
-        {
-            if (physics->abilities.vertCollision() && !physics->abilities.collisionIgnored())
-            {
-                physics->velocity.x = 0;
-                physics->velocity.y = -20;
-                physics->abilities.maxSpeedUp = 20;
-                physics->abilities.acc.x = 0;
-                physics->abilities.disable(Entity::Physics::Abilities::Flag::EnableHorizontalCollision);
-                physics->abilities.disable(Entity::Physics::Abilities::Flag::EnableVerticalCollision);
-            }
-        }
-    }
 
-    if (sprite && physics)
-    {
-        // Flip the sprite according to entity's facing direction (side)
-        auto direction = physics->side.x;
-        if (direction == 0) { sign(physics->velocity.x); }
-        if (direction > 0) sprite->xscale = 1;
-        else if (direction < 0) sprite->xscale = -1;
+    if(amIDeadYet)
+        die();
 
-        // Declare current situation
-
-        bool grounded = physics->grounded;
-        bool walking = grounded && direction;
-        bool jumpingOrFalling = physics->velocity.y <= 0;
-
-        // Declare current and wanted sequence
-
-        int currentSequence = sprite->getSeqIdx();
-        int wantedSequence = currentSequence;
-
-        if (context.inputs.isPressed(6))
-        { // ONLY FOR TESTING
-            wantedSequence = 2;
-        }
-        else if (walking)
-        {
-            // Linear-interpolate walking animation speed
-            int lerp = abs(physics->velocity.x) / physics->abilities.maxSpeedHor * 100;
-            sprite->setLerp(lerp);
-
-            // We wanna walk
-            wantedSequence = 1; //TODO: Refactor me!
-        }
-        else if (grounded)
-        {
-            wantedSequence = 0; //TODO: Refactor me!
-        }
-        else if (jumpingOrFalling)
-        {
-            wantedSequence = 2;
-        }
-        else
-        {
-            wantedSequence = 3;
-        }
-
-        // Play wanted sequence. DON'T REPLAY!
-        if (currentSequence != wantedSequence)
-        {
-            sprite->setSequence(wantedSequence);
-        }
-    }
+    animate(context);
 }
 
 void Shiny::preDraw(DrawContext& context) const

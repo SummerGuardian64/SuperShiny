@@ -29,14 +29,16 @@ Entity::Physics::Physics(Entity& entity)
 {
 }
 
-inline SDL_FRect makeWorldAABB(const SDL_FPoint& pos, const SDL_FRect& localHitbox) {
+inline SDL_FRect makeWorldAABB(const SDL_FPoint& pos, const SDL_FRect& localHitbox)
+{
     return SDL_FRect{ pos.x + localHitbox.x, pos.y + localHitbox.y, localHitbox.w, localHitbox.h };
 }
 
-inline void applyResolvedWorldAABBToEntity(SDL_FPoint& pos, const SDL_FRect& localHitbox, const SDL_FRect& worldAABB) {
+inline void applyResolvedWorldAABBToEntity(SDL_FPoint& pos, const SDL_FRect& localHitbox, const SDL_FRect& worldAABB)
+{
     // localHitbox is relative to pos, so pos = worldBox - localOffset
-    pos.x = worldAABB.x - localHitbox.x;
-    pos.y = worldAABB.y - localHitbox.y;
+    pos.x = floor(worldAABB.x - localHitbox.x);
+    pos.y = floor(worldAABB.y - localHitbox.y);
 }
 
 void Entity::Physics::step(EntityStepContext& context)
@@ -348,8 +350,16 @@ void Entity::Physics::step(EntityStepContext& context)
                 else
                 {
                     // landing logic
-                    if (dy > 0.f) { grounded = true; }     // moving down -> ground
-                    if (dy < 0.f) { jumpTimer = 0.0; }     // bonked head -> stop jump
+                    if (dy > 0.f)
+                    {
+                        // moving down -> ground
+                        grounded = true;
+                    }
+                    if (dy < 0.f)
+                    {
+                        // bonked head -> stop jump
+                        jumpTimer = 0.0;
+                    }
                     velocity.y = 0.f;
                 }
                 // optional: terraforming hook with hy.tile
@@ -378,6 +388,7 @@ void Entity::Physics::step(EntityStepContext& context)
         {
             // Probe 1px below to keep grounded accurate when dy is ~0
             SDL_FRect probe = box;
+            probe.w -= 1; // FIXME: This bodge fixes the broken jump
             probe.y += 1;
             int c0, c1, r0, r1;
             context.level.rectToBlockSpan(probe, c0, c1, r0, r1);
@@ -492,28 +503,31 @@ void ssge::Entity::Control::latch(EntityStepContext& context)
 {
     uint32_t directButtons = 0;
 
-    switch (mode)
+    if (!ignore)
     {
-    case ssge::Entity::Control::Mode::Player:
-        directButtons = context.inputs.getCurrentButtonsForPlayer(playerId);
-        break;
-    case ssge::Entity::Control::Mode::AI:
-        //TODO: UNIMPLEMENTED!
-        break;
-    case ssge::Entity::Control::Mode::Replay:
-        //TODO: UNIMPLEMENTED!
-        break;
-    case ssge::Entity::Control::Mode::NPC:
-        //TODO: UNIMPLEMENTED!
-        break;
-    case ssge::Entity::Control::Mode::Cutscene:
-        //TODO: UNIMPLEMENTED!
-        break;
-    //case ssge::Entity::Control::Mode::None:
-    //case ssge::Entity::Control::Mode::TOTAL:
-    //TODO: Error handling
-    default:
-        break;
+        switch (mode)
+        {
+        case ssge::Entity::Control::Mode::Player:
+            directButtons = context.inputs.getCurrentButtonsForPlayer(playerId);
+            break;
+        case ssge::Entity::Control::Mode::AI:
+            //TODO: UNIMPLEMENTED!
+            break;
+        case ssge::Entity::Control::Mode::Replay:
+            //TODO: UNIMPLEMENTED!
+            break;
+        case ssge::Entity::Control::Mode::NPC:
+            //TODO: UNIMPLEMENTED!
+            break;
+        case ssge::Entity::Control::Mode::Cutscene:
+            //TODO: UNIMPLEMENTED!
+            break;
+            //case ssge::Entity::Control::Mode::None:
+            //case ssge::Entity::Control::Mode::TOTAL:
+            //TODO: Error handling
+        default:
+            break;
+        }
     }
 
     pad.latchButtons(directButtons);

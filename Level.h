@@ -14,6 +14,8 @@ namespace ssge
 	{
 		static inline int worldToCol(float x, int tileW) { return (int)std::floor(x / (float)tileW); }
 		static inline int worldToRow(float y, int tileH) { return (int)std::floor(y / (float)tileH); }
+		static inline int colToWorld(int col, int tileW) { return col * tileW; }
+		static inline int rowToWorld(int row, int tileH) { return row * tileH; }
 	public:
 		class Block
 		{
@@ -165,10 +167,12 @@ namespace ssge
 
 		struct BlockQuery
 		{
-			Level::Block::Coords coords;     // which block we touched/checked
+			Level::Block::Coords coords;     // where is the block on the grid
 			Level::Block::Type type = Level::Block::Type::EMPTY;
 			Level::Block::Collision coll = Level::Block::Collision::Air;
 			std::string callback;
+			SDL_FPoint worldTouch = { 0,0 }; // where was the block touched in the world
+			SDL_FPoint blockTouch = { 0,0 }; // where was the block touched in its own coords
 			bool insideLevel = false;
 		};
 
@@ -236,6 +240,9 @@ namespace ssge
 
         // Return block indices overlapped by a rect (clamped to level bounds).
         void rectToBlockSpan(const SDL_FRect& r, int& col0, int& col1, int& row0, int& row1) const;
+
+		// Queries all blocks that overlap the specified collider
+		std::vector<BlockQuery> queryBlocksUnderCollider(SDL_FRect collider) const;
 
         // Query a block (with OOB policy)
         BlockQuery queryBlock(int col, int row) const;

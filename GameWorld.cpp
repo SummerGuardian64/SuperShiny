@@ -56,6 +56,11 @@ Scene& ssge::GameWorld::getAsScene()
     return *this;
 }
 
+void GameWorld::reportHeroDeadth()
+{
+    heroDied = true;
+}
+
 bool GameWorld::isGameplayOver() const
 {
 	return false;
@@ -64,6 +69,11 @@ bool GameWorld::isGameplayOver() const
 void GameWorld::finishGameplay()
 {
     gameplayOver = true;
+}
+
+int GameWorld::getWantedLevel() const
+{
+    return wantedLevel;
 }
 
 SDL_FRect GameWorld::getConstConfines() const
@@ -162,6 +172,11 @@ void GameWorld::step(SceneStepContext& context)
         GameWorldAccess(this),
         LevelAccess(level.get())
     );
+
+    if (heroDied)
+    {
+        context.scenes.restart();
+    }
 
     entities.step(gameWorldStepContext);
 

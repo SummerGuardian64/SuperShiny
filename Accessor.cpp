@@ -70,6 +70,20 @@ bool ssge::ScenesAccess::isFadeFinished() const
 	return actual->isFadeFinished();
 }
 
+void ssge::ScenesAccess::restart()
+{
+	auto currentSceneClassID = actual->getCurrentSceneClassID();
+	if (currentSceneClassID == SceneClassID::GameWorld)
+	{
+		GameWorld* gameWorldScene = dynamic_cast<GameWorld*>(actual->getCurrentScene());
+		goToLevel(gameWorldScene->getWantedLevel());
+	}
+	else
+	{
+		changeScene(currentSceneClassID);
+	}
+}
+
 bool InputsAccess::isPressed(int buttonIndex)
 {
 	return actual->getPad().isPressed(buttonIndex);
@@ -126,6 +140,11 @@ const Level::Block* ssge::LevelAccess::getConstBlockAt(Level::Block::Coords coor
 	return actual->getBlockAt(coords);
 }
 
+SDL_Rect ssge::LevelAccess::calculateLevelSize() const
+{
+	return actual->calculateLevelSize();
+}
+
 Level::BlockQuery LevelAccess::queryBlock(int col, int row) const
 {
 	return actual->queryBlock(col, row);
@@ -134,6 +153,11 @@ Level::BlockQuery LevelAccess::queryBlock(int col, int row) const
 Level::BlockQuery LevelAccess::queryBlock(SDL_FPoint positionInLevel) const
 {
 	return actual->queryBlock(positionInLevel);
+}
+
+std::vector<Level::BlockQuery> ssge::LevelAccess::queryBlocksUnderCollider(SDL_FRect collider) const
+{
+	return actual->queryBlocksUnderCollider(collider);
 }
 
 Level::SweepHit LevelAccess::sweepHorizontal(const SDL_FRect& rect, float dx) const
@@ -174,4 +198,9 @@ void ssge::MenusAccess::openPauseMenu()
 void ssge::MenusAccess::close()
 {
 	actual->close();
+}
+
+void ssge::GameWorldAccess::reportHeroDeadth()
+{
+	currentGameWorld->reportHeroDeadth();
 }
