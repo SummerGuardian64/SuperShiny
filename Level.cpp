@@ -636,6 +636,12 @@ namespace ssge
 		tilesMeta.inferColumnsFromTexture(tileset);
 	}
 
+	bool Level::loadTileset(SDL_Renderer* renderer)
+	{
+		setTileset(SdlTexture(tilesetTexture.c_str(), renderer));
+		return tileset.isValid();
+	}
+
 	void Level::draw(DrawContext context) const
 	{
 		SDL_Renderer* renderer = context.getRenderer();
@@ -687,6 +693,323 @@ namespace ssge
 					SDL_RenderCopy(renderer, tileset, &src, &dst);
 				}
 			}
+		}
+	}
+	void Level::Loader::logError(std::string error)
+	{
+		errorLog += "Level Loader error: " + error + '\n';
+	}
+	Level::Loader::Loader(PassKey<Level> pk)
+	{}
+	std::unique_ptr<Level> Level::Loader::loadLevel(const char* path)
+	{
+		do // gotophobia
+		{
+			if (!loadIni(path))
+				return nullptr; // goto failure
+
+			newLevel = parseAndConstruct();
+
+			if (!newLevel)
+				break; // goto failure
+
+			if (!parseAfterConstruct())
+				break; // goto failure
+
+			if (!parseBlockDefinitions())
+				break; // goto failure
+
+			if (!parseGrid())
+				break; // goto failure
+
+			return std::move(newLevel);
+		} while (0); // We only needed this block because of gotophobia
+
+		// Failure
+		newLevel = nullptr;
+		return nullptr;
+	}
+	std::string Level::Loader::getErrorLog() const
+	{
+		return errorLog;
+	}
+	bool Level::Loader::loadIni(const char* path)
+	{
+		std::ifstream iniFile(path);
+		if (!iniFile)
+		{
+			logError("Cannot open INI file.");
+			return false;
+		}
+
+		std::string line;
+		Section* currentSection = nullptr;
+		while (std::getline(iniFile, line))
+		{
+			if (line.empty())
+				continue; // Line empty. Seek onward.
+
+			// Do we have a new section?
+			if (line.front() == '[' && line.back() == ']')
+			{
+				// Read section caption
+				std::string sectionCaption = line.substr(1, line.size() - 2);
+
+				// Store section
+				sections.push_back(Section(sectionCaption));
+
+				// Select section
+				currentSection = &sections.back();
+			}
+
+			// Read through the section
+			if (currentSection)
+			{
+				// Find equals sign in line
+				auto eq = line.find('=');
+
+				if (eq == std::string::npos)
+					continue; // No equals sign. Seek onward.
+
+				// Read item
+				auto key = line.substr(0, eq); // Read item key
+				auto value = line.substr(eq + 1); // Read item value
+
+				// Store item
+				currentSection->items.push_back(Item(key, value));
+			}
+		}
+
+		return true;
+	}
+	std::unique_ptr<Level> Level::Loader::parseAndConstruct()
+	{
+		int columns;
+		int rows;
+		SDL_Rect blockSize = { 0,0,0,0 };
+
+		try { columns = std::stoi(getValue("Grid", "Columns")); }
+		catch (...) { logError("Couldn't read [Grid]Columns"); return nullptr; }
+		
+		try { rows = std::stoi(getValue("Grid", "Rows")); }
+		catch (...) { logError("Couldn't read [Grid]Rows"); return nullptr; }
+		
+		try { blockSize.w = std::stoi(getValue("Tileset", "TileWidth")); }
+		catch (...) { logError("Couldn't read [Tileset]TileWidth"); return nullptr; }
+		
+		try { blockSize.h = std::stoi(getValue("Tileset", "TileHeight")); }
+		catch (...) { logError("Couldn't read [Tileset]TileHeight"); return nullptr; }
+		
+		std::string tilesetTexturePath = getValue("Grid", "Columns");
+		if (tilesetTexturePath.empty())
+		{
+			logError("Tileset texture path not specified");
+			return nullptr;
+		}
+		
+		auto newLevel = std::make_unique<Level>(columns, rows, blockSize, nullptr);
+
+		newLevel->tilesetTexture=tilesetTexturePath;
+
+		return std::move(newLevel);
+	}
+	bool Level::Loader::parseAfterConstruct()
+	{
+		newLevel->throughTopLeft = parseOOB("TopLeft");
+		newLevel->throughTop = parseOOB("Top");
+		newLevel->throughTopRight = parseOOB("TopRight");
+		newLevel->throughLeft = parseOOB("Left");
+		newLevel->throughRight = parseOOB("Right");
+		newLevel->throughBottomLeft = parseOOB("BottomLeft");
+		newLevel->throughBottom = parseOOB("Bottom");
+		newLevel->throughBottomRight = parseOOB("BottomRight");
+		return true;
+	}
+	bool Level::Loader::parseBlockDefinitions()
+	{
+		for (int i = 0; i < MAX_BLOCK_DEFINITIONS; i++)
+		{
+			std::string blockDefinition = getValue("Blocks", i);
+			if (blockDefinition.empty())
+				continue;
+			
+			newLevel->blockDefinitions[i].tileIndex = parseTileIndex(blockDefinition);
+			newLevel->blockDefinitions[i].collision = parseBlockCollision(blockDefinition);
+			newLevel->blockDefinitions[i].callback = parseCallbackName(blockDefinition);
+		}
+		return true;
+	}
+	Level::Block* Level::Loader::parseGrid()
+	{
+		int rows = newLevel->rows;
+		int columns = newLevel->columns;
+
+		for (int row = 0; row < rows; row++)
+		{
+			std::string rowString = getValue("Grid", row);
+			for (int column = 0; column < columns; column++)
+			{
+				char blockChar = rowString[column];
+				newLevel->array[column + row * columns].type = blockChar;
+			}
+		}
+
+		return nullptr;
+	}
+	std::string Level::Loader::getValue(std::string caption, std::string key) const
+	{
+		static const char* FALLBACK = "";
+		for (auto& section : sections)
+		{
+			if (section.caption == caption)
+			{
+				for (auto& item : section.items)
+				{
+					if (item.key == key)
+					{
+						return item.value;
+					}
+				}
+				return FALLBACK;
+			}
+		}
+		return FALLBACK;
+	}
+	std::string Level::Loader::getValue(std::string caption, int numericKey) const
+	{
+		static const char* FALLBACK = "";
+		for (auto& section : sections)
+		{
+			if (section.caption == caption)
+			{
+				for (auto& item : section.items)
+				{
+					try
+					{
+						if (std::stoi(caption) == numericKey)
+						{
+							return item.value;
+						}
+					}
+					catch (...) { return FALLBACK; }
+				}
+				return FALLBACK;
+			}
+		}
+		return FALLBACK;
+	}
+	Level::Block::Collision Level::Loader::parseOOB(std::string side)
+	{
+		try
+		{
+			static const char* oobcolString = "OOBCol";
+			static constexpr size_t oobcolStrLen = sizeof(oobcolString) - 1;
+			if (side.size() <= oobcolStrLen
+				&& side.substr(0, strlen(oobcolString)) == oobcolString)
+			{
+				return parseCollision(side.substr(strlen(oobcolString) + 1));
+			}
+
+			// Fallback
+			logError("Couldn't parse OOB collision");
+			return Block::Collision::Air;
+		}
+		catch (...)
+		{
+			logError("Caught OOB collision parsing error!");
+			return Block::Collision::Air;
+		}
+	}
+	Level::Block::Collision Level::Loader::parseCollision(std::string collisionString)
+	{
+		static const char* lut[] =
+		{
+			"Air",
+			"Solid",
+			"Water",
+			"Hazard",
+			"DeathOnTouch",
+			"DeathIfFullyOutside",
+			"WrapAround",
+			"NextSection",
+			nullptr
+		};
+		
+		const char** current = lut;
+
+		for (int i = 0; *current; i++, current++)
+		{
+			if (collisionString == *current)
+				return Block::Collision(i);
+		}
+
+		// Fallback
+		logError("Unknown collision specification!");
+		return Block::Collision::Air;
+	}
+	Level::Block::Collision Level::Loader::parseBlockCollision(std::string blockItemValue)
+	{
+		try
+		{
+			int colonIndex = blockItemValue.find(':');
+			if (colonIndex <= 0)
+			{
+				// Fallback
+				logError("Block collision not parsed");
+				return Block::Collision::Air;
+			}
+			return parseCollision(blockItemValue.substr(colonIndex + 1));
+		}
+		catch (...)
+		{
+			logError("Caught block collision parsing exception!");
+			return Block::Collision::Air;
+		}
+	}
+	int Level::Loader::parseTileIndex(std::string blockItemValue)
+	{
+		try
+		{
+			int colonIndex = blockItemValue.find(':');
+			int endOfNumber = blockItemValue.find('@');
+			std::string numberSubstring;
+			if (endOfNumber == -1)
+			{
+				numberSubstring = blockItemValue.substr(colonIndex + 1);
+			}
+			else
+			{
+				numberSubstring = blockItemValue.substr(colonIndex + 1, endOfNumber - colonIndex - 1);
+			}
+			return std::stoi(numberSubstring);
+		}
+		catch (...)
+		{
+			// Fallback
+			logError("Caught tile index parsing exception! Block will be invisible!");
+			return -1;
+		}
+	}
+	std::string Level::Loader::parseCallbackName(std::string blockItemValue)
+	{
+		try
+		{
+			int monkeyIndex = blockItemValue.find('@');
+			if (monkeyIndex == -1)
+			{
+				// No callback here
+				return "";
+			}
+			else
+			{
+				return blockItemValue.substr(monkeyIndex + 1);
+			}
+		}
+		catch (...)
+		{
+			// Fallback
+			logError("Caught block callback parsing exception!");
+			return "";
 		}
 	}
 }

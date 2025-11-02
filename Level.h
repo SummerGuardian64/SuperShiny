@@ -4,6 +4,7 @@
 #include <SDL.h>
 #include "DrawContext.h"
 #include "SdlTexture.h"
+#include "PassKey.h"
 
 namespace ssge
 {
@@ -24,7 +25,7 @@ namespace ssge
 				DeathOnTouch,
 				DeathIfFullyOutside,
 				WrapAround,
-				Warp,
+				NextSection,
 				TOTAL
 			};
 
@@ -95,8 +96,7 @@ namespace ssge
 				// Tile to draw. -1 = Don't draw
 				int tileIndex = -1;
 				Collision collision;
-				//TODO: Callback implementation
-				uint8_t callback;
+				std::string callback;
 				//TODO: Harden with PassKey
 				Definition() = default;
 			};
@@ -245,6 +245,8 @@ namespace ssge
 		const SdlTexture& getTilesetTexture() const;
 		const TilesetMeta getTilesetMeta() const;
 		void setTileset(SdlTexture& SdlTexture);
+		std::string tilesetTexture;
+		bool loadTileset(SDL_Renderer* renderer);
 
 		void draw(DrawContext context) const; // conservative draw (no templates)
 
@@ -258,5 +260,61 @@ namespace ssge
 			std::size_t size,
 			std::string* outTilesetPath = nullptr,
 			std::string* outError = nullptr);
+
+		class Loader
+		{
+			// INI-related stuff
+
+			struct Item
+			{
+				std::string key;
+				std::string value;
+				Item() = default;
+				Item(std::string key, std::string value) : key(key), value(value) {};
+			};
+			struct Section
+			{
+				std::string caption;
+				std::vector<Item> items;
+				Section() = default;
+				Section(std::string caption) : caption(caption) {};
+			};
+			std::vector<Section> sections;
+
+			// Loading and parsing
+			// Please execute these functions in proper order!
+
+			bool loadIni(const char* path); // Reads INI file into sections
+			std::unique_ptr<Level> newLevel; // Level we're making
+			std::unique_ptr<Level> parseAndConstruct(); // Parses arguments for Level ctor and creates the level
+			bool parseAfterConstruct(); // Populates all data fields using sections
+			bool parseBlockDefinitions(); // Parse Block definitions
+			Block* parseGrid(); // Parse grid
+			
+			// Post-load traversal
+
+			std::string getValue(std::string caption, std::string key) const;
+			std::string getValue(std::string caption, int numericKey) const;
+
+			// Advanced parsing
+
+			Block::Collision parseOOB(std::string side);
+			Block::Collision parseCollision(std::string collisionString);
+			Block::Collision parseBlockCollision(std::string blockItemValue);
+			int parseTileIndex(std::string blockItemValue);
+			std::string parseCallbackName(std::string blockItemValue);
+
+			// Error logging
+			std::string errorLog;
+			void logError(std::string error);
+
+		public:
+			Loader(PassKey<Level> pk);
+			std::unique_ptr<Level> loadLevel(const char* path);
+			std::string getErrorLog() const;
+			Loader(const Loader& toCopy) = delete; // No monkey business
+			Loader(Loader&& toMove) = delete; // No monkey business
+			~Loader() = default;
+		};
 	};
 }
