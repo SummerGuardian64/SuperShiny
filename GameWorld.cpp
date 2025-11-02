@@ -15,20 +15,15 @@ bool ssge::GameWorld::initLevel(SceneStepContext& context)
         std::string tilesetPath;
         std::string error;
         std::string path = "Levels/level" + std::to_string(wantedLevel) + ".ini";
-        auto loader = Level::Loader(PassKey<GameWorld>());
 
-        auto lvl = loader.loadLevel(path.c_str());
+        auto lvl = levelLoader.loadLevel(path.c_str());
 
         if (!lvl)
         {
-            std::cout << "There were errors during loading level from " << path << std::endl << loader.getErrorLog();
+            std::cout << "There were errors during loading level from " << path << std::endl << levelLoader.getErrorLog();
         }
         else
-        {/*
-            if (!tilesetPath.empty())
-            {
-                lvl->setTileset(SdlTexture(tilesetPath.c_str(), context.drawing.getRenderer()));
-            }*/
+        {
             lvl->loadTileset(context.drawing.getRenderer());
             level = std::move(lvl);
         }
@@ -39,7 +34,7 @@ bool ssge::GameWorld::initLevel(SceneStepContext& context)
     return (level != nullptr);
 }
 
-GameWorld::GameWorld()
+GameWorld::GameWorld() : levelLoader(PassKey<GameWorld>())
 {
     backgroundColor = SDL_Color{ 0,0,255,255 };
     setConfines(SDL_FRect{ 0,0,1280,720 });
@@ -47,7 +42,7 @@ GameWorld::GameWorld()
     wantedLevel = 0;
 }
 
-GameWorld::GameWorld(int wantedLevel)
+GameWorld::GameWorld(int wantedLevel) : levelLoader(PassKey<GameWorld>())
 {
     backgroundColor = SDL_Color{ 0,0,255,255 };
     setConfines(SDL_FRect{ 0,0,1280,720 });
@@ -104,9 +99,29 @@ void GameWorld::init(SceneStepContext& context)
     }
     else
     {
-        auto shiny = entities.addEntity(EntityClassID::Shiny);
+        auto& spawnList = levelLoader.getSpawnList();
 
-        entityToScrollTo = shiny;
+        int currentEntityIndex = 0;
+        for (const auto& spawnEntry : spawnList)
+        {
+            // TODO: Move to Entity Registry
+            EntityClassID ecid;
+            if (spawnEntry.what == "Shiny")
+                ecid = EntityClassID::Shiny;
+            else if (spawnEntry.what == "Orb")
+                ecid = EntityClassID::Orb;
+            else continue;
+
+            auto entity = entities.addEntity(ecid);
+            entity->position = spawnEntry.where;
+
+            if (levelLoader.getHeroIndex() == currentEntityIndex)
+            {
+                entityToScrollTo = entity;
+            }
+
+            currentEntityIndex++;
+        }
     }
 
     //std::string error;
@@ -160,6 +175,21 @@ void GameWorld::step(SceneStepContext& context)
         context.scenes.pause();
         context.menus.openPauseMenu();
     }
+
+    // Warp check
+
+    if (auto hero = entityToScrollTo.get())
+    {
+        auto warpQuery = level->queryBlock(hero->position);
+        if (warpQuery.coll == Level::Block::Collision::NextSection)
+        {
+            if (level->nextSection != -1)
+            {
+                context.scenes.goToLevel(level->nextSection);
+            }
+        }
+    }
+
 
     //// TODO: game victory/loss criteria check
 

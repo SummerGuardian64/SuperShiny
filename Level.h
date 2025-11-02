@@ -205,6 +205,7 @@ namespace ssge
 		Block::Collision throughBottomLeft{ Block::Collision::DeathIfFullyOutside };
 		Block::Collision throughBottom{ Block::Collision::DeathIfFullyOutside };
 		Block::Collision throughBottomRight{ Block::Collision::DeathIfFullyOutside };
+		int nextSection;
 
 		// Ctor / Dtor
 		Level(int columns, int rows, SDL_Rect blockSize, SdlTexture tileset);
@@ -288,10 +289,12 @@ namespace ssge
 			bool parseAfterConstruct(); // Populates all data fields using sections
 			bool parseBlockDefinitions(); // Parse Block definitions
 			bool parseGrid(); // Parse grid
+			bool parseSpawnList(); // Parse spawn list
 			
 			// Post-load traversal
 
 			std::string getValue(std::string caption, std::string key) const;
+			std::string getValue(std::string caption, std::string key, std::string fallback) const;
 			std::string getValue(std::string caption, int numericKey) const;
 
 			// Advanced parsing
@@ -306,12 +309,27 @@ namespace ssge
 			std::string errorLog;
 			void logError(std::string error);
 
+			// Spawn list
+
+		public:
+			struct Spawn
+			{
+				SDL_FPoint where;
+				std::string what;
+				std::string callback;
+			};
+		private:
+			std::vector<Spawn> spawnList;
+			int heroIndex = -1;
+
 		public:
 			Loader(PassKey<GameWorld> pk);
 			std::unique_ptr<Level> loadLevel(const char* path);
+			const std::vector<Spawn>& getSpawnList() const;
+			int getHeroIndex() const;
 			std::string getErrorLog() const;
-			Loader(const Loader& toCopy) = delete; // No monkey business
-			Loader(Loader&& toMove) = delete; // No monkey business
+			Loader(const Loader& toCopy) = default;
+			Loader(Loader&& toMove) = default;
 			~Loader() = default;
 		};
 	};

@@ -47,7 +47,7 @@ namespace ssge
         }
         Entity* get() const {
             auto sp = ref.lock();
-            if (!sp) throw std::runtime_error("Dereferencing expired EntityReference");
+            //if (!sp) throw std::runtime_error("Dereferencing expired EntityReference");
             return &*sp;
         }
 

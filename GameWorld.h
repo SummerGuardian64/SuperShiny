@@ -21,6 +21,7 @@ namespace ssge
         bool gameplayOver;
         int wantedLevel;
         bool initLevel(SceneStepContext& context);
+        Level::Loader levelLoader;
     public:
         GameWorld();
         GameWorld(int wantedLevel);

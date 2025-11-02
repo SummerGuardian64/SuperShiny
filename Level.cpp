@@ -566,12 +566,23 @@ namespace ssge
 			if (!parseGrid())
 				break; // goto failure
 
+			if (!parseSpawnList())
+				break; // goto failure
+
 			return std::move(newLevel);
 		} while (0); // We only needed this block because of gotophobia
 
 		// Failure
 		newLevel = nullptr;
 		return nullptr;
+	}
+	const std::vector<Level::Loader::Spawn>& Level::Loader::getSpawnList() const
+	{
+		return spawnList;
+	}
+	int Level::Loader::getHeroIndex() const
+	{
+		return heroIndex;
 	}
 	std::string Level::Loader::getErrorLog() const
 	{
@@ -680,6 +691,14 @@ namespace ssge
 		newLevel->throughBottomLeft = parseOOB("BottomLeft");
 		newLevel->throughBottom = parseOOB("Bottom");
 		newLevel->throughBottomRight = parseOOB("BottomRight");
+
+		try { newLevel->nextSection = std::stoi(getValue("SSGELEV1", "NextSection", "-1"));
+		} catch (...) {
+			// TODO: Better error handling
+			logError("Failed to specify next section! Player may be stuck here!");
+			return false;
+		}
+
 		return true;
 	}
 	bool Level::Loader::parseBlockDefinitions()
@@ -719,9 +738,50 @@ namespace ssge
 
 		return true;
 	}
+	bool Level::Loader::parseSpawnList()
+	{
+		try
+		{
+			int spawnEntries = 0;
+			spawnEntries = std::stoi(getValue("SpawnList", "Entries"));
+			heroIndex = std::stoi(getValue("SpawnList", "Hero"));
+			if (heroIndex < 0)
+			{
+				logError("Invalid hero index!");
+				return false;
+			}
+			if (heroIndex >= spawnEntries)
+			{
+				logError("Hero index out of bounds!");
+				return false;
+			}
+			for (int i = 0; i < spawnEntries; i++)
+			{
+				Spawn entry;
+				entry.where.x = std::stoi(getValue("SpawnList", "Spawn" + std::to_string(i) + "X"));
+				entry.where.y = std::stoi(getValue("SpawnList", "Spawn" + std::to_string(i) + "Y"));
+				entry.what = getValue("SpawnList", "Spawn" + std::to_string(i) + "Entity");
+				entry.callback = getValue("SpawnList", "Spawn" + std::to_string(i) + "Callback");
+				spawnList.push_back(entry);
+			}
+
+			return true;
+		}
+		catch (...)
+		{ // We should have spawned something!!!
+			// TODO: Better error handling. We don't know which field is busted!
+			logError("Spawn list could not be read!");
+			return false;
+		}
+
+	}
 	std::string Level::Loader::getValue(std::string caption, std::string key) const
 	{
 		static const char* FALLBACK = "";
+		return getValue(caption, key, FALLBACK);
+	}
+	std::string Level::Loader::getValue(std::string caption, std::string key, std::string fallback) const
+	{
 		for (auto& section : sections)
 		{
 			if (section.caption == caption)
@@ -733,10 +793,10 @@ namespace ssge
 						return item.value;
 					}
 				}
-				return FALLBACK;
+				return fallback;
 			}
 		}
-		return FALLBACK;
+		return fallback;
 	}
 	std::string Level::Loader::getValue(std::string caption, int numericKey) const
 	{
