@@ -8,183 +8,7 @@
 
 namespace ssge
 {
-	// read helpers (little-endian, bounds-checked)
-	inline bool read_u32(const unsigned char*& p, const unsigned char* end, uint32_t& out)
-	{
-		if (end - p < 4) return false;
-		out = (uint32_t)p[0] | ((uint32_t)p[1] << 8) | ((uint32_t)p[2] << 16) | ((uint32_t)p[3] << 24);
-		p += 4; return true;
-	}
-	inline bool read_s32(const unsigned char*& p, const unsigned char* end, int32_t& out)
-	{
-		uint32_t u; if (!read_u32(p, end, u)) return false; out = (int32_t)u; return true;
-	}
-	inline bool read_u16(const unsigned char*& p, const unsigned char* end, uint16_t& out)
-	{
-		if (end - p < 2) return false;
-		out = (uint16_t)p[0] | ((uint16_t)p[1] << 8);
-		p += 2; return true;
-	}
-	inline bool read_u8(const unsigned char*& p, const unsigned char* end, uint8_t& out)
-	{
-		if (end - p < 1) return false; out = *p++; return true;
-	}
-	inline bool read_bytes(const unsigned char*& p, const unsigned char* end, char* dst, std::size_t n)
-	{
-		if ((std::size_t)(end - p) < n) return false;
-		std::memcpy(dst, p, n); p += n; return true;
-	}
-
-	inline bool check_magic(const unsigned char*& p, const unsigned char* end)
-	{
-		static const char kMagic[8] = { 'S','S','G','E','L','E','V','1' };
-		if (end - p < 8) return false;
-		if (std::memcmp(p, kMagic, 8) != 0) return false;
-		p += 8; return true;
-	}
-
-	inline Level::Block::Collision toCollision(uint8_t v)
-	{
-		using C = Level::Block::Collision;
-		return (v < (uint8_t)C::TOTAL) ? (C)v : C::Air;
-	}
-
-	inline Level::Block::Type toType(uint8_t v)
-	{
-		return Level::Block::Type(v);
-	}
-
-	std::unique_ptr<Level> Level::loadFromFile(const char* path, std::string* outTilesetPath, std::string* outError)
-	{
-		std::ifstream f(path, std::ios::binary);
-		if (!f)
-		{
-			if (outError) *outError = std::string("Cannot open level file: ") + path;
-			return nullptr;
-		}
-		std::vector<unsigned char> buf((std::istreambuf_iterator<char>(f)), std::istreambuf_iterator<char>());
-		if (buf.empty())
-		{
-			if (outError) *outError = "Level file is empty.";
-			return nullptr;
-		}
-		return Level::loadFromBytes(buf.data(), buf.size(), outTilesetPath, outError);
-	}
-
-	std::unique_ptr<Level> Level::loadFromBytes(
-		const unsigned char* data,
-		std::size_t size,
-		std::string* outTilesetPath,
-		std::string* outError)
-	{
-		if (outTilesetPath) outTilesetPath->clear();
-		if (!data || size < 8)
-		{
-			if (outError) *outError = "Level bytes: null/too small";
-			return nullptr;
-		}
-
-		const unsigned char* p = data;
-		const unsigned char* end = data + size;
-
-		if (!check_magic(p, end))
-		{
-			if (outError) *outError = "Level bytes: bad magic (expect SSGELEV1)";
-			return nullptr;
-		}
-
-		uint32_t cols = 0, rows = 0; int32_t bw = 0, bh = 0;
-		if (!read_u32(p, end, cols) || !read_u32(p, end, rows) ||
-			!read_s32(p, end, bw) || !read_s32(p, end, bh))
-		{
-			if (outError) *outError = "Level bytes: header truncated";
-			return nullptr;
-		}
-		if (cols == 0 || rows == 0 || bw <= 0 || bh <= 0)
-		{
-			if (outError) *outError = "Level bytes: invalid dimensions/block size";
-			return nullptr;
-		}
-
-		uint8_t oc[8] = { 0 };
-		for (int i = 0; i < 8; ++i)
-		{
-			if (!read_u8(p, end, oc[i]))
-			{
-				if (outError) *outError = "Level bytes: outside-collision truncated";
-				return nullptr;
-			}
-		}
-
-		uint16_t pathLen = 0;
-		if (!read_u16(p, end, pathLen))
-		{
-			if (outError) *outError = "Level bytes: missing tileset path length";
-			return nullptr;
-		}
-
-		std::string tilesetPath;
-		if (pathLen > 0)
-		{
-			tilesetPath.resize(pathLen);
-			if (!read_bytes(p, end, &tilesetPath[0], pathLen))
-			{
-				if (outError) *outError = "Level bytes: truncated tileset path";
-				return nullptr;
-			}
-			if (outTilesetPath) *outTilesetPath = tilesetPath;
-		}
-
-		const std::size_t cellCount = (std::size_t)cols * (std::size_t)rows;
-		const std::size_t needed = cellCount * 1u;
-		if ((std::size_t)(end - p) < needed)
-		{
-			if (outError) *outError = "Level bytes: truncated block data";
-			return nullptr;
-		}
-		if ((std::size_t)(end - p) > needed)
-		{
-			if (outError) *outError = "Level bytes: block data overflow";
-			return nullptr;
-		}
-
-		// Construct empty level (tileset optional; you can load it later using tilesetPath).
-		SDL_Rect blockRect{ 0,0,bw,bh };
-		std::unique_ptr<Level> lvl = std::make_unique<Level>((int)cols, (int)rows, blockRect, SdlTexture{ nullptr });
-
-		// Outside collision policy
-		lvl->throughTopLeft = toCollision(oc[0]);
-		lvl->throughTop = toCollision(oc[1]);
-		lvl->throughTopRight = toCollision(oc[2]);
-		lvl->throughLeft = toCollision(oc[3]);
-		lvl->throughRight = toCollision(oc[4]);
-		lvl->throughBottomLeft = toCollision(oc[5]);
-		lvl->throughBottom = toCollision(oc[6]);
-		lvl->throughBottomRight = toCollision(oc[7]);
-
-		// Block payload
-		for (uint32_t r = 0; r < rows; ++r) 
-		{
-			for (uint32_t c = 0; c < cols; ++c)
-			{
-				uint8_t t = 0;
-				read_u8(p, end, t);
-				Block* b = lvl->getBlockAt((int)r, (int)c);
-				if (b)
-				{
-					b->type = toType(t);
-				}
-			}
-		}
-
-		// If you later want Level to load tileset here, call your asset loader with tilesetPath.
-		// Otherwise, return Level and let GameWorld/Engine handle tileset based on outTilesetPath.
-
-		return lvl;
-	}
-
 	const Level::Block::Type Level::Block::Type::EMPTY{ 0 };
-
 
 	// ---------------- Block ----------------
 
@@ -215,23 +39,23 @@ namespace ssge
 
 		//HARDCODED PLACEHOLDER
 
-		blockDefinitions[0].tileIndex = -1;
-		blockDefinitions[1].tileIndex = 0;
-		blockDefinitions[2].tileIndex = 1;
-		blockDefinitions[3].tileIndex = 2;
-		blockDefinitions[4].tileIndex = 3;
-		blockDefinitions[5].tileIndex = 4;
-		blockDefinitions[6].tileIndex = 5;
-		blockDefinitions[7].tileIndex = 6;
+		//blockDefinitions[0].tileIndex = -1;
+		//blockDefinitions[1].tileIndex = 0;
+		//blockDefinitions[2].tileIndex = 1;
+		//blockDefinitions[3].tileIndex = 2;
+		//blockDefinitions[4].tileIndex = 3;
+		//blockDefinitions[5].tileIndex = 4;
+		//blockDefinitions[6].tileIndex = 5;
+		//blockDefinitions[7].tileIndex = 6;
 
-		blockDefinitions[0].collision = Block::Collision::Air;
-		blockDefinitions[1].collision = Block::Collision::Solid;
-		blockDefinitions[2].collision = Block::Collision::Solid;
-		blockDefinitions[3].collision = Block::Collision::Solid;
-		blockDefinitions[4].collision = Block::Collision::Solid;
-		blockDefinitions[5].collision = Block::Collision::Solid;
-		blockDefinitions[6].collision = Block::Collision::Solid;
-		blockDefinitions[7].collision = Block::Collision::Solid;
+		//blockDefinitions[0].collision = Block::Collision::Air;
+		//blockDefinitions[1].collision = Block::Collision::Solid;
+		//blockDefinitions[2].collision = Block::Collision::Solid;
+		//blockDefinitions[3].collision = Block::Collision::Solid;
+		//blockDefinitions[4].collision = Block::Collision::Solid;
+		//blockDefinitions[5].collision = Block::Collision::Solid;
+		//blockDefinitions[6].collision = Block::Collision::Solid;
+		//blockDefinitions[7].collision = Block::Collision::Solid;
 
 	}
 
@@ -638,7 +462,7 @@ namespace ssge
 
 	bool Level::loadTileset(SDL_Renderer* renderer)
 	{
-		setTileset(SdlTexture(tilesetTexture.c_str(), renderer));
+		setTileset(SdlTexture(tilesetTexturePath.c_str(), renderer));
 		return tileset.isValid();
 	}
 
@@ -699,7 +523,7 @@ namespace ssge
 	{
 		errorLog += "Level Loader error: " + error + '\n';
 	}
-	Level::Loader::Loader(PassKey<Level> pk)
+	Level::Loader::Loader(PassKey<GameWorld> pk)
 	{}
 	std::unique_ptr<Level> Level::Loader::loadLevel(const char* path)
 	{
@@ -742,6 +566,17 @@ namespace ssge
 			return false;
 		}
 
+		// Remove UTF-8 BOM if present
+		{
+			char bom[3] = { 0,0,0 };
+			iniFile.read(bom, 3);
+			bool hasBOM = (iniFile.gcount() == 3 &&
+				(unsigned char)bom[0] == 0xEF &&
+				(unsigned char)bom[1] == 0xBB &&
+				(unsigned char)bom[2] == 0xBF);
+			if (!hasBOM) { iniFile.clear(); iniFile.seekg(0, std::ios::beg); }
+		}
+
 		std::string line;
 		Section* currentSection = nullptr;
 		while (std::getline(iniFile, line))
@@ -760,6 +595,8 @@ namespace ssge
 
 				// Select section
 				currentSection = &sections.back();
+
+				continue;
 			}
 
 			// Read through the section
@@ -800,7 +637,7 @@ namespace ssge
 		try { blockSize.h = std::stoi(getValue("Tileset", "TileHeight")); }
 		catch (...) { logError("Couldn't read [Tileset]TileHeight"); return nullptr; }
 		
-		std::string tilesetTexturePath = getValue("Grid", "Columns");
+		std::string tilesetTexturePath = getValue("Tileset", "Texture");
 		if (tilesetTexturePath.empty())
 		{
 			logError("Tileset texture path not specified");
@@ -809,7 +646,7 @@ namespace ssge
 		
 		auto newLevel = std::make_unique<Level>(columns, rows, blockSize, nullptr);
 
-		newLevel->tilesetTexture=tilesetTexturePath;
+		newLevel->tilesetTexturePath=tilesetTexturePath;
 
 		return std::move(newLevel);
 	}
@@ -839,7 +676,7 @@ namespace ssge
 		}
 		return true;
 	}
-	Level::Block* Level::Loader::parseGrid()
+	bool Level::Loader::parseGrid()
 	{
 		int rows = newLevel->rows;
 		int columns = newLevel->columns;
@@ -847,14 +684,20 @@ namespace ssge
 		for (int row = 0; row < rows; row++)
 		{
 			std::string rowString = getValue("Grid", row);
-			for (int column = 0; column < columns; column++)
+			int len = std::min(columns, (int)rowString.length());
+			for (int column = 0; column < len; column++)
 			{
-				char blockChar = rowString[column];
-				newLevel->array[column + row * columns].type = blockChar;
+				unsigned char blockChar = rowString[column];
+				if (blockChar < ' ' || blockChar == '`' || blockChar>'~')
+					continue;
+				
+				int blockIndex = blockChar - ' ' - (blockChar == '`' ? 1 : 0);
+
+				newLevel->array[column + row * columns].type = blockIndex;
 			}
 		}
 
-		return nullptr;
+		return true;
 	}
 	std::string Level::Loader::getValue(std::string caption, std::string key) const
 	{
@@ -886,12 +729,12 @@ namespace ssge
 				{
 					try
 					{
-						if (std::stoi(caption) == numericKey)
+						if (std::stoi(item.key) == numericKey)
 						{
 							return item.value;
 						}
 					}
-					catch (...) { return FALLBACK; }
+					catch (...) { ; }
 				}
 				return FALLBACK;
 			}
@@ -902,17 +745,7 @@ namespace ssge
 	{
 		try
 		{
-			static const char* oobcolString = "OOBCol";
-			static constexpr size_t oobcolStrLen = sizeof(oobcolString) - 1;
-			if (side.size() <= oobcolStrLen
-				&& side.substr(0, strlen(oobcolString)) == oobcolString)
-			{
-				return parseCollision(side.substr(strlen(oobcolString) + 1));
-			}
-
-			// Fallback
-			logError("Couldn't parse OOB collision");
-			return Block::Collision::Air;
+			return parseCollision(getValue("SSGELEV1", "OOBCol" + side));
 		}
 		catch (...)
 		{
@@ -954,11 +787,9 @@ namespace ssge
 			int colonIndex = blockItemValue.find(':');
 			if (colonIndex <= 0)
 			{
-				// Fallback
-				logError("Block collision not parsed");
-				return Block::Collision::Air;
+				return parseCollision(blockItemValue);
 			}
-			return parseCollision(blockItemValue.substr(colonIndex + 1));
+			return parseCollision(blockItemValue.substr(0, colonIndex));
 		}
 		catch (...)
 		{

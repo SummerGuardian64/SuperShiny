@@ -14,19 +14,22 @@ bool ssge::GameWorld::initLevel(SceneStepContext& context)
     {
         std::string tilesetPath;
         std::string error;
-        std::string path = "Levels/level" + std::to_string(wantedLevel) + ".lvl";
-        auto lvl = ssge::Level::loadFromFile(path.c_str(), &tilesetPath, &error);
+        std::string path = "Levels/level" + std::to_string(wantedLevel) + ".ini";
+        auto loader = Level::Loader(PassKey<GameWorld>());
+
+        auto lvl = loader.loadLevel(path.c_str());
+
         if (!lvl)
         {
-            std::cout << error << std::endl;
+            std::cout << "There were errors during loading level from " << path << std::endl << loader.getErrorLog();
         }
         else
-        {
-            // If you want, load the tileset here using tilesetPath:
+        {/*
             if (!tilesetPath.empty())
             {
                 lvl->setTileset(SdlTexture(tilesetPath.c_str(), context.drawing.getRenderer()));
-            }
+            }*/
+            lvl->loadTileset(context.drawing.getRenderer());
             level = std::move(lvl);
         }
     }

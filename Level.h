@@ -8,6 +8,8 @@
 
 namespace ssge
 {
+	class GameWorld;
+
     class Level
 	{
 		static inline int worldToCol(float x, int tileW) { return (int)std::floor(x / (float)tileW); }
@@ -245,21 +247,10 @@ namespace ssge
 		const SdlTexture& getTilesetTexture() const;
 		const TilesetMeta getTilesetMeta() const;
 		void setTileset(SdlTexture& SdlTexture);
-		std::string tilesetTexture;
+		std::string tilesetTexturePath;
 		bool loadTileset(SDL_Renderer* renderer);
 
 		void draw(DrawContext context) const; // conservative draw (no templates)
-
-		static std::unique_ptr<Level> loadFromFile(
-			const char* path,
-			std::string* outTilesetPath = nullptr,
-			std::string* outError = nullptr);
-
-		static std::unique_ptr<Level> loadFromBytes(
-			const unsigned char* data,
-			std::size_t size,
-			std::string* outTilesetPath = nullptr,
-			std::string* outError = nullptr);
 
 		class Loader
 		{
@@ -289,7 +280,7 @@ namespace ssge
 			std::unique_ptr<Level> parseAndConstruct(); // Parses arguments for Level ctor and creates the level
 			bool parseAfterConstruct(); // Populates all data fields using sections
 			bool parseBlockDefinitions(); // Parse Block definitions
-			Block* parseGrid(); // Parse grid
+			bool parseGrid(); // Parse grid
 			
 			// Post-load traversal
 
@@ -309,7 +300,7 @@ namespace ssge
 			void logError(std::string error);
 
 		public:
-			Loader(PassKey<Level> pk);
+			Loader(PassKey<GameWorld> pk);
 			std::unique_ptr<Level> loadLevel(const char* path);
 			std::string getErrorLog() const;
 			Loader(const Loader& toCopy) = delete; // No monkey business
