@@ -118,6 +118,26 @@ public:
         return newTex;
     }
 
+    // Get texture dimensions
+    SDL_Rect getDimensions() const
+    {
+        SDL_Rect dimensions{ 0,0,0,0 };
+        SDL_QueryTexture(texture, nullptr, nullptr, &dimensions.w, &dimensions.h);
+        return dimensions;
+    }
+
+    // Query texture via SDL_QueryTexture
+    void query(int& w, int& h) const
+    {
+        SDL_QueryTexture(texture, nullptr, nullptr, &w, &h);
+    }
+
+    // Query texture via SDL_QueryTexture
+    void query(int* w, int* h) const
+    {
+        SDL_QueryTexture(texture, nullptr, nullptr, w, h);
+    }
+
     // Implicit conversion to SDL_Texture*
     operator SDL_Texture* () const noexcept { return texture; }
 
