@@ -363,3 +363,17 @@ MigrationBackup/
 FodyWeavers.xsd
 /build/CMakeFiles
 /build/CMakeCache.txt
+
+# SSGE Layout .gitignore essentials
+/Export/
+/Intermediate/
+/.vs/
+#/CMakeFiles/
+#/CMakeCache.txt
+/*.user
+/*.aps
+/*.suo
+/*.pdb
+/*.ilk
+/*.log
+Thumbs.db
