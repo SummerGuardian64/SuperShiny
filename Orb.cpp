@@ -102,6 +102,39 @@ void Orb::preStep(EntityStepContext& context)
 
 void Orb::postStep(EntityStepContext& context)
 {
+    bool shouldWeBounce = false;
+
+    if (physics)
+    {
+        if (!physics->abilities.collisionIgnored())
+        {
+            // Overal collisions
+            {
+                SDL_FRect collider{
+                    position.x + hitbox.x - 1 - physics->oldVelocity.x,
+                    position.y + hitbox.y - 1 - physics->oldVelocity.y,
+                    hitbox.w + 2,
+                    hitbox.h + 2
+                };
+                auto allCollisions = context.level.queryBlocksUnderCollider(collider);
+                for (auto& collision : allCollisions)
+                {
+                    auto* block = context.level.getBlockAt(collision.coords);
+                    if(collision.coll == Level::Block::Collision::Hazard)
+                    {
+                        shouldWeBounce = true;
+                        block->type = 0;
+                    }
+                }
+            }
+        }
+    }
+
+    if (shouldWeBounce)
+    {
+        physics->velocity.x *= -1;
+        physics->velocity.y *= -1;
+    }
 }
 
 void Orb::preDraw(DrawContext& context) const
