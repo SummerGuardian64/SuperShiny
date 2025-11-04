@@ -5,6 +5,8 @@
 #include "DrawContext.h"
 #include "SdlTexture.h"
 #include "PassKey.h"
+#include <cmath>
+#include <memory>
 
 namespace ssge
 {
@@ -71,7 +73,7 @@ namespace ssge
 				}
 
 				// accessors
-				
+
 				int getIndex() const { return index; }
 				int toInt()   const { return index; }
 				int asInt()   const { return index; }
@@ -79,7 +81,7 @@ namespace ssge
 				// comparisons
 
 				bool isEmpty() const { return *this == EMPTY; }
-				
+
 				bool operator==(int value) const { return index == value; }
 				bool operator!=(int value) const { return index != value; }
 
@@ -94,7 +96,7 @@ namespace ssge
 				}
 
 				// static EMPTY
-				static const Type EMPTY;				
+				static const Type EMPTY;
 			};
 
 			struct Definition
@@ -212,7 +214,7 @@ namespace ssge
 		int nextSection;
 
 		// Ctor / Dtor
-		Level(int columns, int rows, SDL_Rect blockSize, SdlTexture tileset);
+		Level(int columns, int rows, SDL_Rect blockSize, SdlTexture tileset = SdlTexture());
 		~Level();
 
 		// No copying (large arrays). Moves allowed.
@@ -261,7 +263,7 @@ namespace ssge
 
 		const SdlTexture& getTilesetTexture() const;
 		const TilesetMeta getTilesetMeta() const;
-		void setTileset(SdlTexture& SdlTexture);
+		void setTileset(SdlTexture SdlTexture);
 		std::string tilesetTexturePath;
 		bool loadTileset(SDL_Renderer* renderer);
 
@@ -297,7 +299,7 @@ namespace ssge
 			bool parseBlockDefinitions(); // Parse Block definitions
 			bool parseGrid(); // Parse grid
 			bool parseSpawnList(); // Parse spawn list
-			
+
 			// Post-load traversal
 
 			std::string getValue(std::string caption, std::string key) const;

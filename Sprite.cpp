@@ -1,4 +1,5 @@
 #include "Sprite.h"
+#include <cmath>
 
 using namespace ssge;
 
@@ -335,8 +336,8 @@ void Sprite::render(SDL_Renderer* renderer, SDL_Point offsetFromViewport) const
 	SDL_Rect src = img.region;
 
 	// Compute the absolute scaled dimensions.
-	int absW = static_cast<int>(src.w * fabs(xscale));
-	int absH = static_cast<int>(src.h * fabs(yscale));
+	int absW = static_cast<int>(src.w * std::fabs(xscale));
+	int absH = static_cast<int>(src.h * std::fabs(yscale));
 
 	// Determine flip flags based on negative scales.
 	SDL_RendererFlip flip = SDL_FLIP_NONE;

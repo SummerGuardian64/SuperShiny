@@ -494,7 +494,7 @@ namespace ssge
 		return tilesMeta;
 	}
 
-	void Level::setTileset(SdlTexture& SdlTexture)
+	void Level::setTileset(SdlTexture SdlTexture)
 	{
 		this->tileset = std::move(SdlTexture);
 		tilesMeta.inferColumnsFromTexture(tileset);
@@ -528,7 +528,7 @@ namespace ssge
 		if (tileset)
 		{
 			for (int r = topExtent; r < bottomExtent; ++r)
-			{	
+			{
 				for (int c = leftExtent; c < rightExtent; ++c)
 				{
 					// Fetch the block
@@ -678,24 +678,24 @@ namespace ssge
 
 		try { columns = std::stoi(getValue("Grid", "Columns")); }
 		catch (...) { logError("Couldn't read [Grid]Columns"); return nullptr; }
-		
+
 		try { rows = std::stoi(getValue("Grid", "Rows")); }
 		catch (...) { logError("Couldn't read [Grid]Rows"); return nullptr; }
-		
+
 		try { blockSize.w = std::stoi(getValue("Tileset", "TileWidth")); }
 		catch (...) { logError("Couldn't read [Tileset]TileWidth"); return nullptr; }
-		
+
 		try { blockSize.h = std::stoi(getValue("Tileset", "TileHeight")); }
 		catch (...) { logError("Couldn't read [Tileset]TileHeight"); return nullptr; }
-		
+
 		std::string tilesetTexturePath = getValue("Tileset", "Texture");
 		if (tilesetTexturePath.empty())
 		{
 			logError("Tileset texture path not specified");
 			return nullptr;
 		}
-		
-		auto newLevel = std::make_unique<Level>(columns, rows, blockSize, nullptr);
+
+		auto newLevel = std::make_unique<Level>(columns, rows, blockSize);
 
 		newLevel->tilesetTexturePath=tilesetTexturePath;
 
@@ -728,7 +728,7 @@ namespace ssge
 			std::string blockDefinition = getValue("Blocks", i);
 			if (blockDefinition.empty())
 				continue;
-			
+
 			newLevel->blockDefinitions[i].tileIndex = parseTileIndex(blockDefinition);
 			newLevel->blockDefinitions[i].collision = parseBlockCollision(blockDefinition);
 			newLevel->blockDefinitions[i].callback = parseCallbackName(blockDefinition);
@@ -749,7 +749,7 @@ namespace ssge
 				unsigned char blockChar = rowString[column];
 				if (blockChar < ' ' || blockChar == '`' || blockChar>'~')
 					continue;
-				
+
 				int blockIndex = blockChar - ' ' - (blockChar == '`' ? 1 : 0);
 
 				newLevel->array[column + row * columns].type = blockIndex;
@@ -867,7 +867,7 @@ namespace ssge
 			"NextSection",
 			nullptr
 		};
-		
+
 		const char** current = lut;
 
 		for (int i = 0; *current; i++, current++)

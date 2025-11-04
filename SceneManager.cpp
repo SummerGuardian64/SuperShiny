@@ -111,8 +111,9 @@ void SceneManager::draw(DrawContext& context)
 		backgroundColor.b,
 		backgroundColor.a
 	);
-	
-	SDL_RenderFillRect(renderer, &context.getBounds());
+
+	SDL_Rect bounds = context.getBounds();
+	SDL_RenderFillRect(renderer, &bounds);
 
 	// Draw fader
 	//TODO: Port to SDL2

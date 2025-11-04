@@ -439,7 +439,7 @@ void Entity::step(EntityStepContext& context)
 	{
 		physics->step(context);
 	}
-	
+
 	// Finally, execute the entity-specific post-step code
 	postStep(context);
 
@@ -450,7 +450,7 @@ void Entity::step(EntityStepContext& context)
 
 	// Increment lifespan
 	//FIXME: THIS NEEDS REFINEMENT!
-	lifespan += deltaTime * 60;
+	lifespan++;
 
 	//std::cout << "Entity " << (void*)this << " has been there for " << lifespan << std::endl;
 }

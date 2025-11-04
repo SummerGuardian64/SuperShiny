@@ -27,7 +27,7 @@ const char* WindowManager::init(const char* title, int width, int height)
         title,
         SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
         width, height,
-        SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN
+        SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE
     );
 
     // See if window was created
@@ -39,7 +39,7 @@ const char* WindowManager::init(const char* title, int width, int height)
 
     // Create renderer for the window
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-    
+
     if (!renderer)
     {
         return SDL_GetError();
@@ -71,7 +71,7 @@ SDL_Rect WindowManager::makeBestFitScale()
 {
     int virtualWidth = Game::VIRTUAL_WIDTH;
     int virtualHeight = Game::VIRTUAL_HEIGHT;
-    
+
     int windowWidth;
     int windowHeight;
     SDL_GetWindowSize(getWindow(), &windowWidth, &windowHeight);

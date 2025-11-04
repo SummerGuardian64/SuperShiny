@@ -1,0 +1,760 @@
+# depslib dependency file v1.0
+1761088708 source:e:\dev\projects\supershiny\drawcontext.cpp
+	"DrawContext.h"
+
+1759797530 e:\dev\projects\supershiny\drawcontext.h
+	"SDL.h"
+
+1756756810 e:\dev\sdl2-devel-2.32.10-mingw\sdl2-2.32.10\i686-w64-mingw32\include\sdl2\sdl.h
+	"SDL_main.h"
+	"SDL_stdinc.h"
+	"SDL_assert.h"
+	"SDL_atomic.h"
+	"SDL_audio.h"
+	"SDL_clipboard.h"
+	"SDL_cpuinfo.h"
+	"SDL_endian.h"
+	"SDL_error.h"
+	"SDL_events.h"
+	"SDL_filesystem.h"
+	"SDL_gamecontroller.h"
+	"SDL_guid.h"
+	"SDL_haptic.h"
+	"SDL_hidapi.h"
+	"SDL_hints.h"
+	"SDL_joystick.h"
+	"SDL_loadso.h"
+	"SDL_log.h"
+	"SDL_messagebox.h"
+	"SDL_metal.h"
+	"SDL_mutex.h"
+	"SDL_power.h"
+	"SDL_render.h"
+	"SDL_rwops.h"
+	"SDL_sensor.h"
+	"SDL_shape.h"
+	"SDL_system.h"
+	"SDL_thread.h"
+	"SDL_timer.h"
+	"SDL_version.h"
+	"SDL_video.h"
+	"SDL_locale.h"
+	"SDL_misc.h"
+	"begin_code.h"
+	"close_code.h"
+
+1756756810 e:\dev\sdl2-devel-2.32.10-mingw\sdl2-2.32.10\i686-w64-mingw32\include\sdl2\sdl_main.h
+	"SDL_stdinc.h"
+	"begin_code.h"
+	"close_code.h"
+
+1756756810 e:\dev\sdl2-devel-2.32.10-mingw\sdl2-2.32.10\i686-w64-mingw32\include\sdl2\sdl_stdinc.h
+	"SDL_config.h"
+	<sys/types.h>
+	<stdio.h>
+	<stdlib.h>
+	<stddef.h>
+	<stdarg.h>
+	<stdlib.h>
+	<malloc.h>
+	<stddef.h>
+	<stdarg.h>
+	<memory.h>
+	<string.h>
+	<strings.h>
+	<wchar.h>
+	<inttypes.h>
+	<stdint.h>
+	<ctype.h>
+	<math.h>
+	<float.h>
+	<alloca.h>
+	<malloc.h>
+	<malloc.h>
+	<malloc.h>
+	<stdlib.h>
+	<sal.h>
+	"begin_code.h"
+	<stdlib.h>
+	<string.h>
+	<stdio.h>
+	"close_code.h"
+
+1735742872 e:\dev\sdl2-devel-2.32.10-mingw\sdl2-2.32.10\i686-w64-mingw32\include\sdl2\sdl_config.h
+	"SDL_platform.h"
+	"SDL_config_windows.h"
+	"SDL_config_winrt.h"
+	"SDL_config_wingdk.h"
+	"SDL_config_xbox.h"
+	"SDL_config_macosx.h"
+	"SDL_config_iphoneos.h"
+	"SDL_config_android.h"
+	"SDL_config_os2.h"
+	"SDL_config_emscripten.h"
+	"SDL_config_ngage.h"
+	"SDL_config_minimal.h"
+
+1756756810 e:\dev\sdl2-devel-2.32.10-mingw\sdl2-2.32.10\i686-w64-mingw32\include\sdl2\sdl_platform.h
+	<AvailabilityMacros.h>
+	<TargetConditionals.h>
+	<TargetConditionals.h>
+	<winapifamily.h>
+	"begin_code.h"
+	"close_code.h"
+
+1756756810 e:\dev\sdl2-devel-2.32.10-mingw\sdl2-2.32.10\i686-w64-mingw32\include\sdl2\begin_code.h
+
+1756756810 e:\dev\sdl2-devel-2.32.10-mingw\sdl2-2.32.10\i686-w64-mingw32\include\sdl2\close_code.h
+
+1735742872 e:\dev\sdl2-devel-2.32.10-mingw\sdl2-2.32.10\i686-w64-mingw32\include\sdl2\sdl_config_windows.h
+	"SDL_platform.h"
+	<winsdkver.h>
+	<sdkddkver.h>
+
+1735742872 e:\dev\sdl2-devel-2.32.10-mingw\sdl2-2.32.10\i686-w64-mingw32\include\sdl2\sdl_config_winrt.h
+	"SDL_platform.h"
+	<sdkddkver.h>
+
+1735742872 e:\dev\sdl2-devel-2.32.10-mingw\sdl2-2.32.10\i686-w64-mingw32\include\sdl2\sdl_config_wingdk.h
+	"SDL_platform.h"
+
+1735742872 e:\dev\sdl2-devel-2.32.10-mingw\sdl2-2.32.10\i686-w64-mingw32\include\sdl2\sdl_config_xbox.h
+	"SDL_platform.h"
+
+1735742872 e:\dev\sdl2-devel-2.32.10-mingw\sdl2-2.32.10\i686-w64-mingw32\include\sdl2\sdl_config_macosx.h
+	"SDL_platform.h"
+	<AvailabilityMacros.h>
+
+1735742872 e:\dev\sdl2-devel-2.32.10-mingw\sdl2-2.32.10\i686-w64-mingw32\include\sdl2\sdl_config_iphoneos.h
+	"SDL_platform.h"
+
+1735742872 e:\dev\sdl2-devel-2.32.10-mingw\sdl2-2.32.10\i686-w64-mingw32\include\sdl2\sdl_config_android.h
+	"SDL_platform.h"
+	<stdarg.h>
+
+1735742872 e:\dev\sdl2-devel-2.32.10-mingw\sdl2-2.32.10\i686-w64-mingw32\include\sdl2\sdl_config_os2.h
+	"SDL_platform.h"
+
+1735742872 e:\dev\sdl2-devel-2.32.10-mingw\sdl2-2.32.10\i686-w64-mingw32\include\sdl2\sdl_config_emscripten.h
+	"SDL_platform.h"
+
+1735742872 e:\dev\sdl2-devel-2.32.10-mingw\sdl2-2.32.10\i686-w64-mingw32\include\sdl2\sdl_config_ngage.h
+	"SDL_platform.h"
+
+1735742872 e:\dev\sdl2-devel-2.32.10-mingw\sdl2-2.32.10\i686-w64-mingw32\include\sdl2\sdl_config_minimal.h
+	"SDL_platform.h"
+
+1756756810 e:\dev\sdl2-devel-2.32.10-mingw\sdl2-2.32.10\i686-w64-mingw32\include\sdl2\sdl_assert.h
+	"SDL_stdinc.h"
+	"begin_code.h"
+	<signal.h>
+	"close_code.h"
+
+1756756810 e:\dev\sdl2-devel-2.32.10-mingw\sdl2-2.32.10\i686-w64-mingw32\include\sdl2\sdl_atomic.h
+	"SDL_stdinc.h"
+	"SDL_platform.h"
+	"begin_code.h"
+	<sys/cpuinline.h>
+	<mbarrier.h>
+	"close_code.h"
+
+1756756810 e:\dev\sdl2-devel-2.32.10-mingw\sdl2-2.32.10\i686-w64-mingw32\include\sdl2\sdl_audio.h
+	"SDL_stdinc.h"
+	"SDL_error.h"
+	"SDL_endian.h"
+	"SDL_mutex.h"
+	"SDL_thread.h"
+	"SDL_rwops.h"
+	"begin_code.h"
+	"close_code.h"
+
+1756756810 e:\dev\sdl2-devel-2.32.10-mingw\sdl2-2.32.10\i686-w64-mingw32\include\sdl2\sdl_error.h
+	"SDL_stdinc.h"
+	"begin_code.h"
+	"close_code.h"
+
+1756756810 e:\dev\sdl2-devel-2.32.10-mingw\sdl2-2.32.10\i686-w64-mingw32\include\sdl2\sdl_endian.h
+	"SDL_stdinc.h"
+	<intrin.h>
+	<endian.h>
+	<sys/byteorder.h>
+	<endian.h>
+	<sys/endian.h>
+	"begin_code.h"
+	"close_code.h"
+
+1756756810 e:\dev\sdl2-devel-2.32.10-mingw\sdl2-2.32.10\i686-w64-mingw32\include\sdl2\sdl_mutex.h
+	"SDL_stdinc.h"
+	"SDL_error.h"
+	"begin_code.h"
+	"close_code.h"
+
+1756756810 e:\dev\sdl2-devel-2.32.10-mingw\sdl2-2.32.10\i686-w64-mingw32\include\sdl2\sdl_thread.h
+	"SDL_stdinc.h"
+	"SDL_error.h"
+	"SDL_atomic.h"
+	"SDL_mutex.h"
+	<process.h>
+	<process.h>
+	<stdlib.h>
+	"begin_code.h"
+	"close_code.h"
+
+1756756810 e:\dev\sdl2-devel-2.32.10-mingw\sdl2-2.32.10\i686-w64-mingw32\include\sdl2\sdl_rwops.h
+	"SDL_stdinc.h"
+	"SDL_error.h"
+	"begin_code.h"
+	"close_code.h"
+
+1756756810 e:\dev\sdl2-devel-2.32.10-mingw\sdl2-2.32.10\i686-w64-mingw32\include\sdl2\sdl_clipboard.h
+	"SDL_stdinc.h"
+	"begin_code.h"
+	"close_code.h"
+
+1756756810 e:\dev\sdl2-devel-2.32.10-mingw\sdl2-2.32.10\i686-w64-mingw32\include\sdl2\sdl_cpuinfo.h
+	"SDL_stdinc.h"
+	<intrin.h>
+	<intrin.h>
+	<arm_neon.h>
+	<altivec.h>
+	<arm_neon.h>
+	<armintr.h>
+	<arm_neon.h>
+	<arm64intr.h>
+	<arm64_neon.h>
+	<mm3dnow.h>
+	<lsxintrin.h>
+	<lasxintrin.h>
+	<immintrin.h>
+	<mmintrin.h>
+	<xmmintrin.h>
+	<emmintrin.h>
+	<pmmintrin.h>
+	"begin_code.h"
+	"close_code.h"
+
+1756756810 e:\dev\sdl2-devel-2.32.10-mingw\sdl2-2.32.10\i686-w64-mingw32\include\sdl2\sdl_events.h
+	"SDL_stdinc.h"
+	"SDL_error.h"
+	"SDL_video.h"
+	"SDL_keyboard.h"
+	"SDL_mouse.h"
+	"SDL_joystick.h"
+	"SDL_gamecontroller.h"
+	"SDL_quit.h"
+	"SDL_gesture.h"
+	"SDL_touch.h"
+	"begin_code.h"
+	"close_code.h"
+
+1756756810 e:\dev\sdl2-devel-2.32.10-mingw\sdl2-2.32.10\i686-w64-mingw32\include\sdl2\sdl_video.h
+	"SDL_stdinc.h"
+	"SDL_pixels.h"
+	"SDL_rect.h"
+	"SDL_surface.h"
+	"begin_code.h"
+	"close_code.h"
+
+1756756810 e:\dev\sdl2-devel-2.32.10-mingw\sdl2-2.32.10\i686-w64-mingw32\include\sdl2\sdl_pixels.h
+	"SDL_stdinc.h"
+	"SDL_endian.h"
+	"begin_code.h"
+	"close_code.h"
+
+1756756810 e:\dev\sdl2-devel-2.32.10-mingw\sdl2-2.32.10\i686-w64-mingw32\include\sdl2\sdl_rect.h
+	"SDL_stdinc.h"
+	"SDL_error.h"
+	"SDL_pixels.h"
+	"SDL_rwops.h"
+	"begin_code.h"
+	"close_code.h"
+
+1756756810 e:\dev\sdl2-devel-2.32.10-mingw\sdl2-2.32.10\i686-w64-mingw32\include\sdl2\sdl_surface.h
+	"SDL_stdinc.h"
+	"SDL_pixels.h"
+	"SDL_rect.h"
+	"SDL_blendmode.h"
+	"SDL_rwops.h"
+	"begin_code.h"
+	"close_code.h"
+
+1756756810 e:\dev\sdl2-devel-2.32.10-mingw\sdl2-2.32.10\i686-w64-mingw32\include\sdl2\sdl_blendmode.h
+	"begin_code.h"
+	"close_code.h"
+
+1756756810 e:\dev\sdl2-devel-2.32.10-mingw\sdl2-2.32.10\i686-w64-mingw32\include\sdl2\sdl_keyboard.h
+	"SDL_stdinc.h"
+	"SDL_error.h"
+	"SDL_keycode.h"
+	"SDL_video.h"
+	"begin_code.h"
+	"close_code.h"
+
+1756756810 e:\dev\sdl2-devel-2.32.10-mingw\sdl2-2.32.10\i686-w64-mingw32\include\sdl2\sdl_keycode.h
+	"SDL_stdinc.h"
+	"SDL_scancode.h"
+
+1756756810 e:\dev\sdl2-devel-2.32.10-mingw\sdl2-2.32.10\i686-w64-mingw32\include\sdl2\sdl_scancode.h
+	"SDL_stdinc.h"
+
+1756756810 e:\dev\sdl2-devel-2.32.10-mingw\sdl2-2.32.10\i686-w64-mingw32\include\sdl2\sdl_mouse.h
+	"SDL_stdinc.h"
+	"SDL_error.h"
+	"SDL_video.h"
+	"begin_code.h"
+	"close_code.h"
+
+1756756810 e:\dev\sdl2-devel-2.32.10-mingw\sdl2-2.32.10\i686-w64-mingw32\include\sdl2\sdl_joystick.h
+	"SDL_stdinc.h"
+	"SDL_error.h"
+	"SDL_guid.h"
+	"SDL_mutex.h"
+	"begin_code.h"
+	"close_code.h"
+
+1756756810 e:\dev\sdl2-devel-2.32.10-mingw\sdl2-2.32.10\i686-w64-mingw32\include\sdl2\sdl_guid.h
+	"SDL_stdinc.h"
+	"SDL_error.h"
+	"begin_code.h"
+	"close_code.h"
+
+1756756810 e:\dev\sdl2-devel-2.32.10-mingw\sdl2-2.32.10\i686-w64-mingw32\include\sdl2\sdl_gamecontroller.h
+	"SDL_stdinc.h"
+	"SDL_error.h"
+	"SDL_rwops.h"
+	"SDL_sensor.h"
+	"SDL_joystick.h"
+	"begin_code.h"
+	"close_code.h"
+
+1756756810 e:\dev\sdl2-devel-2.32.10-mingw\sdl2-2.32.10\i686-w64-mingw32\include\sdl2\sdl_sensor.h
+	"SDL_stdinc.h"
+	"SDL_error.h"
+	"begin_code.h"
+	"close_code.h"
+
+1756756810 e:\dev\sdl2-devel-2.32.10-mingw\sdl2-2.32.10\i686-w64-mingw32\include\sdl2\sdl_quit.h
+	"SDL_stdinc.h"
+	"SDL_error.h"
+
+1756756810 e:\dev\sdl2-devel-2.32.10-mingw\sdl2-2.32.10\i686-w64-mingw32\include\sdl2\sdl_gesture.h
+	"SDL_stdinc.h"
+	"SDL_error.h"
+	"SDL_video.h"
+	"SDL_touch.h"
+	"begin_code.h"
+	"close_code.h"
+
+1756756810 e:\dev\sdl2-devel-2.32.10-mingw\sdl2-2.32.10\i686-w64-mingw32\include\sdl2\sdl_touch.h
+	"SDL_stdinc.h"
+	"SDL_error.h"
+	"SDL_video.h"
+	"begin_code.h"
+	"close_code.h"
+
+1756756810 e:\dev\sdl2-devel-2.32.10-mingw\sdl2-2.32.10\i686-w64-mingw32\include\sdl2\sdl_filesystem.h
+	"SDL_stdinc.h"
+	"begin_code.h"
+	"close_code.h"
+
+1756756810 e:\dev\sdl2-devel-2.32.10-mingw\sdl2-2.32.10\i686-w64-mingw32\include\sdl2\sdl_haptic.h
+	"SDL_stdinc.h"
+	"SDL_error.h"
+	"SDL_joystick.h"
+	"begin_code.h"
+	"close_code.h"
+
+1756756810 e:\dev\sdl2-devel-2.32.10-mingw\sdl2-2.32.10\i686-w64-mingw32\include\sdl2\sdl_hidapi.h
+	"SDL_stdinc.h"
+	"begin_code.h"
+	"close_code.h"
+
+1756756810 e:\dev\sdl2-devel-2.32.10-mingw\sdl2-2.32.10\i686-w64-mingw32\include\sdl2\sdl_hints.h
+	"SDL_stdinc.h"
+	"begin_code.h"
+	"close_code.h"
+
+1756756810 e:\dev\sdl2-devel-2.32.10-mingw\sdl2-2.32.10\i686-w64-mingw32\include\sdl2\sdl_loadso.h
+	"SDL_stdinc.h"
+	"SDL_error.h"
+	"begin_code.h"
+	"close_code.h"
+
+1756756810 e:\dev\sdl2-devel-2.32.10-mingw\sdl2-2.32.10\i686-w64-mingw32\include\sdl2\sdl_log.h
+	"SDL_stdinc.h"
+	"begin_code.h"
+	"close_code.h"
+
+1756756810 e:\dev\sdl2-devel-2.32.10-mingw\sdl2-2.32.10\i686-w64-mingw32\include\sdl2\sdl_messagebox.h
+	"SDL_stdinc.h"
+	"SDL_video.h"
+	"begin_code.h"
+	"close_code.h"
+
+1756756810 e:\dev\sdl2-devel-2.32.10-mingw\sdl2-2.32.10\i686-w64-mingw32\include\sdl2\sdl_metal.h
+	"SDL_video.h"
+	"begin_code.h"
+	"close_code.h"
+
+1756756810 e:\dev\sdl2-devel-2.32.10-mingw\sdl2-2.32.10\i686-w64-mingw32\include\sdl2\sdl_power.h
+	"SDL_stdinc.h"
+	"begin_code.h"
+	"close_code.h"
+
+1756756810 e:\dev\sdl2-devel-2.32.10-mingw\sdl2-2.32.10\i686-w64-mingw32\include\sdl2\sdl_render.h
+	"SDL_stdinc.h"
+	"SDL_rect.h"
+	"SDL_video.h"
+	"begin_code.h"
+	"close_code.h"
+
+1756756810 e:\dev\sdl2-devel-2.32.10-mingw\sdl2-2.32.10\i686-w64-mingw32\include\sdl2\sdl_shape.h
+	"SDL_stdinc.h"
+	"SDL_pixels.h"
+	"SDL_rect.h"
+	"SDL_surface.h"
+	"SDL_video.h"
+	"begin_code.h"
+	"close_code.h"
+
+1756756810 e:\dev\sdl2-devel-2.32.10-mingw\sdl2-2.32.10\i686-w64-mingw32\include\sdl2\sdl_system.h
+	"SDL_stdinc.h"
+	"SDL_keyboard.h"
+	"SDL_render.h"
+	"SDL_video.h"
+	"begin_code.h"
+	"close_code.h"
+
+1756756810 e:\dev\sdl2-devel-2.32.10-mingw\sdl2-2.32.10\i686-w64-mingw32\include\sdl2\sdl_timer.h
+	"SDL_stdinc.h"
+	"SDL_error.h"
+	"begin_code.h"
+	"close_code.h"
+
+1756756810 e:\dev\sdl2-devel-2.32.10-mingw\sdl2-2.32.10\i686-w64-mingw32\include\sdl2\sdl_version.h
+	"SDL_stdinc.h"
+	"begin_code.h"
+	"close_code.h"
+
+1756756810 e:\dev\sdl2-devel-2.32.10-mingw\sdl2-2.32.10\i686-w64-mingw32\include\sdl2\sdl_locale.h
+	"SDL_stdinc.h"
+	"SDL_error.h"
+	"begin_code.h"
+	"close_code.h"
+
+1756756810 e:\dev\sdl2-devel-2.32.10-mingw\sdl2-2.32.10\i686-w64-mingw32\include\sdl2\sdl_misc.h
+	"SDL_stdinc.h"
+	"begin_code.h"
+	"close_code.h"
+
+1762118664 source:e:\dev\projects\supershiny\accessor.cpp
+	"Accessor.h"
+	"Scene.h"
+	"Engine.h"
+	"SceneManager.h"
+	"InputManager.h"
+	"Level.h"
+	"SplashScreen.h"
+	"GameWorld.h"
+	"EntityManager.h"
+	"MenuManager.h"
+	"TitleScreen.h"
+
+1762118664 e:\dev\projects\supershiny\accessor.h
+	"PassKey.h"
+	<SDL.h>
+	<memory>
+	"Level.h"
+
+1760107672 e:\dev\projects\supershiny\passkey.h
+
+1762204923 e:\dev\projects\supershiny\level.h
+	<vector>
+	<cstddef>
+	<SDL.h>
+	"DrawContext.h"
+	"SdlTexture.h"
+	"PassKey.h"
+	<cmath>
+	<memory>
+
+1762202643 e:\dev\projects\supershiny\sdltexture.h
+	"SDL.h"
+	"SDL_image.h"
+	<string>
+	<iostream>
+	<cstddef>
+
+1741035194 e:\dev\sdl2_image-devel-2.8.8-mingw\sdl2_image-2.8.8\i686-w64-mingw32\include\sdl2\sdl_image.h
+	"SDL.h"
+	"SDL_version.h"
+	"begin_code.h"
+	"close_code.h"
+
+1760588754 e:\dev\projects\supershiny\scene.h
+
+1761201206 e:\dev\projects\supershiny\engine.h
+	"SDL.h"
+	"PassKey.h"
+	"MenuCommand.h"
+	<SDL_ttf.h>
+
+1761206494 e:\dev\projects\supershiny\menucommand.h
+	<cstdint>
+
+1735829046 e:\dev\sdl2_ttf-devel-2.24.0-mingw\sdl2_ttf-2.24.0\i686-w64-mingw32\include\sdl2\sdl_ttf.h
+	"SDL.h"
+	"begin_code.h"
+	"close_code.h"
+
+1762115608 e:\dev\projects\supershiny\scenemanager.h
+	<vector>
+	<memory>
+	"Scene.h"
+	"PassKey.h"
+
+1760587532 e:\dev\projects\supershiny\inputmanager.h
+	"InputBinding.h"
+	"InputPad.h"
+	"PassKey.h"
+
+1759329296 e:\dev\projects\supershiny\inputbinding.h
+	"SDL.h"
+
+1760674610 e:\dev\projects\supershiny\inputpad.h
+	<cstdint>
+
+1760588754 e:\dev\projects\supershiny\splashscreen.h
+	"Scene.h"
+	"SDL.h"
+
+1762117344 e:\dev\projects\supershiny\gameworld.h
+	"Scene.h"
+	"EntityManager.h"
+	"SDL.h"
+	"StepContext.h"
+	<memory>
+	<vector>
+	<list>
+	"Level.h"
+
+1762067180 e:\dev\projects\supershiny\entitymanager.h
+	"Entity.h"
+	<list>
+	<memory>
+	<vector>
+	<iterator>
+
+1762215947 e:\dev\projects\supershiny\entity.h
+	"SDL.h"
+	<chrono>
+	"Sprite.h"
+	"InputPad.h"
+	<cstdint>
+
+1761760260 e:\dev\projects\supershiny\sprite.h
+	"SdlTexture.h"
+	"SDL.h"
+	<vector>
+	<memory>
+	"DrawContext.h"
+
+1761206558 e:\dev\projects\supershiny\stepcontext.h
+	<memory>
+	"SDL.h"
+	"PassKey.h"
+	"Accessor.h"
+
+1761201206 e:\dev\projects\supershiny\menumanager.h
+	<vector>
+	<stack>
+	"Menu.h"
+	"MenuCommand.h"
+	"PassKey.h"
+
+1761192856 e:\dev\projects\supershiny\menu.h
+	<vector>
+	<string>
+	"MenuItem.h"
+
+1761192856 e:\dev\projects\supershiny\menuitem.h
+	<string>
+	"MenuCommand.h"
+
+1761206494 e:\dev\projects\supershiny\titlescreen.h
+	"Scene.h"
+	"SdlTexture.h"
+
+1761207146 source:e:\dev\projects\supershiny\engine.cpp
+	"Engine.h"
+	"SceneManager.h"
+	"InputManager.h"
+	<memory>
+	"StepContext.h"
+	"DrawContext.h"
+	"Game.h"
+	<SDL.h>
+	"PassKey.h"
+	"MenuManager.h"
+	"WindowManager.h"
+	"Accessor.h"
+	"SplashScreen.h"
+	<SDL_ttf.h>
+	"MenuRenderer.h"
+	"GameWorld.h"
+	"TitleScreen.h"
+
+1761039944 e:\dev\projects\supershiny\game.h
+	<memory>
+	"Entity.h"
+	"SDL.h"
+
+1760585738 e:\dev\projects\supershiny\windowmanager.h
+	"SDL.h"
+	"PassKey.h"
+
+1761201854 e:\dev\projects\supershiny\menurenderer.h
+	<SDL.h>
+	<SDL_ttf.h>
+	"Menu.h"
+
+1762125290 source:e:\dev\projects\supershiny\entity.cpp
+	"Entity.h"
+	"StepContext.h"
+	"DrawContext.h"
+	<iostream>
+	"Utilities.h"
+	"Level.h"
+
+1759940894 e:\dev\projects\supershiny\utilities.h
+	<type_traits>
+	<cmath>
+
+1762114188 source:e:\dev\projects\supershiny\game.cpp
+	"Game.h"
+	"Shiny.h"
+	"Orb.h"
+	"Level.h"
+
+1762113444 e:\dev\projects\supershiny\shiny.h
+	"Entity.h"
+
+1760673906 e:\dev\projects\supershiny\orb.h
+	"Entity.h"
+
+1762215516 source:e:\dev\projects\supershiny\entitymanager.cpp
+	"EntityManager.h"
+	"StepContext.h"
+	"Game.h"
+	"PassKey.h"
+	<algorithm>
+
+1762203460 source:e:\dev\projects\supershiny\gameworld.cpp
+	"GameWorld.h"
+	<string>
+	"DrawContext.h"
+	"Game.h"
+	"PassKey.h"
+	"Accessor.h"
+	<algorithm>
+
+1760587532 source:e:\dev\projects\supershiny\inputmanager.cpp
+	"InputManager.h"
+	"SDL.h"
+
+1760674610 source:e:\dev\projects\supershiny\inputpad.cpp
+	"InputPad.h"
+
+1760588520 source:e:\dev\projects\supershiny\main.cpp
+	"Program.h"
+
+1760586816 e:\dev\projects\supershiny\program.h
+
+1761275328 source:e:\dev\projects\supershiny\menucontext.cpp
+	"MenuContext.h"
+	"Engine.h"
+
+1761275328 e:\dev\projects\supershiny\menucontext.h
+	"Accessor.h"
+	"PassKey.h"
+
+1761201206 source:e:\dev\projects\supershiny\menumanager.cpp
+	"MenuManager.h"
+
+1762204923 source:e:\dev\projects\supershiny\level.cpp
+	"Level.h"
+	<cstring>
+	<algorithm>
+	<string>
+	"SdlTexture.h"
+	<fstream>
+	<vector>
+
+1761861856 source:e:\dev\projects\supershiny\menurenderer.cpp
+	"MenuRenderer.h"
+	<iostream>
+
+1762126638 source:e:\dev\projects\supershiny\orb.cpp
+	"Orb.h"
+	"StepContext.h"
+	"DrawContext.h"
+	<iostream>
+	<memory>
+	"Game.h"
+
+1760587904 source:e:\dev\projects\supershiny\program.cpp
+	"Program.h"
+	"Engine.h"
+	"PassKey.h"
+	<memory>
+
+1758055144 source:e:\dev\projects\supershiny\scene.cpp
+	"Scene.h"
+
+1762206608 source:e:\dev\projects\supershiny\shiny.cpp
+	"Shiny.h"
+	"StepContext.h"
+	"DrawContext.h"
+	<iostream>
+	<memory>
+	"Game.h"
+	"EntityManager.h"
+	"Utilities.h"
+
+1762204978 source:e:\dev\projects\supershiny\scenemanager.cpp
+	"SceneManager.h"
+	<iostream>
+	<algorithm>
+	"SDL.h"
+	"StepContext.h"
+	"DrawContext.h"
+	"Accessor.h"
+
+1761206714 source:e:\dev\projects\supershiny\splashscreen.cpp
+	"SplashScreen.h"
+	"StepContext.h"
+	<memory>
+	"GameWorld.h"
+	"DrawContext.h"
+
+1761206494 source:e:\dev\projects\supershiny\stepcontext.cpp
+	"StepContext.h"
+
+1762205008 source:e:\dev\projects\supershiny\sprite.cpp
+	"Sprite.h"
+	<cmath>
+
+1761206494 source:e:\dev\projects\supershiny\titlescreen.cpp
+	"TitleScreen.h"
+	"StepContext.h"
+	<memory>
+	"GameWorld.h"
+	"DrawContext.h"
+
+1759938848 source:e:\dev\projects\supershiny\utilities.cpp
+
+1762214472 source:e:\dev\projects\supershiny\windowmanager.cpp
+	"WindowManager.h"
+	"Game.h"
+	"PassKey.h"
+

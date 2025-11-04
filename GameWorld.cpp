@@ -245,7 +245,7 @@ void GameWorld::step(SceneStepContext& context)
 void GameWorld::draw(DrawContext& context)
 {
     SDL_Renderer* renderer = context.getRenderer();
-    
+
     // Draw background color
     SDL_SetRenderDrawColor(
         renderer,
@@ -254,7 +254,8 @@ void GameWorld::draw(DrawContext& context)
         backgroundColor.b,
         backgroundColor.a
     );
-    SDL_RenderFillRect(renderer, &context.getBounds());
+    SDL_Rect bounds = context.getBounds();
+    SDL_RenderFillRect(renderer, &bounds);
 
     // Default scroll offset is at half of the screen size
     SDL_Rect screenSize = context.getBounds();

@@ -199,7 +199,7 @@ namespace ssge
 
 			// Current abilities
 			Abilities abilities;
-			
+
 			// Current states
 			bool running = false;
 			bool inWater = false;
@@ -252,7 +252,7 @@ namespace ssge
 
 	public:
 
-		uint32_t lifespan{ 0 };
+		uint32_t lifespan = 0;
 		bool scheduledToDestroy{ false };
 
 	protected:

@@ -2,6 +2,7 @@
 #include "StepContext.h"
 #include "Game.h"
 #include "PassKey.h"
+#include <algorithm>
 
 using namespace ssge;
 

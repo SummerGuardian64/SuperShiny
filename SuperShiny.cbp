@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="SuperShiny" />
+		<Option pch_mode="2" />
+		<Option compiler="mingw_810_for_xp" />
+		<Build>
+			<Target title="Debug">
+				<Option output="Export/SuperShiny_WindowsXP_x86_Debug/SuperShiny" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="Export/SuperShiny_WindowsXP_x86_Debug/" />
+				<Option object_output="Intermediate/SuperShiny_WindowsXP_x86_Debug/" />
+				<Option type="1" />
+				<Option compiler="mingw_810_for_xp" />
+				<Compiler>
+					<Add option="-g" />
+				</Compiler>
+			</Target>
+			<Target title="Release">
+				<Option output="Export/SuperShiny_WindowsXP_x86_Release/SuperShiny" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="Export/SuperShiny_WindowsXP_x86_Release/" />
+				<Option object_output="Intermediate/SuperShiny_WindowsXP_x86_Release/" />
+				<Option type="1" />
+				<Option compiler="mingw_810_for_xp" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+			<Add option="-m32" />
+			<Add option="-std=gnu++17 -DWINVER=0x0501 -DWIN32_WINNT=0x0501 -DNOMINMAX" />
+			<Add directory="E:/Dev/SDL2-devel-2.32.10-mingw/SDL2-2.32.10/i686-w64-mingw32/include/SDL2" />
+			<Add directory="E:/Dev/SDL2_image-devel-2.8.8-mingw/SDL2_image-2.8.8/i686-w64-mingw32/include/SDL2" />
+			<Add directory="E:/Dev/SDL2_ttf-devel-2.24.0-mingw/SDL2_ttf-2.24.0/i686-w64-mingw32/include/SDL2" />
+			<Add directory="E:/Dev/SDL2_mixer-devel-2.8.1-mingw/SDL2_mixer-2.8.1/i686-w64-mingw32/include/SDL2" />
+		</Compiler>
+		<Linker>
+			<Add option="-static-libstdc++" />
+			<Add option="-static-libgcc" />
+			<Add option="-m32" />
+			<Add library="mingw32" />
+			<Add library="SDL2main" />
+			<Add library="SDL2.dll" />
+			<Add library="user32" />
+			<Add library="gdi32" />
+			<Add library="winmm" />
+			<Add library="dxguid" />
+			<Add library="SDL2_image.dll" />
+			<Add library="SDL2_ttf.dll" />
+			<Add library="SDL2_mixer.dll" />
+			<Add directory="E:/Dev/SDL2-devel-2.32.10-mingw/SDL2-2.32.10/i686-w64-mingw32/lib" />
+			<Add directory="E:/Dev/SDL2_image-devel-2.8.8-mingw/SDL2_image-2.8.8/i686-w64-mingw32/lib" />
+			<Add directory="E:/Dev/SDL2_ttf-devel-2.24.0-mingw/SDL2_ttf-2.24.0/i686-w64-mingw32/lib" />
+			<Add directory="E:/Dev/SDL2_mixer-devel-2.8.1-mingw/SDL2_mixer-2.8.1/i686-w64-mingw32/lib" />
+		</Linker>
+		<ExtraCommands>
+			<Add after='rem &quot;$(PROJECT_DIR)\Tools\WithEXE_Mirror.exe&quot; &quot;$(PROJECT_DIR)\WithEXE&quot; &quot;$(TARGET_OUTPUT_DIR)&quot; &quot;$(TARGET_OUTPUT_FILE)&quot;' />
+			<Add after='XCOPY &quot;$(#sdl2)\bin\*.dll&quot; &quot;$(TARGET_OUTPUT_DIR)&quot; /D /Y' />
+			<Add after='XCOPY &quot;$(#sdl2_image)\bin\*.dll&quot; &quot;$(TARGET_OUTPUT_DIR)&quot; /D /Y' />
+			<Add after='XCOPY &quot;$(#sdl2_ttf)\bin\*.dll&quot; &quot;$(TARGET_OUTPUT_DIR)&quot; /D /Y' />
+			<Add after='XCOPY &quot;$(#sdl2_mixer)\bin\*.dll&quot; &quot;$(TARGET_OUTPUT_DIR)&quot; /D /Y' />
+			<Mode after="always" />
+		</ExtraCommands>
+		<Unit filename="Accessor.cpp" />
+		<Unit filename="Accessor.h" />
+		<Unit filename="DrawContext.cpp" />
+		<Unit filename="DrawContext.h" />
+		<Unit filename="Engine.cpp" />
+		<Unit filename="Engine.h" />
+		<Unit filename="Entity.cpp" />
+		<Unit filename="Entity.h" />
+		<Unit filename="EntityManager.cpp" />
+		<Unit filename="EntityManager.h" />
+		<Unit filename="Game.cpp" />
+		<Unit filename="Game.h" />
+		<Unit filename="GameWorld.cpp" />
+		<Unit filename="GameWorld.h" />
+		<Unit filename="InputBinding.h" />
+		<Unit filename="InputManager.cpp" />
+		<Unit filename="InputManager.h" />
+		<Unit filename="InputPad.cpp" />
+		<Unit filename="InputPad.h" />
+		<Unit filename="InputSet.h" />
+		<Unit filename="Level.cpp" />
+		<Unit filename="Level.h" />
+		<Unit filename="Menu.h" />
+		<Unit filename="MenuCommand.h" />
+		<Unit filename="MenuContext.cpp" />
+		<Unit filename="MenuContext.h" />
+		<Unit filename="MenuItem.h" />
+		<Unit filename="MenuManager.cpp" />
+		<Unit filename="MenuManager.h" />
+		<Unit filename="MenuRenderer.cpp" />
+		<Unit filename="MenuRenderer.h" />
+		<Unit filename="Orb.cpp" />
+		<Unit filename="Orb.h" />
+		<Unit filename="PassKey.h" />
+		<Unit filename="Program.cpp" />
+		<Unit filename="Program.h" />
+		<Unit filename="Scene.cpp" />
+		<Unit filename="Scene.h" />
+		<Unit filename="SceneManager.cpp" />
+		<Unit filename="SceneManager.h" />
+		<Unit filename="SdlTexture.h" />
+		<Unit filename="Shiny.cpp" />
+		<Unit filename="Shiny.h" />
+		<Unit filename="SplashScreen.cpp" />
+		<Unit filename="SplashScreen.h" />
+		<Unit filename="Sprite.cpp" />
+		<Unit filename="Sprite.h" />
+		<Unit filename="StepContext.cpp" />
+		<Unit filename="StepContext.h" />
+		<Unit filename="TitleScreen.cpp" />
+		<Unit filename="TitleScreen.h" />
+		<Unit filename="Utilities.cpp" />
+		<Unit filename="Utilities.h" />
+		<Unit filename="WindowManager.cpp" />
+		<Unit filename="WindowManager.h" />
+		<Unit filename="main.cpp" />
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+			<lib_finder disable_auto="1" />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>
