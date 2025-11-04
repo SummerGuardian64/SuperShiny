@@ -97,12 +97,12 @@ Shiny::Shiny()
     abilities.maxSpeedDown = 7;
     abilities.acc = { 0.5,0.5 };
     abilities.dec = { 0.5,0.5 };
-    
+
     abilities.jumpSpeed = 10;
     abilities.jumpStrength = 13;
     abilities.swimPower = 5;
     abilities.gravity = 0.7;
-    
+
     // Refactor these into their own abilities
 
     //physics->gravityInWater = 0.1;
@@ -193,7 +193,8 @@ void Shiny::preStep(EntityStepContext& context)
                 auto& orb = *orbRef.get();
                 orb.position = position;
                 orb.position.y -= 40;
-                if(physics->velocity.x<0)
+
+                if(sprite->xscale<0)
                     orb.getPhysics()->velocity.x *= -1;
             }
         }
