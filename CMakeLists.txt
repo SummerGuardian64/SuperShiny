@@ -12,36 +12,18 @@ project ("SuperShiny")
 find_package(SDL2 REQUIRED)
 find_package(SDL2_image REQUIRED)
 find_package(SDL2_ttf REQUIRED)
+find_package(SDL2_mixer REQUIRED)
 
-# Add source to this project's executable.
-add_executable (SuperShiny
-  "main.cpp" 
-  "Program.cpp" "Program.h"
-  "Engine.cpp" "Engine.h"
-  "WindowManager.cpp" "WindowManager.h"
-  "SceneManager.cpp" "SceneManager.h"
-  "InputManager.cpp" "InputManager.h"
-  "StepContext.cpp" "StepContext.h"
-  "DrawContext.cpp" "DrawContext.h"
-   
-  "Scene.cpp" "Scene.h"
-  "GameWorld.cpp" "GameWorld.h"
-  "Game.cpp" "Game.h"
-  "EntityManager.cpp" "EntityManager.h"
-  "Entity.cpp" "Entity.h"
-  "SplashScreen.cpp" "SplashScreen.h"
-  "InputPad.cpp" "InputPad.h"
-  "InputBinding.h" "InputSet.h"
-  "Shiny.cpp" "Shiny.h"
-  "Sprite.cpp" "Sprite.h"
-  "SdlTexture.h"
-  "Level.cpp" "Level.h"
-  "Utilities.h" "Utilities.cpp"
-  "PassKey.h"
-  "Accessor.h" "Accessor.cpp"
-  "Orb.cpp" "Orb.h"
-  "MenuManager.cpp" "MenuManager.h" "Menu.h" "MenuItem.h"  "MenuRenderer.h" "MenuRenderer.cpp"
- "MenuCommand.h" "TitleScreen.cpp" "TitleScreen.h")
+# --- minimal: point CMake at your Source/ tree ---
+set(SRC_DIR "${CMAKE_CURRENT_LIST_DIR}/Source")
+
+# If you still list files manually, comment this next line out.
+file(GLOB_RECURSE SRC_FILES CONFIGURE_DEPENDS
+    "${SRC_DIR}/*.cpp" "${SRC_DIR}/*.c" "${SRC_DIR}/*.h"
+)
+
+# If you use SRC_FILES, make sure your target uses it:
+add_executable(${PROJECT_NAME} ${SRC_FILES})
 
 # Link against SDL2 and SDL2_image
 # SDL2main is needed on Windows to provide a main() wrapper
@@ -52,6 +34,7 @@ target_link_libraries(SuperShiny
   SDL2::SDL2main
   SDL2_image::SDL2_image
   SDL2_ttf::SDL2_ttf
+  SDL2_mixer::SDL2_mixer
 )
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
@@ -61,6 +44,17 @@ endif()
 
 # TODO: Add tests and install targets if needed.
 
+# --- Mirror WithEXE into the target dir (Windows only) ---
+if (WIN32 AND EXISTS "${CMAKE_SOURCE_DIR}/WithEXE")
+  add_custom_command(TARGET SuperShiny POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E echo "Mirroring WithEXE -> $<TARGET_FILE_DIR:SuperShiny> ..."
+    COMMAND ${CMAKE_COMMAND} -E env
+      WITHEXE_SRC=${CMAKE_SOURCE_DIR}/WithEXE
+      WITHEXE_DST=$<TARGET_FILE_DIR:SuperShiny>
+      WITHEXE_KEEP=$<TARGET_FILE:SuperShiny>
+      "${CMAKE_SOURCE_DIR}/tools/WithEXE_Mirror.exe"
+  )
+endif()
 # --- Copy SDL2 and SDL2_image DLLs after build ---
 add_custom_command(TARGET SuperShiny POST_BUILD
   COMMAND ${CMAKE_COMMAND} -E echo "Copying SDL2 runtime DLLs..."
@@ -72,5 +66,8 @@ add_custom_command(TARGET SuperShiny POST_BUILD
     "$<TARGET_FILE_DIR:SuperShiny>"
   COMMAND ${CMAKE_COMMAND} -E copy_if_different
     "$<TARGET_FILE:SDL2_ttf::SDL2_ttf>"
+    "$<TARGET_FILE_DIR:SuperShiny>"
+  COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    "$<TARGET_FILE:SDL2_mixer::SDL2_mixer>"
     "$<TARGET_FILE_DIR:SuperShiny>"
 )
