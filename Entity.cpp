@@ -259,6 +259,10 @@ void Entity::Physics::step(EntityStepContext& context)
             //else
             //{
                 velocity.y += abilities.gravity;
+                if (velocity.y > abilities.maxSpeedDown)
+                {
+                    velocity.y = sign(velocity.y) * abilities.maxSpeedDown;
+                }
             //}
         }
 

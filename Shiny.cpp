@@ -94,12 +94,12 @@ Shiny::Shiny()
 
     abilities.maxSpeedHor = 8;
     abilities.maxSpeedUp = 10;
-    abilities.maxSpeedDown = 7;
+    abilities.maxSpeedDown = 10;
     abilities.acc = { 0.5,0.5 };
     abilities.dec = { 0.5,0.5 };
 
-    abilities.jumpSpeed = 10;
-    abilities.jumpStrength = 13;
+    abilities.jumpSpeed = 9;
+    abilities.jumpStrength = 15;
     abilities.swimPower = 5;
     abilities.gravity = 0.7;
 
