@@ -1,11 +1,11 @@
 #include "Shiny.h"
-#include "StepContext.h"
-#include "DrawContext.h"
+#include "../ssge/StepContext.h"
+#include "../ssge/DrawContext.h"
 #include <iostream>
 #include <memory>
-#include "Game.h"
-#include "EntityManager.h"
-#include "Utilities.h"
+#include "../ssge/Game.h"
+#include "../ssge/EntityManager.h"
+#include "../ssge/Utilities.h"
 
 using namespace ssge;
 

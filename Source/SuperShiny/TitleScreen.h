@@ -1,6 +1,6 @@
 #pragma once
-#include "Scene.h"
-#include "SdlTexture.h"
+#include "../ssge/Scene.h"
+#include "../ssge/SdlTexture.h"
 
 using namespace ssge;
 

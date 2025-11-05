@@ -10,11 +10,11 @@
 #include "MenuManager.h"
 #include "WindowManager.h"
 #include "Accessor.h"
-#include "SplashScreen.h"
+#include "../SuperShiny/SplashScreen.h" // FIXME: Decouple!
 #include <SDL_ttf.h>
 #include "MenuRenderer.h"
 #include "GameWorld.h"
-#include "TitleScreen.h"
+#include "../SuperShiny/TitleScreen.h" // FIXME: Decouple!
 
 using namespace ssge;
 

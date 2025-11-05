@@ -1,5 +1,5 @@
 #pragma once
-#include "Scene.h"
+#include "../ssge/Scene.h"
 #include "SDL.h"
 
 using namespace ssge;

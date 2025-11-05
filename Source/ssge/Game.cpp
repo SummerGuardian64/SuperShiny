@@ -1,6 +1,6 @@
 #include "Game.h"
-#include "Shiny.h"
-#include "Orb.h"
+#include "../SuperShiny/Shiny.h" // FIXME: Decouple!
+#include "../SuperShiny/Orb.h" // FIXME: Decouple!
 #include "Level.h"
 
 using namespace ssge;

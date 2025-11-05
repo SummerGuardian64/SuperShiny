@@ -4,11 +4,11 @@
 #include "SceneManager.h"
 #include "InputManager.h"
 #include "Level.h"
-#include "SplashScreen.h"
+#include "../SuperShiny/SplashScreen.h" // FIXME: Decouple!
 #include "GameWorld.h"
 #include "EntityManager.h"
 #include "MenuManager.h"
-#include "TitleScreen.h"
+#include "../SuperShiny/TitleScreen.h" // FIXME: Decouple!
 
 using namespace ssge;
 

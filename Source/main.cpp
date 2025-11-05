@@ -1,5 +1,10 @@
-﻿// SuperShiny.cpp : Defines the entry point for the application.
-//
+﻿// main.cpp (game side)
+#include "ssge/Program.h"
+//#include "ssge/IGameFlow.h"
+//#include "Game/Flow.h" // your concrete Flow
 
-#include "Program.h"
-int main(int argc, char* argv[]) { return ssge::Program::run(argc, argv); }
+int main(int argc, char** argv)
+{
+	//Game::Flow flow;        // your policy brain; owns menus, game rules
+	return ssge::Program::run(/*flow,*/ argc, argv);
+}

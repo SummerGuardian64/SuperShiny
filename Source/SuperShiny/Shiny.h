@@ -1,5 +1,5 @@
 #pragma once
-#include "Entity.h"
+#include "../ssge/Entity.h"
 
 using namespace ssge;
 

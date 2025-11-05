@@ -1,9 +1,9 @@
 #include "Orb.h"
-#include "StepContext.h"
-#include "DrawContext.h"
+#include "../ssge/StepContext.h"
+#include "../ssge/DrawContext.h"
 #include <iostream>
 #include <memory>
-#include "Game.h"
+#include "../ssge/Game.h"
 
 using namespace ssge;
 

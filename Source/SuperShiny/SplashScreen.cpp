@@ -1,8 +1,8 @@
 #include "SplashScreen.h"
-#include "StepContext.h"
+#include "../ssge/StepContext.h"
 #include <memory>
-#include "GameWorld.h"
-#include "DrawContext.h"
+#include "../ssge/GameWorld.h"
+#include "../ssge/DrawContext.h"
 
 using namespace ssge;
 
