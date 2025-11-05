@@ -37,6 +37,39 @@ target_link_libraries(SuperShiny
   SDL2_mixer::SDL2_mixer
 )
 
+# --- Per-config export directory for the final binary ---
+# Put this right after target_link_libraries(SuperShiny ...) and before any POST_BUILD commands.
+
+# Derive a platform tag the way you want it shown on disk
+if (WIN32)
+  if (MSVC)
+    if (CMAKE_SIZEOF_VOID_P EQUAL 8)
+      set(SSGE_PLATFORM "Windows11_x64")
+    else()
+      set(SSGE_PLATFORM "Windows11_Win32")
+    endif()
+  elseif (MINGW)
+    if (CMAKE_SIZEOF_VOID_P EQUAL 4)
+      set(SSGE_PLATFORM "WindowsXP_x86")
+    else()
+      set(SSGE_PLATFORM "Windows_x64")
+    endif()
+  endif()
+else()
+  set(SSGE_PLATFORM "${CMAKE_SYSTEM_NAME}")
+endif()
+
+# Route target outputs into Export/SuperShiny_<platform>_<config>
+foreach(OUTPUTCONFIG Debug Release RelWithDebInfo MinSizeRel)
+  string(TOUPPER ${OUTPUTCONFIG} OUTPUTCONFIG_UPPER)
+  set(outdir "${CMAKE_SOURCE_DIR}/Export/SuperShiny_${SSGE_PLATFORM}_${OUTPUTCONFIG}")
+  set_target_properties(SuperShiny PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY_${OUTPUTCONFIG_UPPER} "${outdir}"
+    LIBRARY_OUTPUT_DIRECTORY_${OUTPUTCONFIG_UPPER} "${outdir}"
+    ARCHIVE_OUTPUT_DIRECTORY_${OUTPUTCONFIG_UPPER} "${outdir}"
+  )
+endforeach()
+
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET SuperShiny PROPERTY CXX_STANDARD 17)
   set_property(TARGET SuperShiny PROPERTY CXX_STANDARD_REQUIRED ON)

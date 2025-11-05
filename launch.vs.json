@@ -1,0 +1,17 @@
+{
+  "version": "0.2.1",
+  "defaults": {},
+  "configurations": [
+    {
+      "name": "Super Shiny",
+      "type": "default",
+      "project": "CMakeLists.txt",
+      "inheritEnvironments": [ "msvc_x64_x64" ],
+      "program": "$targetPath(SuperShiny)",
+      "args": [],
+      "cwd": "$targetDir(SuperShiny)",
+      "env": {},
+      "console": "externalConsole" // or "integratedConsole"
+    }
+  ]
+}
