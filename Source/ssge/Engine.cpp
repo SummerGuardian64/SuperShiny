@@ -284,6 +284,19 @@ void Engine::shutdown()
 {
 	std::cout << "shutdown()" << std::endl;
 
+	game.cleanUp(PassKey<Engine>());
+
+	if (menuTitle)
+	{
+		TTF_CloseFont(menuTitle);
+		menuTitle = nullptr;
+	}
+	if (menuItem)
+	{
+		TTF_CloseFont(menuItem);
+		menuItem = nullptr;
+	}
+
 	if (window)
 	{
 		delete window;
