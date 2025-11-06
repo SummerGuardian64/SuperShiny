@@ -6,9 +6,9 @@
 #include "../ssge/Scene.h"
 #include "SDL.h"
 
-ssge::SceneClassID TitleScreen::getSceneClassID() const
+std::string TitleScreen::getSceneClassID() const
 {
-	return ssge::SceneClassID::TitleScreen;
+	return "TitleScreen";
 }
 
 TitleScreen::TitleScreen()

@@ -42,7 +42,7 @@ namespace ssge
         void setConfines(SDL_FRect confines);
         //sf::Vector2i getMousePosition();
         //std::weak_ptr<Ball> spawnNewBall();
-        SceneClassID getSceneClassID() const override;
+        std::string getSceneClassID() const override;
         void init(SceneStepContext& context) override;
         void step(SceneStepContext& context) override;
         void draw(DrawContext& context) override;

@@ -15,7 +15,6 @@ namespace ssge {
     class Engine;
     class EntityReference;           // forward-declare the wrapper type
     enum class EntityClassID : int;  // forward-declare the enum class
-    enum class SceneClassID : int;
     class InputManager;
     class Scene;
     class GameWorld;
@@ -42,7 +41,6 @@ namespace ssge {
     public:
         explicit ScenesAccess(SceneManager* actual, IGame& game)
             : actual(actual), gameScenes(game.getScenes(PassKey<ScenesAccess>())) { }
-        void changeScene(SceneClassID sceneClassID);
         void changeScene(std::string newSceneId);
         void goToLevel(int wantedLevel);
         void pause();
@@ -81,7 +79,7 @@ namespace ssge {
         Scene* currentScene;
     public:
         explicit CurrentSceneAccess(Scene* current) : currentScene(current) {}
-        SceneClassID getSceneClassID() const;
+        std::string getSceneClassID() const;
     };
 
     class GameWorldAccess {

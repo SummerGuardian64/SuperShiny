@@ -138,11 +138,11 @@ Scene* SceneManager::getCurrentScene() const
 	return currentScene.get();
 }
 
-SceneClassID SceneManager::getCurrentSceneClassID() const
+std::string SceneManager::getCurrentSceneClassID() const
 {
 	if (!currentScene)
 	{
-		return SceneClassID::None;
+		return "";
 	}
 	else return currentScene->getSceneClassID();
 }

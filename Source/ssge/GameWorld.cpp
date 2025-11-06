@@ -90,9 +90,9 @@ void GameWorld::setConfines(SDL_FRect confines)
 	this->confines = confines;
 }
 
-SceneClassID GameWorld::getSceneClassID() const
+std::string GameWorld::getSceneClassID() const
 {
-	return SceneClassID::GameWorld;
+    return "GameWorld";
 }
 
 void GameWorld::init(SceneStepContext& context)

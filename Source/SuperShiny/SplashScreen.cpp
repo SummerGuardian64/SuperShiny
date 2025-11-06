@@ -6,9 +6,9 @@
 #include "../ssge/Scene.h"
 #include "SDL.h"
 
-ssge::SceneClassID SplashScreen::getSceneClassID() const
+std::string SplashScreen::getSceneClassID() const
 {
-	return ssge::SceneClassID::SplashScreen;
+	return "SplashScreen";
 }
 
 SplashScreen::SplashScreen()

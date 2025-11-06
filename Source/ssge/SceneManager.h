@@ -32,7 +32,7 @@ namespace ssge
 		void wrapUp();
 
 		Scene* getCurrentScene() const;
-		SceneClassID getCurrentSceneClassID() const;
+		std::string getCurrentSceneClassID() const;
 		Scene* changeScene(std::unique_ptr<Scene> newScene);
 		bool isSceneInitialized() const;
 		bool isPaused() const;

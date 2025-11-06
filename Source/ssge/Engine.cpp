@@ -12,7 +12,7 @@
 #include <SDL_ttf.h>
 #include "MenuRenderer.h"
 #include "GameWorld.h"
-#include "../SuperShiny/TitleScreen.h"
+#include "../SuperShiny/TitleScreen.h" // FIXME: Decouple!
 
 using namespace ssge;
 

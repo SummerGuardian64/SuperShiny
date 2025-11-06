@@ -20,22 +20,6 @@ void EngineAccess::wrapUp()
 	actual->wrapUp();
 }
 
-void ScenesAccess::changeScene(SceneClassID sceneClassID)
-{
-	switch (sceneClassID)
-	{
-	case SceneClassID::SplashScreen:
-		changeScene("SplashScreen");
-		break;
-	case SceneClassID::TitleScreen:
-		changeScene("TitleScreen");
-		break;
-	case SceneClassID::GameWorld:
-		changeScene("GameWorld");
-		break;
-	}
-}
-
 void ssge::ScenesAccess::changeScene(std::string newSceneId)
 {
 	if (!actual)return; // Null-safety
@@ -76,7 +60,7 @@ bool ssge::ScenesAccess::isFadeFinished() const
 void ssge::ScenesAccess::restart()
 {
 	auto currentSceneClassID = actual->getCurrentSceneClassID();
-	if (currentSceneClassID == SceneClassID::GameWorld)
+	if (currentSceneClassID == "GameWorld")
 	{
 		GameWorld* gameWorldScene = dynamic_cast<GameWorld*>(actual->getCurrentScene());
 		goToLevel(gameWorldScene->getWantedLevel());
@@ -112,7 +96,7 @@ uint32_t InputsAccess::getCurrentButtonsForPlayer(int playerId)
 	//TODO: Support for more players!
 }
 
-SceneClassID CurrentSceneAccess::getSceneClassID() const
+std::string CurrentSceneAccess::getSceneClassID() const
 {
 	return currentScene->getSceneClassID();
 }
