@@ -13,7 +13,12 @@ int ssge::Program::run(IGame& game, int argc, char* argv[])
 
     auto engine = std::make_unique<Engine>(PassKey<Program>(), game);
     if (engine->init(PassKey<Program>()))
+    {
         engine->mainLoop(PassKey<Program>());
+        return 0;
+    }
     else
+    {
         return -1;
+    }
 }
