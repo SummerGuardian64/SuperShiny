@@ -8,6 +8,7 @@ namespace ssge {
     // Engine's systems
 
     class Engine;
+    class IGame;
     class WindowManager;
     class InputManager;
     class SceneManager;
@@ -16,16 +17,19 @@ namespace ssge {
     class EntityManager;
     class MenuManager;
     
-    class StepContextBase {
+    class StepContextBase
+    {
     public:
         // Deltatime
         const double deltaTime{ 0.0 };
         StepContextBase(double deltaTime);
     };
 
-    class StepContext : public StepContextBase {
+    class StepContext : public StepContextBase
+    {
     public:
         EngineAccess engine;
+        GameAccess game;
         ScenesAccess scenes;
         InputsAccess inputs;
         DrawingAccess drawing;
@@ -35,6 +39,7 @@ namespace ssge {
             PassKey<Engine> pk,
             double deltaTime,
             EngineAccess engine,
+            GameAccess game,
             ScenesAccess scenes,
             InputsAccess inputs,
             DrawingAccess drawing,
@@ -42,9 +47,11 @@ namespace ssge {
         );
     };
 
-    class SceneStepContext : public StepContextBase {
+    class SceneStepContext : public StepContextBase
+    {
     public:
         EngineAccess engine;
+        GameAccess game;
         ScenesAccess scenes;
         InputsAccess inputs;
         DrawingAccess drawing;
@@ -55,6 +62,7 @@ namespace ssge {
             PassKey<SceneManager> pk,
             double deltaTime,
             EngineAccess engine,
+            GameAccess game,
             ScenesAccess scenes,
             InputsAccess inputs,
             DrawingAccess drawing,
@@ -63,9 +71,11 @@ namespace ssge {
         );
     };
 
-    class GameWorldStepContext : public StepContextBase {
+    class GameWorldStepContext : public StepContextBase
+    {
     public:
         EngineAccess engine;
+        GameAccess game;
         ScenesAccess scenes;
         InputsAccess inputs;
         DrawingAccess drawing;
@@ -77,6 +87,7 @@ namespace ssge {
             PassKey<GameWorld> pk,
             double deltaTime,
             EngineAccess engine,
+            GameAccess game,
             ScenesAccess scenes,
             InputsAccess inputs,
             DrawingAccess drawing,
@@ -87,9 +98,11 @@ namespace ssge {
     };
 
 
-    class EntityStepContext : public StepContextBase {
+    class EntityStepContext : public StepContextBase
+    {
     public:
         EngineAccess engine;
+        GameAccess game;
         ScenesAccess scenes;
         InputsAccess inputs;
         DrawingAccess drawing;
@@ -97,18 +110,21 @@ namespace ssge {
         GameWorldAccess gameWorld;
         LevelAccess level;
         EntitiesAccessWCurrent entities;
+        SpritesAccess sprites;
 
         explicit EntityStepContext(
             PassKey<EntityManager> pk,
             double deltaTime,
             EngineAccess engine,
+            GameAccess game,
             ScenesAccess scenes,
             InputsAccess inputs,
             DrawingAccess drawing,
             CurrentSceneAccess currentScene,
             GameWorldAccess gameWorld,
             LevelAccess level,
-            EntitiesAccessWCurrent entitiesAndCurrent
+            EntitiesAccessWCurrent entitiesAndCurrent,
+            SpritesAccess sprites
         );
     };
 

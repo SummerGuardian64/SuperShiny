@@ -4,11 +4,9 @@
 #include "SceneManager.h"
 #include "InputManager.h"
 #include "Level.h"
-#include "../SuperShiny/SplashScreen.h" // FIXME: Decouple!
 #include "GameWorld.h"
 #include "EntityManager.h"
 #include "MenuManager.h"
-#include "../SuperShiny/TitleScreen.h" // FIXME: Decouple!
 
 using namespace ssge;
 
@@ -24,20 +22,25 @@ void EngineAccess::wrapUp()
 
 void ScenesAccess::changeScene(SceneClassID sceneClassID)
 {
-	std::unique_ptr<Scene> newScene;
 	switch (sceneClassID)
 	{
 	case SceneClassID::SplashScreen:
-		newScene = std::make_unique<SplashScreen>();
+		changeScene("SplashScreen");
 		break;
 	case SceneClassID::TitleScreen:
-		newScene = std::make_unique<TitleScreen>();
+		changeScene("TitleScreen");
 		break;
 	case SceneClassID::GameWorld:
-		newScene = std::make_unique<GameWorld>();
+		changeScene("GameWorld");
 		break;
 	}
-	actual->changeScene(std::move(newScene));
+}
+
+void ssge::ScenesAccess::changeScene(std::string newSceneId)
+{
+	if (!actual)return; // Null-safety
+
+	actual->changeScene(gameScenes.createScene(PassKey<ScenesAccess>(), newSceneId));
 }
 
 void ssge::ScenesAccess::goToLevel(int wantedLevel)
@@ -175,9 +178,22 @@ bool LevelAccess::rectInWater(const SDL_FRect& r) const
 	return actual->rectInWater(r);
 }
 
-EntityReference ssge::EntitiesAccess::addEntity(EntityClassID entityClassID)
+EntityReference ssge::EntitiesAccess::addEntity(std::string entityID)
 {
-	return actual->addEntity(entityClassID);
+	return actual->addEntity(gameEntities.createEntity(PassKey<EntitiesAccess>(), entityID));
+}
+
+const ssge::Sprite::Definition* ssge::SpritesAccess::fetchDefinition(std::string sprdefId)
+{
+	return actual.fetchDefinition(sprdefId);
+}
+
+std::unique_ptr<ssge::Sprite> ssge::SpritesAccess::create(std::string sprdefId)
+{
+	auto sprdef = fetchDefinition(sprdefId);
+	if (sprdef)
+		return std::make_unique<ssge::Sprite>(*sprdef);
+	else return nullptr;
 }
 
 bool ssge::MenusAccess::isOpen() const

@@ -3,6 +3,7 @@
 #include <memory>
 #include "Scene.h"
 #include "PassKey.h"
+#include <string>
 
 namespace ssge
 {

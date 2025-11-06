@@ -105,7 +105,7 @@ void GameWorld::init(SceneStepContext& context)
         // ERROR! Get out of there!
         // TODO! Report the error
         context.scenes.pause();
-        context.scenes.changeScene(SceneClassID::TitleScreen);
+        context.scenes.changeScene("TitleScreen");
     }
     else
     {
@@ -114,15 +114,12 @@ void GameWorld::init(SceneStepContext& context)
         int currentEntityIndex = 0;
         for (const auto& spawnEntry : spawnList)
         {
-            // TODO: Move to Entity Registry
-            EntityClassID ecid;
-            if (spawnEntry.what == "Shiny")
-                ecid = EntityClassID::Shiny;
-            else if (spawnEntry.what == "Orb")
-                ecid = EntityClassID::Orb;
-            else continue;
+            // FIXME: BIG BODGE!
+            EntitiesAccess bodge(&entities, context.game);
+            EntityReference entity = bodge.addEntity(spawnEntry.what);
+            if (!entity)
+                continue;
 
-            auto entity = entities.addEntity(ecid);
             entity->position = spawnEntry.where;
 
             if (levelLoader.getHeroIndex() == currentEntityIndex)
@@ -165,6 +162,7 @@ void GameWorld::step(SceneStepContext& context)
         ssge::PassKey<GameWorld>(),
         context.deltaTime,
         context.engine,
+        context.game,
         context.scenes,
         context.inputs,
         context.drawing,

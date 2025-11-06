@@ -6,10 +6,12 @@
 #include "../ssge/Game.h"
 #include "../ssge/EntityManager.h"
 #include "../ssge/Utilities.h"
+#include "SDL.h"
 
-using namespace ssge;
+using ssge::sign;
+using ssge::Level;
 
-void Shiny::animate(EntityStepContext& context)
+void Shiny::animate(ssge::EntityStepContext& context)
 {
     if (sprite && physics)
     {
@@ -71,18 +73,18 @@ void Shiny::animate(EntityStepContext& context)
 
 Shiny::Shiny()
 {
-	sprite = std::make_unique<Sprite>(Game::Sprites::shiny());
-	physics = std::make_unique<Physics>(*this);
-    control = std::make_unique<Control>(*this);
+	//sprite = std::make_unique<Sprite>(Game::Sprites::shiny());
+	physics = std::make_unique<ssge::Entity::Physics>(*this);
+    control = std::make_unique<ssge::Entity::Control>(*this);
 
-    control->mode = Entity::Control::Mode::Player;
+    control->mode = ssge::Entity::Control::Mode::Player;
     control->playable = true;
     control->playerId = 0;
 
     position.x = 400;
     position.y = 100;
 
-    using Ability = Entity::Physics::Abilities::Flag;
+    using Ability = ssge::Entity::Physics::Abilities::Flag;
     auto& abilities = physics->abilities;
     abilities.set(Ability::EnablePhysics);
     abilities.set(Ability::EnableHorizontalMove);
@@ -166,21 +168,22 @@ void Shiny::die()
     physics->velocity.x = 0;
     physics->velocity.y = -20;
     physics->abilities.maxSpeedUp = 20;
-    physics->abilities.enable(Entity::Physics::Abilities::Flag::IgnoreCollision);
+    physics->abilities.enable(ssge::Entity::Physics::Abilities::Flag::IgnoreCollision);
     control->ignore = true;
 }
 
-EntityClassID Shiny::getEntityClassID() const
+ssge::EntityClassID Shiny::getEntityClassID() const
 {
-	return EntityClassID::Shiny;
+	return ssge::EntityClassID::Shiny;
 }
 
-void Shiny::firstStep(EntityStepContext& context)
+void Shiny::firstStep(ssge::EntityStepContext& context)
 {
+    sprite = context.sprites.create("Shiny");
 	//std::cout << "Helloy!" << std::endl;
 }
 
-void Shiny::preStep(EntityStepContext& context)
+void Shiny::preStep(ssge::EntityStepContext& context)
 {
 	//std::cout << "scale.. ";
 
@@ -188,7 +191,7 @@ void Shiny::preStep(EntityStepContext& context)
     {
         if (ctrl->getPad().isJustPressed(5))
         {
-            if (auto orbRef = context.entities.addEntity(EntityClassID::Orb))
+            if (auto orbRef = context.entities.addEntity("Orb"))
             {
                 auto& orb = *orbRef.get();
                 orb.position = position;
@@ -211,7 +214,7 @@ void Shiny::preStep(EntityStepContext& context)
     }
 }
 
-void Shiny::postStep(EntityStepContext& context)
+void Shiny::postStep(ssge::EntityStepContext& context)
 {
     bool amIDeadYet = false;
     float tipOfTheHead = position.y + hitbox.y;
@@ -299,15 +302,15 @@ void Shiny::postStep(EntityStepContext& context)
     animate(context);
 }
 
-void Shiny::preDraw(DrawContext& context) const
+void Shiny::preDraw(ssge::DrawContext& context) const
 {
 }
 
-void Shiny::postDraw(DrawContext& context) const
+void Shiny::postDraw(ssge::DrawContext& context) const
 {
 }
 
-void Shiny::onDestroy(EntityStepContext& context)
+void Shiny::onDestroy(ssge::EntityStepContext& context)
 {
 	//std::cout << "Scalefloof go poof!" << std::endl;
 }

@@ -77,6 +77,12 @@ namespace ssge
 
 		class Definition {
 		public: //TODO: Encapsulate after everything properly works
+			Definition() = default;
+			Definition(std::string spritesheetPath);;
+			std::string spritesheetPath;
+			bool load(SDL_Renderer* renderer);
+			void unload();
+			bool isLoaded() const;
 			SdlTexture spritesheet;
 			std::vector<Sprite::Animation::Sequence> sequences;
 			std::vector<Sprite::Image> images; // Contains the frames of the sprite
@@ -86,7 +92,7 @@ namespace ssge
 
 		// A Sprite can only made according to its definition.
 		// Without the definition, the sprite cannot be made.
-		Sprite(Sprite::Definition& definition);
+		Sprite(const Sprite::Definition& definition);
 
 		bool isPlaying() const; // Calls animation.IsPlaying()
 
@@ -136,6 +142,6 @@ namespace ssge
 		void render(SDL_Renderer* renderer, SDL_Point offsetFromViewport) const;
 
 		Sprite::Animation animation;
-		Sprite::Definition& definition;
+		const Sprite::Definition& definition;
 	};
 };

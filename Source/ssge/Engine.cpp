@@ -10,15 +10,14 @@
 #include "MenuManager.h"
 #include "WindowManager.h"
 #include "Accessor.h"
-#include "../SuperShiny/SplashScreen.h" // FIXME: Decouple!
 #include <SDL_ttf.h>
 #include "MenuRenderer.h"
 #include "GameWorld.h"
-#include "../SuperShiny/TitleScreen.h" // FIXME: Decouple!
+#include "../SuperShiny/TitleScreen.h"
 
 using namespace ssge;
 
-Engine::Engine(PassKey<Program> pk)
+Engine::Engine(PassKey<Program> pk, IGame& game) : game(game)
 {
 	window = new WindowManager(PassKey<Engine>());
 	scenes = new SceneManager(PassKey<Engine>());
@@ -119,8 +118,17 @@ bool Engine::loadInitialResources(SDL_Renderer* renderer)
 bool Engine::prepareInitialState()
 {
 	//TODO: Initialize first scene
-	//scenes->changeScene(std::make_unique<GameWorld>());
-	scenes->changeScene(std::make_unique<SplashScreen>());
+	auto stepContext = StepContext(PassKey<Engine>(),
+		0,
+		EngineAccess(this),
+		GameAccess(game),
+		ScenesAccess(scenes, game),
+		InputsAccess(inputs),
+		DrawingAccess(window->getRenderer()),
+		MenusAccess(menus));
+	game.init(stepContext);
+
+	//scenes->changeScene("SplashScreen");
 	inputs->bindings[0].bindToKey(SDL_Scancode::SDL_SCANCODE_UP);
 	inputs->bindings[1].bindToKey(SDL_Scancode::SDL_SCANCODE_DOWN);
 	inputs->bindings[2].bindToKey(SDL_Scancode::SDL_SCANCODE_LEFT);
@@ -232,7 +240,8 @@ bool Engine::update(double deltaTime)
 		PassKey<Engine>(),
 		deltaTime,
 		EngineAccess(this),
-		ScenesAccess(scenes),
+		GameAccess(game),
+		ScenesAccess(scenes, game),
 		InputsAccess(inputs),
 		DrawingAccess(window->getRenderer()),
 		MenusAccess(menus)
@@ -311,10 +320,12 @@ void Engine::onMenuCommand(const MenuCommand& cmd)
 {
 	switch (cmd.type) {
 	case MenuCommandType::NewGame:
+		//FIXME: Decouple me!!!
 		scenes->changeScene(std::make_unique<GameWorld>(1));
 		menus->close(); // or pop stack if you prefer
 		break;
 	case MenuCommandType::GoToLevel:
+		//FIXME: Decouple me!!!
 		scenes->changeScene(std::make_unique<GameWorld>(cmd.param));
 		menus->close();
 		break;

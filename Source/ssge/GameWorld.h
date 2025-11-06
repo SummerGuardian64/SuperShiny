@@ -7,6 +7,7 @@
 #include <vector>
 #include <list>
 #include "Level.h"
+#include "IGame.h"
 //#include "LevelLoader.h"
 //#include "PowerupType.h"
 //#include "HintManager.h"

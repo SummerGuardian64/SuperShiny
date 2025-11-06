@@ -3,6 +3,7 @@
 #include <SDL.h>
 #include <memory>
 #include "Level.h"
+#include "IGame.h"
 
 namespace ssge {
 
@@ -28,11 +29,21 @@ namespace ssge {
         void wrapUp();
     };
 
+    class GameAccess {
+        IGame& actual;
+    public:
+        explicit GameAccess(IGame& actual) : actual(actual) {}
+        IGame& get() { return actual; }
+    };
+
     class ScenesAccess {
         SceneManager* actual;
+        IGameScenes& gameScenes;
     public:
-        explicit ScenesAccess(SceneManager* actual) : actual(actual) {}
+        explicit ScenesAccess(SceneManager* actual, IGame& game)
+            : actual(actual), gameScenes(game.getScenes(PassKey<ScenesAccess>())) { }
         void changeScene(SceneClassID sceneClassID);
+        void changeScene(std::string newSceneId);
         void goToLevel(int wantedLevel);
         void pause();
         void unpause();
@@ -119,17 +130,28 @@ namespace ssge {
     
     class EntitiesAccess {
         EntityManager* actual;
+        IGameEntities& gameEntities;
     public:
-        explicit EntitiesAccess(EntityManager* actual) : actual(actual) {}
+        explicit EntitiesAccess(EntityManager* actual, GameAccess& game)
+            : actual(actual), gameEntities(game.get().getEntities(PassKey<EntitiesAccess>())) { }
         //TBA
         //TODO: Spawning in new entities, entity lookup, etc.
-        EntityReference addEntity(EntityClassID entityClassID);
+        EntityReference addEntity(std::string entityID);
     };
 
     class EntitiesAccessWCurrent : public EntitiesAccess {
     public:
         Entity& current;
-        explicit EntitiesAccessWCurrent(EntityManager* actual, Entity* current) : EntitiesAccess(actual), current(*current) {}
+        explicit EntitiesAccessWCurrent(EntityManager* actual, GameAccess& game, Entity* current)
+            : EntitiesAccess(actual, game), current(*current) {}
+    };
+    
+    class SpritesAccess {
+        IGameSprites& actual;
+    public:
+        explicit SpritesAccess(IGameSprites& actual) : actual(actual) {}
+        const Sprite::Definition* fetchDefinition(std::string sprdefId);
+        std::unique_ptr<Sprite> create(std::string sprdefId);
     };
 
     class MenusAccess {

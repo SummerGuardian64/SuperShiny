@@ -58,7 +58,7 @@ int Sprite::Animation::calculateEffectiveSpeed() const
 // Sprite Constructor
 //===================
 
-Sprite::Sprite(Sprite::Definition& def)
+Sprite::Sprite(const Sprite::Definition& def)
 	: definition(def)
 {
 	// Initialize rendering properties
@@ -354,16 +354,20 @@ void Sprite::render(SDL_Renderer* renderer, SDL_Point offsetFromViewport) const
 
 	// Adjust destination rectangle so that the anchor lands at offsetFromViewport.
 	SDL_Rect dst;
-	if (xscale < 0) {
+	if (xscale < 0)
+	{
 		dst.x = offsetFromViewport.x - (absW - scaledAnchorX);
 	}
-	else {
+	else
+	{
 		dst.x = offsetFromViewport.x - scaledAnchorX;
 	}
-	if (yscale < 0) {
+	if (yscale < 0)
+	{
 		dst.y = offsetFromViewport.y - (absH - scaledAnchorY);
 	}
-	else {
+	else
+	{
 		dst.y = offsetFromViewport.y - scaledAnchorY;
 	}
 	dst.w = absW;
@@ -386,6 +390,24 @@ Sprite::Image::Image(int x, int y, int w, int h, int cx, int cy)
 {
 	region = { x,y,w,h };
 	anchor = { cx,cy };
+}
+
+Sprite::Definition::Definition(std::string spritesheetPath) : spritesheetPath(spritesheetPath) {}
+
+bool Sprite::Definition::load(SDL_Renderer* renderer)
+{
+	spritesheet = SdlTexture(spritesheetPath, renderer);
+	return isLoaded();
+}
+
+void Sprite::Definition::unload()
+{
+	spritesheet.free();
+}
+
+bool Sprite::Definition::isLoaded() const
+{
+	return spritesheet.isValid();
 }
 
 Sprite::Animation::Sequence& Sprite::Definition::addSequence()

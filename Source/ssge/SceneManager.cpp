@@ -8,7 +8,9 @@
 
 using namespace ssge;
 
-SceneManager::SceneManager(PassKey<Engine> pk) {}
+SceneManager::SceneManager(PassKey<Engine> pk)
+{
+}
 
 void SceneManager::step(StepContext& context)
 {
@@ -24,6 +26,7 @@ void SceneManager::step(StepContext& context)
 				PassKey<SceneManager>(),
 				context.deltaTime,
 				context.engine,
+				context.game,
 				context.scenes,
 				context.inputs,
 				context.drawing,
@@ -39,6 +42,7 @@ void SceneManager::step(StepContext& context)
 				PassKey<SceneManager>(),
 				context.deltaTime,
 				context.engine,
+				context.game,
 				context.scenes,
 				context.inputs,
 				context.drawing,

@@ -16,6 +16,9 @@ namespace ssge
     class GameWorldStepContext;
     class DrawContext;
 
+    class IGame;
+    class IGameEntities;
+
     class EntityReference {
         std::weak_ptr<Entity> ref;
     public:
@@ -154,7 +157,6 @@ namespace ssge
 
 	class EntityManager
 	{
-
     public:
         void step(GameWorldStepContext& context);
         void draw(DrawContext& context);
@@ -162,7 +164,7 @@ namespace ssge
         EntityCollection entities;
         EntityCollection::iterator getEntitiesBegin();
         EntityCollection::iterator getEntitiesEnd();
-        EntityReference addEntity(EntityClassID entityClassID);
+        EntityReference addEntity(std::shared_ptr<Entity> entity);
         bool deleteEntity(EntityReference entity);
         Entity* findEntity(EntityClassID entityClassID);
         const Entity* findConstEntity(EntityClassID entityClassID) const;

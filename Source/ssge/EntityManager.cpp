@@ -3,6 +3,7 @@
 #include "Game.h"
 #include "PassKey.h"
 #include <algorithm>
+#include "IGame.h"
 
 using namespace ssge;
 
@@ -15,13 +16,15 @@ void EntityManager::step(GameWorldStepContext& context)
             PassKey<EntityManager>(),
             context.deltaTime,
             context.engine,
+            context.game,
             context.scenes,
             context.inputs,
             context.drawing,
             context.currentScene,
             context.gameWorld,
             context.level,
-            EntitiesAccessWCurrent(this, entityPtr.get())
+            EntitiesAccessWCurrent(this, context.game, entityPtr.get()),
+            SpritesAccess(context.game.get().getSprites())
         );
 
         entityPtr->latch(entityStepContext);
@@ -54,9 +57,8 @@ EntityCollection::iterator EntityManager::getEntitiesEnd()
     return entities.end();
 }
 
-EntityReference EntityManager::addEntity(EntityClassID id)
+EntityReference EntityManager::addEntity(std::shared_ptr<Entity> entity)
 {
-	auto entity = Game::Entities::create(id);
 	if (!entity)
 		return EntityReference(nullptr); // invalid ID
 
@@ -173,13 +175,15 @@ void EntityManager::destroyScheduledEntities(GameWorldStepContext& context)
                 PassKey<EntityManager>(),
                 context.deltaTime,
                 context.engine,
+                context.game,
                 context.scenes,
                 context.inputs,
                 context.drawing,
                 context.currentScene,
                 context.gameWorld,
                 context.level,
-                EntitiesAccessWCurrent(this, it->get())
+                EntitiesAccessWCurrent(this, context.game, it->get()),
+                SpritesAccess(context.game.get().getSprites())
             );
             (*it)->onDestroy(entityStepContext);
             it = entities.erase(it);

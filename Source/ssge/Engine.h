@@ -6,6 +6,7 @@
 
 namespace ssge
 {
+	class IGame;
 	class SceneManager;
 	class WindowManager;
 	class InputManager;
@@ -16,6 +17,8 @@ namespace ssge
 
 	class Engine : public IMenuCommandSink // The game engine core
 	{
+		IGame& game;
+
 		WindowManager* window;
 		// Manages scenes
 		SceneManager* scenes;
@@ -33,7 +36,7 @@ namespace ssge
 		bool wannaFinish = false;
 		bool wannaWrapUp = false;
 	public:
-		Engine(PassKey<Program> pk);
+		Engine(PassKey<Program> pk, IGame& game);
 		Engine(const Engine& toCopy) = delete;
 		Engine(Engine&& toMove) = delete;
 		~Engine();

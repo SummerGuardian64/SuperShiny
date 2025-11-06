@@ -10,6 +10,7 @@ StepContext::StepContext(
     PassKey<Engine> /*pk*/,
     double deltaTime,
     EngineAccess engine_,
+    GameAccess game_,
     ScenesAccess scenes_,
     InputsAccess inputs_,
     DrawingAccess drawing_,
@@ -17,6 +18,7 @@ StepContext::StepContext(
 )
     : StepContextBase(deltaTime),
     engine(std::move(engine_)),
+    game(std::move(game_)),
     scenes(std::move(scenes_)),
     inputs(std::move(inputs_)),
     drawing(std::move(drawing_)),
@@ -29,6 +31,7 @@ SceneStepContext::SceneStepContext(
     PassKey<SceneManager> /*pk*/,
     double deltaTime,
     EngineAccess engine_,
+    GameAccess game_,
     ScenesAccess scenes_,
     InputsAccess inputs_,
     DrawingAccess drawing_,
@@ -37,6 +40,7 @@ SceneStepContext::SceneStepContext(
 )
     : StepContextBase(deltaTime),
     engine(std::move(engine_)),
+    game(std::move(game_)),
     scenes(std::move(scenes_)),
     inputs(std::move(inputs_)),
     drawing(std::move(drawing_)),
@@ -50,6 +54,7 @@ GameWorldStepContext::GameWorldStepContext(
     PassKey<GameWorld> /*pk*/,
     double deltaTime,
     EngineAccess engine_,
+    GameAccess game_,
     ScenesAccess scenes_,
     InputsAccess inputs_,
     DrawingAccess drawing_,
@@ -59,6 +64,7 @@ GameWorldStepContext::GameWorldStepContext(
 )
     : StepContextBase(deltaTime),
     engine(std::move(engine_)),
+    game(std::move(game_)),
     scenes(std::move(scenes_)),
     inputs(std::move(inputs_)),
     drawing(std::move(drawing_)),
@@ -73,22 +79,26 @@ EntityStepContext::EntityStepContext(
     PassKey<EntityManager> /*pk*/,
     double deltaTime,
     EngineAccess engine_,
+    GameAccess game_,
     ScenesAccess scenes_,
     InputsAccess inputs_,
     DrawingAccess drawing_,
     CurrentSceneAccess currentScene_,
     GameWorldAccess gameWorld_,
     LevelAccess level_,
-    EntitiesAccessWCurrent entitiesAndCurrent_
+    EntitiesAccessWCurrent entitiesAndCurrent_,
+    SpritesAccess sprites_
 )
     : StepContextBase(deltaTime),
     engine(std::move(engine_)),
+    game(std::move(game_)),
     scenes(std::move(scenes_)),
     inputs(std::move(inputs_)),
     drawing(std::move(drawing_)),
     currentScene(std::move(currentScene_)),
     gameWorld(std::move(gameWorld_)),
     level(std::move(level_)),
-    entities(std::move(entitiesAndCurrent_))
+    entities(std::move(entitiesAndCurrent_)),
+    sprites(std::move(sprites_))
 {
 }

@@ -3,12 +3,12 @@
 #include <memory>
 #include "../ssge/GameWorld.h"
 #include "../ssge/DrawContext.h"
+#include "../ssge/Scene.h"
+#include "SDL.h"
 
-using namespace ssge;
-
-SceneClassID TitleScreen::getSceneClassID() const
+ssge::SceneClassID TitleScreen::getSceneClassID() const
 {
-	return SceneClassID::TitleScreen;
+	return ssge::SceneClassID::TitleScreen;
 }
 
 TitleScreen::TitleScreen()
@@ -19,12 +19,12 @@ TitleScreen::~TitleScreen()
 {
 }
 
-void TitleScreen::init(SceneStepContext& context)
+void TitleScreen::init(ssge::SceneStepContext& context)
 {
 	background = SdlTexture("Backgrounds/ShinyRuns_720p.png", context.drawing.getRenderer());
 }
 
-void TitleScreen::step(SceneStepContext& context)
+void TitleScreen::step(ssge::SceneStepContext& context)
 {
 	if (!offeredMenu && context.scenes.isFadeFinished())
 	{
@@ -33,7 +33,7 @@ void TitleScreen::step(SceneStepContext& context)
 	}
 }
 
-void TitleScreen::draw(DrawContext& context)
+void TitleScreen::draw(ssge::DrawContext& context)
 {
 	SDL_Renderer* renderer = context.getRenderer();
 	SDL_Rect screenRect = context.getBounds();
