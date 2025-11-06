@@ -11,6 +11,8 @@ namespace ssge
 		SDL_Window* window;
 		SDL_Surface* windowSurface;
 		SDL_Renderer* renderer;
+		int virtualWidth;
+		int virtualHeight;
 	public:
 		WindowManager(PassKey<Engine> pk);
 		WindowManager(const WindowManager& toCopy) = delete;

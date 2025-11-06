@@ -4,7 +4,6 @@
 #include <memory>
 #include "StepContext.h"
 #include "DrawContext.h"
-#include "Game.h"
 #include <SDL.h>
 #include "PassKey.h"
 #include "MenuManager.h"
@@ -52,7 +51,7 @@ bool Engine::init(PassKey<Program> pk)
 	}
 
 	// Initialize program window
-	if (auto error = window->init(Game::APPLICATION_TITLE, 1280, 720))
+	if (auto error = window->init(game.getApplicationTitle(), game.getVirtualWidth(), game.getVirtualHeight()))
 	{
 		std::cout << error << std::endl;
 		return false;
@@ -73,7 +72,7 @@ bool Engine::init(PassKey<Program> pk)
 
 bool Engine::loadInitialResources(SDL_Renderer* renderer)
 {
-	Game::init(renderer);
+	//Game::init(renderer);
 
 	// load fonts once (SDL_ttf already initialized by Program)
 	menuTitle = TTF_OpenFont("Fonts/VCR_OSD_MONO.ttf", 28);
@@ -145,8 +144,8 @@ bool Engine::mainLoop(PassKey<Program> pk)
 {
 	SDL_Renderer* renderer = window->getRenderer();
 
-	int virtualWidth = Game::VIRTUAL_WIDTH;
-	int virtualHeight = Game::VIRTUAL_HEIGHT;
+	int virtualWidth = game.getVirtualWidth();
+	int virtualHeight = game.getVirtualHeight();
 
 	// Create a render target texture for the virtual screen.
 	SDL_Texture* gameScreen =

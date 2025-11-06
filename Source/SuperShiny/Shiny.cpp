@@ -3,7 +3,6 @@
 #include "../ssge/DrawContext.h"
 #include <iostream>
 #include <memory>
-#include "../ssge/Game.h"
 #include "../ssge/EntityManager.h"
 #include "../ssge/Utilities.h"
 #include "SDL.h"

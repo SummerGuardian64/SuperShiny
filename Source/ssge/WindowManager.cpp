@@ -1,5 +1,4 @@
 #include "WindowManager.h"
-#include "Game.h"
 #include "PassKey.h"
 
 using namespace ssge;
@@ -21,6 +20,9 @@ const char* WindowManager::init(const char* title, int width, int height)
     // Don't re-create the window!
     if (window)
         return "Window already created!";
+
+    virtualWidth = width;
+    virtualHeight = height;
 
     // Create window
     window = SDL_CreateWindow(
@@ -69,9 +71,6 @@ SDL_Renderer* WindowManager::getRenderer() const
 
 SDL_Rect WindowManager::makeBestFitScale()
 {
-    int virtualWidth = Game::VIRTUAL_WIDTH;
-    int virtualHeight = Game::VIRTUAL_HEIGHT;
-
     int windowWidth;
     int windowHeight;
     SDL_GetWindowSize(getWindow(), &windowWidth, &windowHeight);

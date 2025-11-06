@@ -3,7 +3,6 @@
 #include "../ssge/DrawContext.h"
 #include <iostream>
 #include <memory>
-#include "../ssge/Game.h"
 
 using namespace ssge;
 

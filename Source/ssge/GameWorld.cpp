@@ -1,7 +1,6 @@
 #include "GameWorld.h"
 #include <string>
 #include "DrawContext.h"
-#include "Game.h"
 #include "PassKey.h"
 #include "Accessor.h"
 #include <algorithm>
