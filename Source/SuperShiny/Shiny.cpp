@@ -171,9 +171,9 @@ void Shiny::die()
     control->ignore = true;
 }
 
-ssge::EntityClassID Shiny::getEntityClassID() const
+std::string Shiny::getEntityClassID() const
 {
-	return ssge::EntityClassID::Shiny;
+	return "Shiny";
 }
 
 void Shiny::firstStep(ssge::EntityStepContext& context)

@@ -4,16 +4,10 @@
 #include "Sprite.h"
 #include "InputPad.h"
 #include <cstdint>
+#include <string>
 
 namespace ssge
 {
-	enum class EntityClassID {
-		UNKNOWN,
-		Shiny,
-		Orb,
-		TOTAL
-	};
-
 	class EntityStepContext;
 	class DrawContext;
 
@@ -261,7 +255,7 @@ namespace ssge
 
 	public:
 		Entity();
-		virtual EntityClassID getEntityClassID() const = 0;
+		virtual std::string getEntityClassID() const = 0;
 		uint32_t getLifespan() const { return lifespan; }
 		SDL_FPoint position{ 0.0f, 0.0f };
 		std::unique_ptr<Sprite> sprite;

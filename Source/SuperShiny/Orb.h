@@ -6,7 +6,7 @@ class Orb : public ssge::Entity
 public:
 	Orb();
 	// Inherited via Entity
-	ssge::EntityClassID getEntityClassID() const override;
+	std::string getEntityClassID() const override;
 	void firstStep(ssge::EntityStepContext& context) override;
 	void preStep(ssge::EntityStepContext& context) override;
 	void postStep(ssge::EntityStepContext& context) override;

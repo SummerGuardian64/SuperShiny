@@ -11,7 +11,6 @@ namespace ssge
     class Entity;
     class EntityAllocator;
     class EntityReference;
-    enum class EntityClassID : int;
 
     class GameWorldStepContext;
     class DrawContext;
@@ -58,7 +57,7 @@ namespace ssge
 
         // Casting helper
         template<typename T>
-        T* tryCast(EntityClassID expectedID) const {
+        T* tryCast(std::string expectedID) const {
             auto sp = ref.lock();
             if (sp && sp->getEntityClassID() == expectedID) {
                 return dynamic_cast<T*>(sp.get());
@@ -166,11 +165,11 @@ namespace ssge
         EntityCollection::iterator getEntitiesEnd();
         EntityReference addEntity(std::shared_ptr<Entity> entity);
         bool deleteEntity(EntityReference entity);
-        Entity* findEntity(EntityClassID entityClassID);
-        const Entity* findConstEntity(EntityClassID entityClassID) const;
-        EntityQueryResult findAllEntities(EntityClassID entityClassID);
+        Entity* findEntity(std::string entityClassID);
+        const Entity* findConstEntity(std::string entityClassID) const;
+        EntityQueryResult findAllEntities(std::string entityClassID);
         int countAllEntities() const;
-        int countAllEntities(EntityClassID entityClassID) const;
+        int countAllEntities(std::string entityClassID) const;
         void destroyScheduledEntities(GameWorldStepContext& context);
 	};
 }

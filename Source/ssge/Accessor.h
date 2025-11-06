@@ -14,7 +14,6 @@ namespace ssge {
     class Entity;
     class Engine;
     class EntityReference;           // forward-declare the wrapper type
-    enum class EntityClassID : int;  // forward-declare the enum class
     class InputManager;
     class Scene;
     class GameWorld;

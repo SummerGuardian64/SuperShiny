@@ -85,9 +85,9 @@ Orb::Orb()
     hitbox.h = 64;
 }
 
-ssge::EntityClassID Orb::getEntityClassID() const
+std::string Orb::getEntityClassID() const
 {
-    return EntityClassID::Orb;
+    return "Orb";
 }
 
 void Orb::firstStep(ssge::EntityStepContext& context)

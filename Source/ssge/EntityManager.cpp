@@ -81,7 +81,7 @@ bool EntityManager::deleteEntity(EntityReference entity)
     }
 }
 
-Entity* EntityManager::findEntity(EntityClassID entityClassID)
+Entity* EntityManager::findEntity(std::string entityClassID)
 {
     for (auto& entity : entities)
     {
@@ -97,7 +97,7 @@ Entity* EntityManager::findEntity(EntityClassID entityClassID)
     return nullptr;
 }
 
-const Entity* EntityManager::findConstEntity(EntityClassID entityClassID) const
+const Entity* EntityManager::findConstEntity(std::string entityClassID) const
 {
     for (auto& entity : entities)
     {
@@ -113,7 +113,7 @@ const Entity* EntityManager::findConstEntity(EntityClassID entityClassID) const
     return nullptr;
 }
 
-EntityQueryResult EntityManager::findAllEntities(EntityClassID entityClassID)
+EntityQueryResult EntityManager::findAllEntities(std::string entityClassID)
 {
     EntityQueryResult foundEntities;
 
@@ -146,7 +146,7 @@ int EntityManager::countAllEntities() const
     return count;
 }
 
-int EntityManager::countAllEntities(EntityClassID entityClassID) const
+int EntityManager::countAllEntities(std::string entityClassID) const
 {
     int count = 0;
 
