@@ -31,6 +31,15 @@ void TitleScreen::step(ssge::SceneStepContext& context)
 		context.menus.openMainMenu();
 		offeredMenu = true;
 	}
+
+	if (context.inputs.isJustPressed(4))
+	{
+		context.scenes.goToLevel(1);
+	}
+	if (context.inputs.isJustPressed(7))
+	{
+		context.engine.wrapUp();
+	}
 }
 
 void TitleScreen::draw(ssge::DrawContext& context)

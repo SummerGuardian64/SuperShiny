@@ -13,7 +13,7 @@ namespace ssge {
     class EntityManager;
     class Entity;
     class Engine;
-    class EntityReference;           // forward-declare the wrapper type
+    class EntityReference;
     class InputManager;
     class Scene;
     class GameWorld;
@@ -154,6 +154,7 @@ namespace ssge {
     class MenusAccess {
         MenuManager* actual;
     public:
+        explicit MenusAccess() : actual(nullptr) {}; // TODO: Remove this later!
         explicit MenusAccess(MenuManager* actual) : actual(actual) {}
         bool isOpen() const;
         void openMainMenu();

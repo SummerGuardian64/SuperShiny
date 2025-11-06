@@ -6,7 +6,7 @@
 #include "Level.h"
 #include "GameWorld.h"
 #include "EntityManager.h"
-#include "MenuManager.h"
+//#include "MenuManager.h"
 
 using namespace ssge;
 
@@ -182,22 +182,23 @@ std::unique_ptr<ssge::Sprite> ssge::SpritesAccess::create(std::string sprdefId)
 
 bool ssge::MenusAccess::isOpen() const
 {
-	return actual->isOpen();
+	return false;
+	//return actual->isOpen();
 }
 
 void ssge::MenusAccess::openMainMenu()
 {
-	actual->pushMenu(0);
+	//actual->pushMenu(0);
 }
 
 void ssge::MenusAccess::openPauseMenu()
 {
-	actual->pushMenu(2);
+	//actual->pushMenu(2);
 }
 
 void ssge::MenusAccess::close()
 {
-	actual->close();
+	//actual->close();
 }
 
 void ssge::GameWorldAccess::reportHeroDeadth()

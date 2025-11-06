@@ -6,13 +6,13 @@
 #include "DrawContext.h"
 #include <SDL.h>
 #include "PassKey.h"
-#include "MenuManager.h"
+//#include "MenuManager.h"
 #include "WindowManager.h"
 #include "Accessor.h"
 #include <SDL_ttf.h>
-#include "MenuRenderer.h"
+//#include "MenuRenderer.h"
 #include "GameWorld.h"
-#include "../SuperShiny/TitleScreen.h" // FIXME: Decouple!
+//#include "../SuperShiny/TitleScreen.h" // FIXME: Decouple!
 
 using namespace ssge;
 
@@ -21,7 +21,7 @@ Engine::Engine(PassKey<Program> pk, IGame& game) : game(game)
 	window = new WindowManager(PassKey<Engine>());
 	scenes = new SceneManager(PassKey<Engine>());
 	inputs = new InputManager(PassKey<Engine>());
-	menus = new MenuManager(PassKey<Engine>(), *this);
+	//menus = new MenuManager(PassKey<Engine>(), *this);
 }
 
 Engine::~Engine()
@@ -78,38 +78,7 @@ bool Engine::loadInitialResources(SDL_Renderer* renderer)
 	menuTitle = TTF_OpenFont("Fonts/VCR_OSD_MONO.ttf", 28);
 	menuItem = TTF_OpenFont("Fonts/VCR_OSD_MONO.ttf", 22);
 
-	// register your menus here (or in a helper)
-	const int mainId = menus->registerMenu(Menu{
-		"SUPER SHINY",
-		{
-			{"Play",    true,true,false, MenuCommand{MenuCommandType::NewGame}},
-			{"Levels",  true,true,false, MenuCommand::PushMenu(/*level id*/1)},
-			{"Options", true,false,false, MenuCommand::PushMenu(/*opts id*/2)},
-			{"Exit",    true,true,false, MenuCommand{MenuCommandType::ExitProgram}}
-		}
-		});
-	const int levelId = menus->registerMenu(Menu{
-		"Select Level",
-		{
-			{"Radical Sunshine",  true,true,false, MenuCommand::GoToLevel(1)},
-			{"Extreme Moonlight", true,true,false, MenuCommand::GoToLevel(2)},
-			{"Back",              true,true,false, MenuCommand::Pop()}
-		}
-		});
-	const int pauseId = menus->registerMenu(Menu{
-		"Paused",
-		{
-			{"Continue", true,true,false,MenuCommand::Unpause()},
-			{"Back to Main Menu", true,true,false,MenuCommand::PushMenu(3)}
-		}
-		});
-	const int areYouSureId = menus->registerMenu(Menu{
-		"Are you sure?",
-		{
-			{"Yes", true,true,false,MenuCommand::GoToTitleScreen()},
-			{"No", true,true,false,MenuCommand::Pop()}
-		}
-		});
+	
 
 	return true;
 }
@@ -124,7 +93,7 @@ bool Engine::prepareInitialState()
 		ScenesAccess(scenes, game),
 		InputsAccess(inputs),
 		DrawingAccess(window->getRenderer()),
-		MenusAccess(menus));
+		MenusAccess(/*menus*/));
 	game.init(stepContext);
 
 	//scenes->changeScene("SplashScreen");
@@ -151,7 +120,9 @@ bool Engine::mainLoop(PassKey<Program> pk)
 	SDL_Texture* gameScreen =
 		SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET,
 			virtualWidth, virtualHeight);
-	if (!gameScreen) {
+
+	if (!gameScreen)
+	{
 		std::cout << "SDL_CreateTexture (gameScreen) error: " << SDL_GetError();
 		return false;
 	}
@@ -243,7 +214,7 @@ bool Engine::update(double deltaTime)
 		ScenesAccess(scenes, game),
 		InputsAccess(inputs),
 		DrawingAccess(window->getRenderer()),
-		MenusAccess(menus)
+		MenusAccess(/*menus*/)
 	);
 
 	scenes->step(stepContext);
@@ -257,7 +228,7 @@ bool Engine::update(double deltaTime)
 	const bool accept = inputs->pad.isJustPressed(4);
 	const bool back = inputs->pad.isJustPressed(5);
 
-	menus->handleInput(up, down, left, right, accept, back);
+	//menus->handleInput(up, down, left, right, accept, back);
 
 	//menus->step(stepContext);
 
@@ -269,15 +240,15 @@ void Engine::render(DrawContext context)
 {
 	scenes->draw(context);
 	
-	if (menus->isOpen())
-	{
-		// Draw menu over scene (HUD layer)
-		// Either give MenuManager a renderer or build a MenuRenderer here:
-		MenuRenderer mr(context.getRenderer(), menuTitle, menuItem, {/*colors/sizes*/ });
-		if (const Menu* m = menus->current()) {
-			mr.draw(*m, { 0, 80 }, context.getBounds().w);
-		}
-	}
+	//if (menus->isOpen())
+	//{
+	//	// Draw menu over scene (HUD layer)
+	//	// Either give MenuManager a renderer or build a MenuRenderer here:
+	//	MenuRenderer mr(context.getRenderer(), menuTitle, menuItem, {/*colors/sizes*/ });
+	//	if (const Menu* m = menus->current()) {
+	//		mr.draw(*m, { 0, 80 }, context.getBounds().w);
+	//	}
+	//}
 }
 
 void Engine::shutdown()
@@ -326,42 +297,4 @@ void Engine::finish()
 void Engine::wrapUp()
 {
 	wannaWrapUp = true;
-}
-
-void Engine::onMenuCommand(const MenuCommand& cmd)
-{
-	switch (cmd.type) {
-	case MenuCommandType::NewGame:
-		//FIXME: Decouple me!!!
-		scenes->changeScene(std::make_unique<GameWorld>(1));
-		menus->close(); // or pop stack if you prefer
-		break;
-	case MenuCommandType::GoToLevel:
-		//FIXME: Decouple me!!!
-		scenes->changeScene(std::make_unique<GameWorld>(cmd.param));
-		menus->close();
-		break;
-	case MenuCommandType::Unpause:
-		menus->close();
-		scenes->unpause();
-		break;
-	case MenuCommandType::GoToTitleScreen:
-		menus->close();
-		scenes->changeScene(std::make_unique<TitleScreen>());
-		break;
-	case MenuCommandType::Pop:
-		menus->popMenu();
-		break;
-	case MenuCommandType::PushMenu:
-		menus->pushMenu(cmd.param);
-		break;
-	case MenuCommandType::ExitProgram:
-		this->wrapUp(); // your graceful shutdown
-		break;
-	case MenuCommandType::Option:
-		// apply +/- adjustment to config (volume, controls) deterministically
-		// e.g. config.volume = clamp(config.volume + cmd.param, 0, 10);
-		break;
-	default: break;
-	}
 }
