@@ -48,6 +48,8 @@ public: //TODO: Encapsulate
 
     int getVirtualHeight() override;
 
+    ssge::MenuCommandEx onHavingBackedOutOfMenus(ssge::PassKey<ssge::GameAccess> pk, ssge::MenuContext& context) override;
+
     // Scenes
     class Scenes : public ssge::IGameScenes
     {
@@ -64,6 +66,7 @@ public: //TODO: Encapsulate
         static std::unique_ptr<TitleScreen> titleScreen();
 
         std::unique_ptr<ssge::Scene> createScene(ssge::PassKey<ssge::ScenesAccess> pk, std::string id) override;
+        std::string getMainMenuSceneClassID() const override;
     };
 
     Scenes scenes;

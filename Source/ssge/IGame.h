@@ -15,6 +15,9 @@ namespace ssge
     class Entity;
     class EntitiesAccess;
     class Sprite;
+    class GameAccess;
+    class MenuCommandEx;
+    class MenuContext;
 
     class IGameScenes;
     class IGameEntities;
@@ -49,6 +52,8 @@ namespace ssge
         virtual IGameEntities& getEntities(PassKey<EntitiesAccess> pk) = 0;
 
         virtual IGameSprites& getSprites() = 0;
+
+        virtual ssge::MenuCommandEx onHavingBackedOutOfMenus(PassKey<GameAccess> pk, MenuContext& context) = 0;
     };
 
     class IGameScenes
@@ -57,6 +62,7 @@ namespace ssge
         virtual ~IGameScenes() = default;
 
         virtual std::unique_ptr<Scene> createScene(PassKey<ScenesAccess> pk, std::string sceneId) = 0;
+        virtual std::string getMainMenuSceneClassID() const = 0;
     };
 
     class IGameEntities

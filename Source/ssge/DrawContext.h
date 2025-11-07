@@ -1,16 +1,18 @@
 #pragma once
 #include "SDL.h"
+#include "SDL_ttf.h"
 
 namespace ssge
 {
 	class DrawContext
 	{
-		SDL_Renderer* renderer;
-		SDL_Rect bounds;
-		SDL_Point origin;
-		double deltaTime;
-		SDL_Point scrollOffset;
-		SDL_Texture* renderTarget;
+		SDL_Renderer* renderer = nullptr;
+		SDL_Rect bounds = { 0,0 };
+		SDL_Point origin = { 0,0 };
+		double deltaTime = 0;
+		SDL_Point scrollOffset = { 0,0 };
+		SDL_Texture* renderTarget = nullptr;
+		TTF_Font* font = nullptr;
 
 	public:
 		DrawContext(SDL_Renderer* const renderer);
@@ -18,7 +20,8 @@ namespace ssge
 			const SDL_Rect bounds,
 			const SDL_Point origin,
 			const double deltaTime,
-			SDL_Texture* const renderTarget = nullptr
+			SDL_Texture* const renderTarget = nullptr,
+			TTF_Font* font = nullptr
 			);
 		DrawContext(const DrawContext& toCopy);
 		SDL_Renderer* getRenderer() const;
@@ -27,6 +30,7 @@ namespace ssge
 		double getDeltaTime() const;
 		SDL_Point getScrollOffset() const;
 		SDL_Point calculateAnchorPoint() const;
+		TTF_Font* getFont();
 
 		// Context derivation
 

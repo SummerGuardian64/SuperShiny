@@ -1,8 +1,9 @@
 #include "SuperShiny.h"
-#include "SuperShiny.h"
 #include "../ssge/Scene.h"
 #include "../ssge/StepContext.h"
 #include "../ssge/Accessor.h"
+#include "../ssge/MenuSystem.h"
+#include "../ssge/MenuContext.h"
 #include <memory>
 #include <vector>
 #include <string_view>
@@ -68,6 +69,34 @@ int SuperShiny::getVirtualHeight()
 	return 720;
 }
 
+ssge::MenuCommandEx SuperShiny::onHavingBackedOutOfMenus(ssge::PassKey<ssge::GameAccess> pk, ssge::MenuContext& context)
+{
+	ssge::MenuCommandEx cmdEx;
+
+	// TODO: Port this:
+	if (context.currentScene.getSceneClassID()=="TitleScreen") // FIXME: HARDCODED!
+	{ // If this is the main menu, ask the player do they wanna exit program
+	  
+		//Breakenzi style:
+		//previousMenus.push(currentMenu);
+	    //setMenu(Breakenzi::ConfirmExitProgram);
+
+		// TODO: Implement the menus first
+		//cmdEx.smallCmd = ssge::MenuCommand::GOTO_MENU;
+		//cmdEx.targetMenu = nullptr; // TODO: IMPLEMENT ME!
+		// 
+		// Until it's implemented, we stick to this
+		cmdEx.smallCmd = ssge::MenuCommand::EXIT_PROGRAM;
+	}
+	else
+	{ // Otherwise just close the menu
+	    //closeMenu = true;
+		cmdEx.smallCmd = ssge::MenuCommand::CLOSE_MENU;
+	}
+
+	return cmdEx;
+}
+
 ssge::IGameScenes& SuperShiny::getScenes(ssge::PassKey<ssge::ScenesAccess> pk)
 {
 	return scenes;
@@ -92,6 +121,11 @@ std::unique_ptr<ssge::Scene> SuperShiny::Scenes::createScene(ssge::PassKey<ssge:
 		return titleScreen();
 
 	else return nullptr;
+}
+
+std::string SuperShiny::Scenes::getMainMenuSceneClassID() const
+{
+	return "TitleScreen";
 }
 
 SuperShiny::Scenes::Scenes(ssge::PassKey<SuperShiny> pk) {}

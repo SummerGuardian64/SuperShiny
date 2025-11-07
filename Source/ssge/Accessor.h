@@ -18,6 +18,8 @@ namespace ssge {
     class Scene;
     class GameWorld;
     class MenuManager;
+    class MenuCommandEx;
+    class MenuContext;
 
     class EngineAccess {
         Engine* actual;
@@ -32,6 +34,7 @@ namespace ssge {
     public:
         explicit GameAccess(IGame& actual) : actual(actual) {}
         IGame& get() { return actual; }
+        MenuCommandEx onHavingBackedOutOfMenus(PassKey<MenuManager> pk, MenuContext& context);
     };
 
     class ScenesAccess {
@@ -42,6 +45,7 @@ namespace ssge {
             : actual(actual), gameScenes(game.getScenes(PassKey<ScenesAccess>())) { }
         void changeScene(std::string newSceneId);
         void goToLevel(int wantedLevel);
+        void goToMainMenu();
         void pause();
         void unpause();
         bool togglePause();

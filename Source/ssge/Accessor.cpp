@@ -6,7 +6,7 @@
 #include "Level.h"
 #include "GameWorld.h"
 #include "EntityManager.h"
-//#include "MenuManager.h"
+#include "MenuSystem.h"
 
 using namespace ssge;
 
@@ -30,6 +30,13 @@ void ssge::ScenesAccess::changeScene(std::string newSceneId)
 void ssge::ScenesAccess::goToLevel(int wantedLevel)
 {
 	actual->changeScene(std::make_unique<GameWorld>(wantedLevel));
+}
+
+void ssge::ScenesAccess::goToMainMenu()
+{
+	std::string mainMenuSceneClassID = gameScenes.getMainMenuSceneClassID();
+	if(!mainMenuSceneClassID.empty())
+		changeScene(mainMenuSceneClassID);
 }
 
 void ScenesAccess::pause()
@@ -204,4 +211,9 @@ void ssge::MenusAccess::close()
 void ssge::GameWorldAccess::reportHeroDeadth()
 {
 	currentGameWorld->reportHeroDeadth();
+}
+
+MenuCommandEx ssge::GameAccess::onHavingBackedOutOfMenus(PassKey<MenuManager> pk, MenuContext& context)
+{
+	return actual.onHavingBackedOutOfMenus(PassKey<GameAccess>(), context);
 }

@@ -24,13 +24,15 @@ DrawContext::DrawContext(
 	const SDL_Rect bounds,
 	const SDL_Point origin,
 	const double deltaTime,
-	SDL_Texture* const renderTarget
+	SDL_Texture* const renderTarget,
+	TTF_Font* font
 	) :
 	renderer(renderer),
 	bounds(bounds),
 	origin(origin),
 	deltaTime(deltaTime),
-	renderTarget(renderTarget)
+	renderTarget(renderTarget),
+	font(font)
 { }
 
 DrawContext::DrawContext(const DrawContext& toCopy)
@@ -74,6 +76,11 @@ SDL_Point DrawContext::calculateAnchorPoint() const
 	anchor.x -= scrollOffset.x;
 	anchor.y -= scrollOffset.y;
 	return anchor;
+}
+
+TTF_Font* ssge::DrawContext::getFont()
+{
+	return font;
 }
 
 DrawContext DrawContext::clone() const

@@ -6,6 +6,7 @@ using namespace ssge;
 MenuContext::MenuContext(
 	PassKey<GameWorld> pk,
 	EngineAccess engine,
+	GameAccess game,
 	ScenesAccess scenes,
 	InputsAccess inputs,
 	DrawingAccess drawing,
@@ -15,6 +16,7 @@ MenuContext::MenuContext(
 	LevelAccess level
 ) :
 	engine(engine),
+	game(game),
 	scenes(scenes),
 	inputs(inputs),
 	drawing(drawing),

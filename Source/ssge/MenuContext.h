@@ -8,6 +8,7 @@ namespace ssge
     class MenuContext {
     public:
         EngineAccess engine;
+        GameAccess game;
         ScenesAccess scenes;
         InputsAccess inputs;
         DrawingAccess drawing;
@@ -19,6 +20,7 @@ namespace ssge
         explicit MenuContext(
             PassKey<GameWorld> pk,
             EngineAccess engine,
+            GameAccess game,
             ScenesAccess scenes,
             InputsAccess inputs,
             DrawingAccess drawing,
