@@ -39,7 +39,7 @@ Orb::Orb()
     abilities.jumpSpeed = 10;
     abilities.jumpStrength = 13;
     abilities.swimPower = 5;
-    abilities.gravity = 0.7;
+    abilities.gravity = 0.7f;
 
     //physics->gravityInWater = 0.1;
 

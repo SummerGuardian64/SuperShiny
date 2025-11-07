@@ -28,7 +28,7 @@ namespace ssge
 		SceneManager(SceneManager&& toMove) = delete;
 
 		void step(StepContext& context);
-		void draw(DrawContext& context);
+		void draw(DrawContext& context) const;
 		void wrapUp();
 
 		Scene* getCurrentScene() const;

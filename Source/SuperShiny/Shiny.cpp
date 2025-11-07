@@ -43,7 +43,7 @@ void Shiny::animate(ssge::EntityStepContext& context)
         {
             // Linear-interpolate walking animation speed
             // FIXME: Tweak me!
-            int lerp = abs(physics->velocity.x) / physics->abilities.maxSpeedHor * 100;
+            int lerp = (int)(abs(physics->velocity.x) / physics->abilities.maxSpeedHor * 100);
             sprite->setLerp(lerp);
 
             // We wanna walk
@@ -102,7 +102,7 @@ Shiny::Shiny()
     abilities.jumpSpeed = 9;
     abilities.jumpStrength = 15;
     abilities.swimPower = 5;
-    abilities.gravity = 0.7;
+    abilities.gravity = 0.7f;
 
     // Refactor these into their own abilities
 
@@ -205,7 +205,7 @@ void Shiny::preStep(ssge::EntityStepContext& context)
     if (isDying())
     {
         SDL_Rect levelBounds = context.level.calculateLevelSize();
-        int tipOfTheHead = position.y + hitbox.y;
+        int tipOfTheHead = (int)(position.y + hitbox.y);
         if (tipOfTheHead >= levelBounds.h)
         {
             context.gameWorld.reportHeroDeadth();

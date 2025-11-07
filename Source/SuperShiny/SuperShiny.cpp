@@ -133,7 +133,7 @@ ssge::MenuCommandEx SuperShiny::onHavingBackedOutOfMenus(ssge::PassKey<ssge::Gam
 	    //setMenu(Breakenzi::confirmExitProgram);
 
 		// TODO: Implement the menus first
-		cmdEx.smallCmd = ssge::MenuCommand::GOTO_MENU;
+		cmdEx.smallCmd = ssge::MenuCommand::SUB_MENU;
 		cmdEx.targetMenu = &menus.confirmExitProgram; // TODO: IMPLEMENT ME!
 		// 
 		// Until it's implemented, we stick to this

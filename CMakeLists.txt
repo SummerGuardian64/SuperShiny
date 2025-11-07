@@ -70,16 +70,6 @@ foreach(OUTPUTCONFIG Debug Release RelWithDebInfo MinSizeRel)
   )
 endforeach()
 
-if (MSVC)
-  target_compile_options(SuperShiny PRIVATE
-    $<$<CONFIG:Debug>:/Zi>         # full debug info in .obj
-  )
-  target_link_options(SuperShiny PRIVATE
-    $<$<CONFIG:Debug>:/DEBUG:FULL> # generate full .pdb
-    $<$<CONFIG:Debug>:/INCREMENTAL> # helpful for JIT debugging
-  )
-endif()
-
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET SuperShiny PROPERTY CXX_STANDARD 17)
   set_property(TARGET SuperShiny PROPERTY CXX_STANDARD_REQUIRED ON)

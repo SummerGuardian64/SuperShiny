@@ -26,6 +26,7 @@ namespace ssge
 		, rows(rws)
 		, blockSize(blkSize)
 		, tileset(std::move(tex))
+		, nextSection(0)
 	{
 		const std::size_t count = static_cast<std::size_t>(columns) * static_cast<std::size_t>(rows);
 		array = (count > 0) ? new Block[count] : nullptr;
@@ -79,6 +80,7 @@ namespace ssge
 		, throughBottomLeft(other.throughBottomLeft)
 		, throughBottom(other.throughBottom)
 		, throughBottomRight(other.throughBottomRight)
+		, nextSection(other.nextSection)
 	{
 		other.array = nullptr;
 
@@ -143,16 +145,16 @@ namespace ssge
 	Level::Block* Level::getBlockAt(SDL_FPoint point)
 	{
 		if (!array || !inBoundsPt(point)) return nullptr;
-		const int c = point.x / blockSize.w;
-		const int r = point.y / blockSize.h;
+		const int c = (int)point.x / blockSize.w;
+		const int r = (int)point.y / blockSize.h;
 		return getBlockAt(Block::Coords(c, r));
 	}
 
 	const Level::Block* Level::getConstBlockAt(SDL_FPoint point) const
 	{
 		if (!array || !inBoundsPt(point)) return nullptr;
-		const int c = point.x / blockSize.w;
-		const int r = point.y / blockSize.h;
+		const int c = (int)point.x / blockSize.w;
+		const int r = (int)point.y / blockSize.h;
 		return getConstBlockAt(Block::Coords(c, r));
 	}
 
@@ -319,8 +321,8 @@ namespace ssge
 
 	Level::BlockQuery Level::queryBlock(SDL_FPoint positionInLevel) const
 	{
-		int column = worldToCol((int)positionInLevel.x, blockSize.w);
-		int row = worldToRow((int)positionInLevel.y, blockSize.h);
+		int column = worldToCol(std::floor(positionInLevel.x), blockSize.w);
+		int row = worldToRow(std::floor(positionInLevel.y), blockSize.h);
 		return queryBlock(column, row);
 	}
 
@@ -778,8 +780,8 @@ namespace ssge
 			for (int i = 0; i < spawnEntries; i++)
 			{
 				Spawn entry;
-				entry.where.x = std::stoi(getValue("SpawnList", "Spawn" + std::to_string(i) + "X"));
-				entry.where.y = std::stoi(getValue("SpawnList", "Spawn" + std::to_string(i) + "Y"));
+				entry.where.x = (float)std::stoi(getValue("SpawnList", "Spawn" + std::to_string(i) + "X"));
+				entry.where.y = (float)std::stoi(getValue("SpawnList", "Spawn" + std::to_string(i) + "Y"));
 				entry.what = getValue("SpawnList", "Spawn" + std::to_string(i) + "Entity");
 				entry.callback = getValue("SpawnList", "Spawn" + std::to_string(i) + "Callback");
 				spawnList.push_back(entry);
@@ -884,7 +886,7 @@ namespace ssge
 	{
 		try
 		{
-			int colonIndex = blockItemValue.find(':');
+			auto colonIndex = blockItemValue.find(':');
 			if (colonIndex <= 0)
 			{
 				return parseCollision(blockItemValue);
@@ -901,8 +903,8 @@ namespace ssge
 	{
 		try
 		{
-			int colonIndex = blockItemValue.find(':');
-			int endOfNumber = blockItemValue.find('@');
+			auto colonIndex = blockItemValue.find(':');
+			auto endOfNumber = blockItemValue.find('@');
 			std::string numberSubstring;
 			if (endOfNumber == -1)
 			{
@@ -925,7 +927,7 @@ namespace ssge
 	{
 		try
 		{
-			int monkeyIndex = blockItemValue.find('@');
+			auto monkeyIndex = blockItemValue.find('@');
 			if (monkeyIndex == -1)
 			{
 				// No callback here

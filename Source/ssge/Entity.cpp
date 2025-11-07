@@ -29,12 +29,12 @@ Entity::Physics::Physics(Entity& entity)
 {
 }
 
-inline SDL_FRect makeWorldAABB(const SDL_FPoint& pos, const SDL_FRect& localHitbox)
+inline static SDL_FRect makeWorldAABB(const SDL_FPoint& pos, const SDL_FRect& localHitbox)
 {
     return SDL_FRect{ pos.x + localHitbox.x, pos.y + localHitbox.y, localHitbox.w, localHitbox.h };
 }
 
-inline void applyResolvedWorldAABBToEntity(SDL_FPoint& pos, const SDL_FRect& localHitbox, const SDL_FRect& worldAABB)
+inline static void applyResolvedWorldAABBToEntity(SDL_FPoint& pos, const SDL_FRect& localHitbox, const SDL_FRect& worldAABB)
 {
     // localHitbox is relative to pos, so pos = worldBox - localOffset
     pos.x = floor(worldAABB.x - localHitbox.x);
@@ -67,7 +67,7 @@ void Entity::Physics::step(EntityStepContext& context)
         }
         // Set accelleration, deccelleration and maximum speeds
         // And also, offer jump
-        int situation = grounded | (inWater << 2);
+        int situation = (grounded ? 1 : 0) | (inWater << 2);
         switch (situation)
         {
         case 0: // In air
@@ -184,7 +184,7 @@ void Entity::Physics::step(EntityStepContext& context)
             // Try swimming in water
             if (inWater && abilities.canSwim())
             {
-                int swimSpeed = -abilities.swimPower;
+                float swimSpeed = -abilities.swimPower;
                 if (velocity.y > swimSpeed)
                 {
                     velocity.y = swimSpeed;
@@ -413,7 +413,7 @@ void Entity::Physics::step(EntityStepContext& context)
     }
 }
 
-Entity::NPC::NPC(Entity& entity) : entity(entity)
+Entity::NPC::NPC(Entity& entity) : entity(entity), directInputs(0)
 {
 }
 
@@ -495,7 +495,7 @@ ssge::InputPad ssge::Entity::getPad()
     {
         return ctrl->getPad();
     }
-    else InputPad();
+    else return InputPad();
 }
 
 ssge::Entity::Physics* ssge::Entity::getPhysics()

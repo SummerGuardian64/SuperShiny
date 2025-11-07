@@ -95,7 +95,7 @@ void SceneManager::step(StepContext& context)
 	}
 }
 
-void SceneManager::draw(DrawContext& context)
+void SceneManager::draw(DrawContext& context) const
 {
 	//std::cout << "SceneManager::draw()" << std::endl;
 	// Draw current scene

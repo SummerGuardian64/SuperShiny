@@ -1,6 +1,4 @@
 #include "MenuSystem.h"
-#include "MenuSystem.h"
-#include "MenuSystem.h"
 #include "MenuContext.h"
 #include "DrawContext.h"
 #include <algorithm>
@@ -38,7 +36,7 @@ MenuCommand::MenuCommand(const MenuCommand& toCopy)
 	_cmd = toCopy._cmd;
 }
 
-MenuCommand::MenuCommand(MenuCommand&& toMove)
+MenuCommand::MenuCommand(MenuCommand&& toMove) noexcept
 {
 	_cmd = toMove._cmd;
 	toMove._cmd = NOTHING;
@@ -575,7 +573,7 @@ void MenuManager::step(MenuContext& context)
             closeMenu = true;
             break;
 
-        case MenuCommand::GOTO_MENU:
+        case MenuCommand::SET_MENU:
             // Go to the specified target menu
             if (!currentMenuItem)break; // Validate item
             if (!cmdEx.targetMenu)break; // Validate target pointer

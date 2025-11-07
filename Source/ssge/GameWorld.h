@@ -27,6 +27,7 @@ namespace ssge
     public:
         GameWorld();
         GameWorld(int wantedLevel);
+        static GameWorld* tryCast(Scene* scene);
         Scene& getAsScene();
         EntityManager entities;
         std::unique_ptr<Level> level;
@@ -38,7 +39,7 @@ namespace ssge
         void finishGameplay();
         int getWantedLevel() const;
         SDL_FRect getConstConfines() const;
-        SDL_FRect getConfines();
+        SDL_FRect getConfines() const;
         void setConfines(SDL_FRect confines);
         //sf::Vector2i getMousePosition();
         //std::weak_ptr<Ball> spawnNewBall();

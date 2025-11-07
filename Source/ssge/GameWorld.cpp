@@ -50,6 +50,13 @@ GameWorld::GameWorld(int wantedLevel) : levelLoader(PassKey<GameWorld>())
     this->wantedLevel = wantedLevel;
 }
 
+GameWorld* ssge::GameWorld::tryCast(Scene* scene)
+{
+    if (scene->getSceneClassID() != "GameWorld")
+        return dynamic_cast<GameWorld*>(scene);
+    else return nullptr;
+}
+
 Scene& ssge::GameWorld::getAsScene()
 {
     return *this;
@@ -80,7 +87,7 @@ SDL_FRect GameWorld::getConstConfines() const
 	return confines;
 }
 
-SDL_FRect GameWorld::getConfines()
+SDL_FRect GameWorld::getConfines() const
 {
 	return confines;
 }
@@ -250,8 +257,8 @@ void GameWorld::draw(DrawContext& context)
 
     // Default scroll offset is at half of the screen size
     SDL_Rect screenSize = context.getBounds();
-    SDL_FRect halfScreen{ 0, 0, screenSize.w / 2,screenSize.h / 2 };
-    SDL_FPoint centerPoint{ halfScreen.w,halfScreen.h };
+    SDL_Rect halfScreen{ 0, 0, screenSize.w / 2,screenSize.h / 2 };
+    SDL_Point centerPoint{ halfScreen.w,halfScreen.h };
 
     // If level exists, base scrolling off of it and draw it.
     if (level)
@@ -265,12 +272,12 @@ void GameWorld::draw(DrawContext& context)
         if (levelSize.w < screenSize.w)
             centerPoint.x = levelSize.w / 2;
         else
-            centerPoint.x = std::clamp(scrollTarget.x, halfScreen.w, levelSize.w - halfScreen.w);
+            centerPoint.x = std::clamp((int)scrollTarget.x, halfScreen.w, levelSize.w - halfScreen.w);
 
         if (levelSize.h < screenSize.h)
             centerPoint.y = levelSize.h / 2;
         else
-            centerPoint.y = std::clamp(scrollTarget.y, halfScreen.h, levelSize.h - halfScreen.h);
+            centerPoint.y = std::clamp((int)scrollTarget.y, halfScreen.h, levelSize.h - halfScreen.h);
 
         // View offset (top-left in world)
         SDL_Point viewOffset{

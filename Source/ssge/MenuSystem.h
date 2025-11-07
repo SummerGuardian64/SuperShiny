@@ -29,7 +29,7 @@ namespace ssge
         static const int MAIN_MENU = -6;
         static const int CLOSE_MENU = -7;
         static const int EXIT_PROGRAM = -8;
-        static const int GOTO_MENU = -9;
+        static const int SET_MENU = -9;
         static const int MAKE_ROOT = -10;
         static const int SUB_MENU = -11;
         static const int POP_AND_GOTO = -12;
@@ -43,7 +43,7 @@ namespace ssge
         bool operator==(MenuCommand& other);
         MenuCommand(int command = MenuCommand::NOTHING);
         MenuCommand(const MenuCommand& toCopy);
-        MenuCommand(MenuCommand&& toMove);
+        MenuCommand(MenuCommand&& toMove) noexcept;
         operator int() const;
     };
 

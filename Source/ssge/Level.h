@@ -103,7 +103,7 @@ namespace ssge
 			{
 				// Tile to draw. -1 = Don't draw
 				int tileIndex = -1;
-				Collision collision;
+				Collision collision = Collision::Air;
 				std::string callback;
 				//TODO: Harden with PassKey
 				Definition() = default;
@@ -158,11 +158,13 @@ namespace ssge
 				if (columns == 0 || index == -1)
 					return SDL_Rect{ 0,0,0,0 };
 
-				SDL_Rect rect;
-				rect.w = tileW;
-				rect.h = tileH;
-				rect.x = (index % columns) * tileW;
-				rect.y = (index / columns) * tileH;
+				SDL_Rect rect{
+					(index % columns) * tileW, // rect.x
+					(index / columns) * tileH, // rect.y
+					tileW, // rect.w
+					tileH // rect.h
+				};
+
 				return rect;
 			}
 		};
@@ -323,7 +325,7 @@ namespace ssge
 		public:
 			struct Spawn
 			{
-				SDL_FPoint where;
+				SDL_FPoint where = { 0,0 };
 				std::string what;
 				std::string callback;
 			};

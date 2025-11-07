@@ -257,25 +257,32 @@ bool Engine::update(double deltaTime)
 	const bool accept = inputs->pad.isJustPressed(4);
 	const bool back = inputs->pad.isJustPressed(5);
 
-	//menus->handleInput(up, down, left, right, accept, back);
-
-	MenuContext menuContext(
-		PassKey<Engine>(),
-		EngineAccess(this),
-		GameAccess(game),
-		WindowAccess(window),
-		ScenesAccess(scenes, game),
-		InputsAccess(inputs),
-		DrawingAccess(window->getRenderer()),
-		MenusAccess(menus),
-		CurrentSceneAccess(nullptr),
-		GameWorldAccess(nullptr),
-		LevelAccess(nullptr)
-	);
-
 	game.step(stepContext);
 
-	menus->step(menuContext);
+	{ // Prepare MenuContext
+		Scene* currentScene = scenes->getCurrentScene();
+		GameWorld* gameWorld = GameWorld::tryCast(currentScene);
+		Level* level = nullptr;
+		if (gameWorld)
+		{
+			level = gameWorld->level.get();
+		}
+		MenuContext menuContext(
+			PassKey<Engine>(),
+			EngineAccess(this),
+			GameAccess(game),
+			WindowAccess(window),
+			ScenesAccess(scenes, game),
+			InputsAccess(inputs),
+			DrawingAccess(window->getRenderer()),
+			MenusAccess(menus),
+			CurrentSceneAccess(currentScene),
+			GameWorldAccess(gameWorld),
+			LevelAccess(level)
+		);
+
+		menus->step(menuContext);
+	}
 
 	// Let this be the final update if we're finished
 	return !wannaFinish;

@@ -29,7 +29,7 @@ bool ssge::EngineAccess::isWrappingUp() const
 {
 	if (!actual)return false;
 
-	actual->isWrappingUp();
+	return actual->isWrappingUp();
 }
 
 void ssge::ScenesAccess::changeScene(std::string newSceneId)
@@ -305,7 +305,7 @@ void ssge::MenusAccess::close()
 
 void ssge::GameWorldAccess::reportHeroDeadth()
 {
-	currentGameWorld->reportHeroDeadth();
+	if(currentGameWorld) currentGameWorld->reportHeroDeadth();
 }
 
 MenuCommandEx ssge::GameAccess::onHavingBackedOutOfMenus(PassKey<MenuManager> pk, MenuContext& context)
