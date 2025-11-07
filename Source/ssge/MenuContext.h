@@ -5,6 +5,8 @@
 
 namespace ssge
 {
+    class Engine;
+
     class MenuContext {
     public:
         EngineAccess engine;
@@ -18,7 +20,7 @@ namespace ssge
         LevelAccess level;
 
         explicit MenuContext(
-            PassKey<GameWorld> pk,
+            PassKey<Engine> pk,
             EngineAccess engine,
             GameAccess game,
             ScenesAccess scenes,

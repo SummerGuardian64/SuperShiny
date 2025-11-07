@@ -4,7 +4,7 @@
 using namespace ssge;
 
 MenuContext::MenuContext(
-	PassKey<GameWorld> pk,
+	PassKey<Engine> pk,
 	EngineAccess engine,
 	GameAccess game,
 	ScenesAccess scenes,

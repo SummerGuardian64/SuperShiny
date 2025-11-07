@@ -6,13 +6,12 @@
 #include "DrawContext.h"
 #include <SDL.h>
 #include "PassKey.h"
-//#include "MenuManager.h"
+#include "MenuSystem.h"
 #include "WindowManager.h"
 #include "Accessor.h"
 #include <SDL_ttf.h>
-//#include "MenuRenderer.h"
 #include "GameWorld.h"
-//#include "../SuperShiny/TitleScreen.h" // FIXME: Decouple!
+#include "MenuContext.h"
 
 using namespace ssge;
 
@@ -21,7 +20,7 @@ Engine::Engine(PassKey<Program> pk, IGame& game) : game(game)
 	window = new WindowManager(PassKey<Engine>());
 	scenes = new SceneManager(PassKey<Engine>());
 	inputs = new InputManager(PassKey<Engine>());
-	//menus = new MenuManager(PassKey<Engine>(), *this);
+	menus = new MenuManager(PassKey<Engine>());
 }
 
 Engine::~Engine()
@@ -93,7 +92,7 @@ bool Engine::prepareInitialState()
 		ScenesAccess(scenes, game),
 		InputsAccess(inputs),
 		DrawingAccess(window->getRenderer()),
-		MenusAccess(/*menus*/));
+		MenusAccess(menus));
 	game.init(stepContext);
 
 	//scenes->changeScene("SplashScreen");
@@ -214,7 +213,7 @@ bool Engine::update(double deltaTime)
 		ScenesAccess(scenes, game),
 		InputsAccess(inputs),
 		DrawingAccess(window->getRenderer()),
-		MenusAccess(/*menus*/)
+		MenusAccess(menus)
 	);
 
 	scenes->step(stepContext);
@@ -230,7 +229,20 @@ bool Engine::update(double deltaTime)
 
 	//menus->handleInput(up, down, left, right, accept, back);
 
-	//menus->step(stepContext);
+	MenuContext menuContext(
+		PassKey<Engine>(),
+		EngineAccess(this),
+		GameAccess(game),
+		ScenesAccess(scenes, game),
+		InputsAccess(inputs),
+		DrawingAccess(window->getRenderer()),
+		MenusAccess(menus),
+		CurrentSceneAccess(nullptr),
+		GameWorldAccess(nullptr),
+		LevelAccess(nullptr)
+	);
+
+	menus->step(menuContext);
 
 	// Let this be the final update if we're finished
 	return !wannaFinish;
@@ -240,15 +252,7 @@ void Engine::render(DrawContext context)
 {
 	scenes->draw(context);
 	
-	//if (menus->isOpen())
-	//{
-	//	// Draw menu over scene (HUD layer)
-	//	// Either give MenuManager a renderer or build a MenuRenderer here:
-	//	MenuRenderer mr(context.getRenderer(), menuTitle, menuItem, {/*colors/sizes*/ });
-	//	if (const Menu* m = menus->current()) {
-	//		mr.draw(*m, { 0, 80 }, context.getBounds().w);
-	//	}
-	//}
+	menus->draw(context);
 }
 
 void Engine::shutdown()

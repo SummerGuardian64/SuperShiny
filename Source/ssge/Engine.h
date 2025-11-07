@@ -9,7 +9,7 @@ namespace ssge
 	class SceneManager;
 	class WindowManager;
 	class InputManager;
-	//class MenuManager;
+	class MenuManager;
 	class Scene;
 	class Program;
 	class DrawContext;
@@ -26,7 +26,7 @@ namespace ssge
 		// Manages resources
 		//ResourceManager resources;
 		// Manages menus
-		//MenuManager* menus;
+		MenuManager* menus;
 
 		// fonts for menus (init once)
 		TTF_Font* menuTitle = nullptr;
