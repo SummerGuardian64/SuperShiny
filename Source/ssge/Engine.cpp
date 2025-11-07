@@ -113,10 +113,12 @@ bool Engine::mainLoop(PassKey<Program> pk)
 {
 	SDL_Renderer* renderer = window->getRenderer();
 
-	int virtualWidth = game.getVirtualWidth();
-	int virtualHeight = game.getVirtualHeight();
+	const int virtualWidth = game.getVirtualWidth();
+	const int virtualHeight = game.getVirtualHeight();
 
 	// Create a render target texture for the virtual screen.
+	// TODO: If render targets aren’t supported on some old GPUs, consider the
+	// "logical size" approach shown below. For now we keep your target.
 	SDL_Texture* gameScreen =
 		SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET,
 			virtualWidth, virtualHeight);
@@ -127,39 +129,64 @@ bool Engine::mainLoop(PassKey<Program> pk)
 		return false;
 	}
 
+	// Fixed timestep
+	const double fps = 60.0;
+	const Uint32 deltaTimeMS = (Uint32)(1000.0 / fps + 0.5); // 16 or 17 ms
+	const Uint32 MAX_STEPS = 5;                        // frameskip cap
+
+	Uint32 prevTicks = SDL_GetTicks();
+	Uint32 accumulatorMS = 0;
+
 	bool done = false;
-	double fps = 60.0f;
-	double frameDuration = 1.0f / fps;
-	Uint32 lastTicks = SDL_GetTicks();
+
+	// TODO: After the con, let this be MainLoop to please Emscripten.
+	//       Place the surrounding code into something like beforeMainLoop and afterMainLoop.
 	while (!done)
 	{
 		handleEvents();
 
-		Uint32 currentTicks = SDL_GetTicks();
-		float deltaTime = (currentTicks - lastTicks) / 1000.0f;
-		if (deltaTime >= frameDuration)
+		// Update time passed
+		Uint32 now = SDL_GetTicks();
+		Uint32 frameMS = now - prevTicks;
+		prevTicks = now;
+
+		// Clamp huge stalls (alt-tab, breakpoint, etc.)
+		if (frameMS > 250) frameMS = 250;
+
+		// Accumulate time
+		accumulatorMS += frameMS;
+
+		// Prevent spiral of deadth by limiting frameskip to MAX_STEPS
+		unsigned steps = 0;
+		while (accumulatorMS >= deltaTimeMS && steps < MAX_STEPS)
 		{
-			lastTicks -= frameDuration;
+			const double dt = (double)deltaTimeMS / 1000.0f;
 
 			// Update the engine and see if it's done (wants to quit)
-			done |= !update(frameDuration);
-
-			// Render the game onto the virtual gameScreen texture.
-			SDL_SetRenderTarget(renderer, gameScreen);
-			render(DrawContext(renderer));
-			SDL_SetRenderTarget(renderer, NULL);
-
-			// Clear the window (black background for letterboxing).
-			SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-			SDL_RenderClear(renderer);
-
-			// Render the gameScreen texture scaled to best fit the window.
-			SDL_Rect fitRect = window->makeBestFitScale();
-			SDL_RenderCopy(renderer, gameScreen, NULL, &fitRect);
-
-			SDL_RenderPresent(renderer);
+			done |= !update(dt);
+			accumulatorMS -= deltaTimeMS;
+			steps++;
 		}
+
+		// Render the game onto the virtual gameScreen texture.
+		SDL_SetRenderTarget(renderer, gameScreen);
+		render(DrawContext(renderer));
+		SDL_SetRenderTarget(renderer, nullptr);
+
+		// Clear the window (black background for letterboxing).
+		SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+		SDL_RenderClear(renderer);
+
+		// Render the gameScreen texture scaled to best fit the window.
+		SDL_Rect fitRect = window->makeBestFitScale();
+		SDL_RenderCopy(renderer, gameScreen, nullptr, &fitRect);
+
+		SDL_RenderPresent(renderer);
+
+		// Cooperative yield (keeps XP/old drivers happy)
+		SDL_Delay(0);
 	}
+
 	SDL_DestroyTexture(gameScreen);
 
 	return false;
