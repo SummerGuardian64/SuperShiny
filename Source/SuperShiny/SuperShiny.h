@@ -1,11 +1,13 @@
 #pragma once
 #include "../ssge/IGame.h"
 #include "../ssge/PassKey.h"
+#include "../ssge/MenuSystem.h"
 
 class Scene;
 class ScenesAccess;
 class Entity;
 class EntitiesAccess;
+class MenuHeader;
 
 // GAMEDEV: Please forward-declare your scenes here
 
@@ -116,5 +118,42 @@ public: //TODO: Encapsulate
 
     Sprites sprites;
     ssge::IGameSprites& getSprites() override;
+
+    class Config;
+
+    class Menus
+    {
+        ssge::MenuHeader mainMenu;
+        ssge::MenuHeader pauseMenu;
+        ssge::MenuHeader gameOverMenu;
+        ssge::MenuHeader levelCompleteMenu;
+        ssge::MenuHeader victoryMenu;
+        ssge::MenuHeader highScoreMenu;
+        ssge::MenuHeader confirmExitProgram;
+        ssge::MenuHeader optionsMenu;
+        ssge::MenuHeader confirmRestart;
+        ssge::MenuHeader confirmExitGame;
+        ssge::MenuHeader levelSelect;
+        ssge::MenuHeader friendlyReminderReset;
+        ssge::MenuHeader friendlyReminderExit;
+
+        int levelSelectorInt = 1;
+
+    public:
+        void init(SuperShiny::Config& config);
+        static void refreshHighScoreMenu(int direction);
+    };
+
+    Menus menus;
+
+    class Config
+    {
+    public:
+        int sfxVolume = 100;
+        int musicVolume = 100;
+        int resolutionScaleConfig = 1;
+    };
+
+    Config config;
 
 };

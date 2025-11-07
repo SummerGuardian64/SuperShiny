@@ -17,6 +17,8 @@
 #include "Shiny.h"
 #include "Orb.h"
 
+using namespace ssge;
+
 SuperShiny SuperShiny::makeGame()
 {
 	static bool alreadyCreated = false;
@@ -38,6 +40,7 @@ void SuperShiny::init(ssge::StepContext& context)
 	sprites.load("Shiny", renderer);
 	sprites.load("Orb", renderer);
 	context.scenes.changeScene("SplashScreen");
+	menus.init(config);
 }
 
 void SuperShiny::step(ssge::StepContext& context)
@@ -79,7 +82,7 @@ ssge::MenuCommandEx SuperShiny::onHavingBackedOutOfMenus(ssge::PassKey<ssge::Gam
 	  
 		//Breakenzi style:
 		//previousMenus.push(currentMenu);
-	    //setMenu(Breakenzi::ConfirmExitProgram);
+	    //setMenu(Breakenzi::confirmExitProgram);
 
 		// TODO: Implement the menus first
 		//cmdEx.smallCmd = ssge::MenuCommand::GOTO_MENU;
@@ -243,4 +246,99 @@ ssge::Sprite::Definition* SuperShiny::Sprites::fetchDefinitionNonConst(std::stri
 		return &sprdefOrb;
 
 	return nullptr;
+}
+
+void SuperShiny::Menus::init(SuperShiny::Config& config)
+{
+	// Compose other menus
+	optionsMenu.setTitle("Options");
+	confirmRestart.setTitle("Caution!");
+	confirmExitGame.setTitle("Warning!");
+	levelSelect.setTitle("Level Select");
+	friendlyReminderReset.setTitle("Friendly reminder");
+	friendlyReminderExit.setTitle("Friendly reminder");
+
+	// Create the exit menu header
+	confirmExitProgram.setTitle("Exit?");
+
+	// Create the high score menu header
+	highScoreMenu.setTitle("High Score");
+
+	// Compose the main menu
+	mainMenu.setTitle("Breakenzi");
+	mainMenu.newItem_NewGame("Start Game");
+	mainMenu.newItem_SubMenu("Level Select", &levelSelect);
+	mainMenu.newItem("Super Duper Secret Menu")->visible = false;
+	mainMenu.newItem_SubMenu("High Score", &highScoreMenu, (MenuFunction)refreshHighScoreMenu);
+	mainMenu.newItem_SubMenu("Options", &optionsMenu);
+	mainMenu.newItem_SubMenu("Exit", &confirmExitProgram);
+	mainMenu.newLabel("Created by Summer Guardian 64");
+	mainMenu.newLabel("Thank you for playing!");
+
+	optionsMenu.newItem_IntSetting("Sound Volume:", &config.sfxVolume, 0, 100);
+	optionsMenu.newItem_IntSetting("Music Volume:", &config.musicVolume, 0, 100);
+	optionsMenu.newItem_IntSetting("Resolution Upscale:", &config.resolutionScaleConfig, 1, 4);
+	optionsMenu.newItem_GoBack("Back");
+
+	confirmRestart.newLabel("Restarting a level will discard unsaved score!");
+	confirmRestart.newLabel("Are you sure you want to restart this level?");
+	confirmRestart.newItem_RestartLevel("Yes");
+	confirmRestart.newItem_GoBack("No");
+
+	confirmExitGame.newLabel("Exiting the game will discard unsaved score!");
+	confirmExitGame.newLabel("Are you sure you want to return to the main menu?");
+	confirmExitGame.newItem_MainMenu("Yes");
+	confirmExitGame.newItem_GoBack("No");
+
+	confirmExitProgram.newLabel("Are you sure you want to exit Breakenzi?");
+	confirmExitProgram.newItem_ExitProgram("Yes");
+	confirmExitProgram.newItem_GoBack("No");
+
+	levelSelect.newItem_IntSetting("Level", &levelSelectorInt, 0, 10, MenuCommand::GOTO_LEVEL);
+	levelSelect.newItem("Start Game")->command = MenuCommand::GOTO_LEVEL;
+	levelSelect.newItem_GoBack("Back");
+
+	// Compose the pause menu
+	pauseMenu.setTitle("Pause");
+	pauseMenu.newItem_CloseMenu("Resume");
+	pauseMenu.newItem_SubMenu("Restart Level", &confirmRestart);
+	pauseMenu.newItem_SubMenu("High Score", &highScoreMenu, (MenuFunction)&refreshHighScoreMenu);
+	pauseMenu.newItem_SubMenu("Options", &optionsMenu);
+	pauseMenu.newItem_SubMenu("Go To Main Menu", &confirmExitGame);
+
+	// Compose the game over menu
+	gameOverMenu.setTitle("Game Over");
+	gameOverMenu.newItem_SubMenu("High Score", &highScoreMenu, (MenuFunction)&refreshHighScoreMenu);
+	gameOverMenu.newItem_RestartLevel("Try Again");
+	gameOverMenu.newItem_NewGame("Start Over");
+	gameOverMenu.newItem_SubMenu("Options", &optionsMenu);
+	gameOverMenu.newItem_SubMenu("Go To Main Menu", &confirmExitGame);
+
+	// Compose the level completion menu
+	levelCompleteMenu.setTitle("Level Complete!");
+	levelCompleteMenu.newItem_NextLevel("Next Level");
+	levelCompleteMenu.newItem_SubMenu("High Score", &highScoreMenu, (MenuFunction)&refreshHighScoreMenu);
+	levelCompleteMenu.newItem_SubMenu("Options", &optionsMenu);
+	levelCompleteMenu.newItem_SubMenu("Go To Main Menu", &confirmExitGame);
+
+	// Compose the victory menu
+	victoryMenu.setTitle("Congratulations!");
+	victoryMenu.newLabel("You have completed the last level of this demo!");
+	victoryMenu.newLabel("Thank you for playing!");
+	victoryMenu.newLabel("Don't forget to enter your high score!");
+	victoryMenu.newItem_SubMenu("Enter High Score", &highScoreMenu, (MenuFunction)&refreshHighScoreMenu);
+	victoryMenu.newItem_SubMenu("Start Over", &friendlyReminderReset);
+	victoryMenu.newItem_SubMenu("Go To Main Menu", &friendlyReminderExit);
+
+	friendlyReminderReset.newLabel("You should save your high score before restarting");
+	friendlyReminderReset.newItem_NewGame("It's alright. I wanna start over");
+	friendlyReminderReset.newItem_GoBack("Oh nose! Take me back!");
+
+	friendlyReminderExit.newLabel("You should save your high score before exiting ;)");
+	friendlyReminderExit.newItem_MainMenu("It's alright. Exit, please");
+	friendlyReminderExit.newItem_GoBack("Uh oh, you're right. Go back!");
+}
+
+void SuperShiny::Menus::refreshHighScoreMenu(int direction)
+{
 }
