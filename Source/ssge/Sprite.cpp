@@ -81,9 +81,11 @@ bool Sprite::isPlaying() const
 
 int Sprite::getSeqIdx() const { return animation.seqIdx; }
 
-int Sprite::getCurrentAnimationFrame() const { return animation.frameIdx; }
+int Sprite::getCurrentAnimationFrame() const
+{ return animation.frameIdx; }
 
-int Sprite::getAnimationSpeed() const { return animation.calculateEffectiveSpeed(); }
+int Sprite::getAnimationSpeed() const
+{ return animation.calculateEffectiveSpeed(); }
 
 //==========================
 // Animation Control Methods
@@ -181,7 +183,7 @@ Sprite& Sprite::setSequence(int seqIdx)
 Sprite& Sprite::setFrame(int frame)
 {
 	auto& sequence = definition.sequences[animation.seqIdx];
-	int nOFrames = sequence.imageIndexes.size();
+	int nOFrames = (int)sequence.imageIndexes.size();
 
 	// Handle out-of-bounds parameter
 	if (frame < 0 || frame >= nOFrames)
@@ -286,16 +288,17 @@ const Sprite::Image& Sprite::fetchCurrentImage() const
 // Update and Rendering
 //======================
 
-void Sprite::update(float deltaTime)
+void Sprite::update(double deltaTime)
 {
-	if (!animation.paused) {
+	if (!animation.paused)
+	{
 		animation.finished = false;
 
 		int effectiveSpeed = animation.calculateEffectiveSpeed();
 		animation.timer += static_cast<int>(deltaTime * effectiveSpeed * 100);
 
 		auto& currentSequence = definition.sequences[animation.seqIdx];
-		int nOFrames = currentSequence.imageIndexes.size();
+		int nOFrames = (int)currentSequence.imageIndexes.size();
 
 		// When timer exceeds 100, advance the frame.
 		while (animation.timer > 100)
@@ -352,38 +355,39 @@ void Sprite::render(SDL_Renderer* renderer, SDL_Point offsetFromViewport) const
 	int scaledAnchorX = static_cast<int>(img.anchor.x * fabs(xscale));
 	int scaledAnchorY = static_cast<int>(img.anchor.y * fabs(yscale));
 
-	// Adjust destination rectangle so that the anchor lands at offsetFromViewport.
-	SDL_Rect dst;
-	if (xscale < 0)
-	{
-		dst.x = offsetFromViewport.x - (absW - scaledAnchorX);
-	}
-	else
-	{
-		dst.x = offsetFromViewport.x - scaledAnchorX;
-	}
-	if (yscale < 0)
-	{
-		dst.y = offsetFromViewport.y - (absH - scaledAnchorY);
-	}
-	else
-	{
-		dst.y = offsetFromViewport.y - scaledAnchorY;
-	}
-	dst.w = absW;
-	dst.h = absH;
+	// Adjust destination rectangle
+	// so that the anchor lands at offsetFromViewport.
+	SDL_Rect dst{
+		(xscale < 0) ? // dst.x
+			offsetFromViewport.x - (absW - scaledAnchorX)
+		  : offsetFromViewport.x - scaledAnchorX,
+		(yscale < 0) ? // dst.y
+			offsetFromViewport.y - (absH - scaledAnchorY)
+		 : offsetFromViewport.y - scaledAnchorY,
+		absW, // dst.w
+		absH  // dst.h
+	};
 
-	// Compute the rotation center (pivot) relative to the destination rectangle.
-	SDL_Point center;
-	center.x = (xscale < 0) ? (absW - scaledAnchorX) : scaledAnchorX;
-	center.y = (yscale < 0) ? (absH - scaledAnchorY) : scaledAnchorY;
+	// Compute the rotation center (pivot)
+	// relative to the destination rectangle.
+	SDL_Point center{
+		(xscale < 0) ? (absW - scaledAnchorX) : scaledAnchorX, // center.x
+		(yscale < 0) ? (absH - scaledAnchorY) : scaledAnchorY // center.y
+	};
 
-	SDL_SetTextureAlphaMod(definition.spritesheet, alpha);
+	// Update TextureAlphaMod, but only if we changed it
+	Uint8 alphaInSDL;
+	auto& spritesheet = definition.spritesheet;
+	SDL_GetTextureAlphaMod(spritesheet, &alphaInSDL);
+	if(alpha!=alphaInSDL)
+		SDL_SetTextureAlphaMod(spritesheet, alpha);
 
-	SDL_RenderCopyEx(renderer, definition.spritesheet, &src, &dst, static_cast<double>(angle),
+	SDL_RenderCopyEx(
+		renderer, spritesheet, &src, &dst, static_cast<double>(angle),
 		&center, flip);
 
-	SDL_SetTextureAlphaMod(definition.spritesheet, 255);
+	// Redundant
+	//SDL_SetTextureAlphaMod(definition.spritesheet, 255);
 }
 
 Sprite::Image::Image(int x, int y, int w, int h, int cx, int cy)
@@ -392,7 +396,8 @@ Sprite::Image::Image(int x, int y, int w, int h, int cx, int cy)
 	anchor = { cx,cy };
 }
 
-Sprite::Definition::Definition(std::string spritesheetPath) : spritesheetPath(spritesheetPath) {}
+Sprite::Definition::Definition(std::string spritesheetPath)
+	: spritesheetPath(spritesheetPath) {}
 
 bool Sprite::Definition::load(SDL_Renderer* renderer)
 {
@@ -417,7 +422,8 @@ Sprite::Animation::Sequence& Sprite::Definition::addSequence()
 	return sequences.back();
 }
 
-Sprite::Animation::Sequence& Sprite::Definition::addSequence(int speed, int altSpeed, int loopTo)
+Sprite::Animation::Sequence& Sprite::Definition::addSequence(
+	int speed, int altSpeed, int loopTo)
 {
 	Sprite::Animation::Sequence seq(speed, altSpeed, loopTo);
 	sequences.push_back(std::move(seq));

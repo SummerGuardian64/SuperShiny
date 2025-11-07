@@ -122,22 +122,22 @@ namespace ssge
 		SDL_Rect getBounds() const;
 
 		// CLARIFICATIONS: This is how rendering a Sprite works
-		// Calculating frame index is needed to fetch the current image which is needed by Render
-		// function to know how to tell SDL2's rendering functions to properly crop the wanted
-		// image for the sprite out of the spritesheet and put it onto the render target (which is
-		// set for the renderer and none of Sprite class's responsibility)
-		// Update function updates all necessary timers by calling animation.Update and passing the
-		// provided deltatime.
+		// Calculating frame index is needed to fetch the current image
+		// which is needed by Render function to know how to tell SDL2's rendering
+		// functions to properly crop the wanted image for the sprite out of the
+		// spritesheet and put it onto the render target (which is set for the
+		// renderer and none of Sprite class's responsibility).
+		// Update function updates all necessary timers by calling
+		// animation.Update and passing the provided deltatime.
 		//
 		// IMPORTANT TIMING NOTE!
 		// Update is tick-based while Render is FPS-based.
 
-		int calculateImageIndex()
-			const; // definition.sequences[animation.animSeq].imageIndexes[animation.animFrame]
-		const Sprite::Image& fetchCurrentImage() const; // definition.images[fetchCurrentImageIndex]
+		int calculateImageIndex() const;
+		const Sprite::Image& fetchCurrentImage() const;
 
 		//TODO: New step context???
-		void update(float deltaTime);
+		void update(double deltaTime);
 		void draw(DrawContext context) const;
 		void render(SDL_Renderer* renderer, SDL_Point offsetFromViewport) const;
 
