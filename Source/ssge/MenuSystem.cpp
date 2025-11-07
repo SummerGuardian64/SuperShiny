@@ -576,4 +576,88 @@ void MenuManager::step(MenuContext& context)
 
 void MenuManager::draw(DrawContext& context)
 {
+    if (!currentMenu) return;
+
+    SDL_Renderer* renderer = context.getRenderer();
+    const SDL_Rect bounds = context.getBounds();
+
+    // Allegro: al_get_font_line_height(Breakenzi::Font)
+    // SDL_ttf equivalent:
+    TTF_Font* font = context.getFont(); // or however you access your menu font
+    const int fontHeight = font ? TTF_FontLineSkip(font) : 18; // safe fallback
+
+    // Count visible items
+    int visibleItems = 0;
+    for (auto& item : currentMenu->items)
+        if (item->visible) visibleItems++;
+
+    const int menuCenter = bounds.h / 2;
+    const int linePadding = 6;
+    const int lineHeight = fontHeight + linePadding;
+    const int lineCount = visibleItems + 1; // title + items
+    const int menuTextHeight = lineCount * lineHeight;
+    const int top = menuCenter - menuTextHeight / 2;
+
+    // Background (Allegro had a rounded rect; we fill a rect here)
+    // If you want rounded corners later, you can draw 4 quarter-circles + 3 rects,
+    // or use SDL2_gfx. Keeping it simple for now.
+    const int margin = 10;
+    SDL_Rect bg{ bounds.x,
+                 top - margin,
+                 bounds.w,
+                 menuTextHeight + 2 * margin };
+
+    // Save/restore draw color around fills
+    Uint8 pr, pg, pb, pa;
+    SDL_GetRenderDrawColor(renderer, &pr, &pg, &pb, &pa);
+    SDL_SetRenderDrawColor(renderer, cMenuBackground.r, cMenuBackground.g, cMenuBackground.b, cMenuBackground.a);
+    SDL_RenderFillRect(renderer, &bg);
+    SDL_SetRenderDrawColor(renderer, pr, pg, pb, pa);
+
+    // Title
+    drawText(context, cMenuTitle, top + linePadding / 2, currentMenu->getTitle());
+
+    // Items
+    int currentHeight = top + lineHeight;
+    std::string stringToPrint;
+    SDL_Color itemColor;
+    unsigned int i = 0;
+
+    for (auto& item : currentMenu->items)
+    {
+        // Skip invisible items
+        if (!item->visible) { ++i; continue; }
+
+        // Selected row highlight (Allegro: al_draw_filled_rectangle)
+        if (i == itemIndex)
+        {
+            SDL_GetRenderDrawColor(renderer, &pr, &pg, &pb, &pa);
+            SDL_SetRenderDrawColor(renderer, cItemCursor.r, cItemCursor.g, cItemCursor.b, cItemCursor.a);
+            SDL_Rect sel{ bounds.x, currentHeight, bounds.w, lineHeight };
+            SDL_RenderFillRect(renderer, &sel);
+            SDL_SetRenderDrawColor(renderer, pr, pg, pb, pa);
+        }
+
+        // Determine item color (matches your logic)
+        if (item->selectable)
+        {
+            if (item->enabled)
+                itemColor = (i == itemIndex) ? cItemSelected : cItemEnabled;
+            else
+                itemColor = cItemDisabled;
+        }
+        else
+        {
+            itemColor = cItemLabel; // label
+        }
+
+        // Text
+        stringToPrint = item->printItem();
+        drawText(context, itemColor, currentHeight + linePadding / 2, stringToPrint);
+
+        // advance
+        currentHeight += lineHeight;
+        ++i;
+    }
 }
+
