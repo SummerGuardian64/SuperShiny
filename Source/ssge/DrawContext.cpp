@@ -42,7 +42,8 @@ DrawContext::DrawContext(const DrawContext& toCopy)
 	origin(toCopy.origin),
 	deltaTime(toCopy.deltaTime),
 	scrollOffset(toCopy.scrollOffset),
-	renderTarget(toCopy.renderTarget)
+	renderTarget(toCopy.renderTarget),
+	font(toCopy.font)
 { }
 
 SDL_Renderer* DrawContext::getRenderer() const
@@ -102,6 +103,15 @@ DrawContext DrawContext::deriveForEntity(SDL_FPoint entityPosition) const
 	DrawContext derivedContext = DrawContext(*this);
 
 	derivedContext.origin = SDL_Point{ (int)entityPosition.x,(int)entityPosition.y };
+
+	return derivedContext;
+}
+
+DrawContext ssge::DrawContext::deriveWithFont(TTF_Font* font) const
+{
+	DrawContext derivedContext = DrawContext(*this);
+
+	derivedContext.font = font;
 
 	return derivedContext;
 }

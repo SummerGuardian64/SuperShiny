@@ -137,7 +137,7 @@ namespace ssge
 	class MenuManager
 	{
     private:
-        bool _justCreated = true;
+        bool _justOpened = true;
     public:
         // HELP ME REPLACE ALLEGRO_COLOR WITH SOMETHING SDL2 LIKES!
         constexpr static SDL_Color cItemCursor = SDL_Color{ 255, 192, 64, 255 };
@@ -146,7 +146,7 @@ namespace ssge
         constexpr static SDL_Color cItemDisabled = SDL_Color{ 128, 128, 128, 255 };
         constexpr static SDL_Color cItemLabel = SDL_Color{ 255, 255, 255, 255 };
         constexpr static SDL_Color cMenuTitle = SDL_Color{ 255, 64, 32, 255 };
-        constexpr static SDL_Color cMenuBackground = SDL_Color{ 32, 32, 192, 255 };
+        constexpr static SDL_Color cMenuBackground = SDL_Color{ 32, 32, 192, 64 };
         constexpr static SDL_Color cTextShadow = SDL_Color{ 64, 64, 64, 255 };
         static void drawText(DrawContext& drawContext, SDL_Color color, int height, std::string text);
         int levelSelectorInt = 0;
@@ -155,6 +155,8 @@ namespace ssge
         unsigned int itemIndex = 0;
         void properlyAdjustItemIndex();
         void setMenu(MenuHeader* menu);
+        bool isOpen() const;
+        void close();
         MenuManager(PassKey<Engine> pk);
         void step(MenuContext& context);
         void draw(DrawContext& context);

@@ -5,7 +5,6 @@
 class TitleScreen : public ssge::Scene
 {
 	SdlTexture background;
-	bool offeredMenu = false;
 
 	// Inherited via Scene
 	std::string getSceneClassID() const override;

@@ -12,12 +12,23 @@ using namespace ssge;
 
 void EngineAccess::finish()
 {
+	if (!actual) return;
+
 	actual->finish();
 }
 
 void EngineAccess::wrapUp()
 {
+	if (!actual) return;
+
 	actual->wrapUp();
+}
+
+bool ssge::EngineAccess::isWrappingUp() const
+{
+	if (!actual)return false;
+
+	actual->isWrappingUp();
 }
 
 void ssge::ScenesAccess::changeScene(std::string newSceneId)
@@ -25,6 +36,13 @@ void ssge::ScenesAccess::changeScene(std::string newSceneId)
 	if (!actual)return; // Null-safety
 
 	actual->changeScene(gameScenes.createScene(PassKey<ScenesAccess>(), newSceneId));
+}
+
+std::string ssge::ScenesAccess::getCurrentSceneClassID() const
+{
+	if (!actual)return "";
+
+	return actual->getCurrentSceneClassID();
 }
 
 void ssge::ScenesAccess::goToLevel(int wantedLevel)
@@ -189,13 +207,26 @@ std::unique_ptr<ssge::Sprite> ssge::SpritesAccess::create(std::string sprdefId)
 
 bool ssge::MenusAccess::isOpen() const
 {
-	return false;
-	//return actual->isOpen();
+	if (!actual)return false;
+
+	return actual->isOpen();
+}
+
+void ssge::MenusAccess::setMenu(MenuHeader& menuHeader)
+{
+	setMenu(&menuHeader);
+}
+
+void ssge::MenusAccess::setMenu(MenuHeader* menuHeader)
+{
+	if (!actual) return;
+
+	actual->setMenu(menuHeader);
 }
 
 void ssge::MenusAccess::openMainMenu()
 {
-	//actual->pushMenu(0);
+	//TODO: Wire up IGameMenus
 }
 
 void ssge::MenusAccess::openPauseMenu()
@@ -205,7 +236,7 @@ void ssge::MenusAccess::openPauseMenu()
 
 void ssge::MenusAccess::close()
 {
-	//actual->close();
+	actual->close();
 }
 
 void ssge::GameWorldAccess::reportHeroDeadth()

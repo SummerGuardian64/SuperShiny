@@ -45,6 +45,45 @@ void SuperShiny::init(ssge::StepContext& context)
 
 void SuperShiny::step(ssge::StepContext& context)
 {
+	std::string currentScene = context.scenes.getCurrentSceneClassID();
+
+	if (currentScene == scenes.getMainMenuSceneClassID())
+	{
+		if (!context.menus.isOpen()
+			&& context.scenes.isFadeFinished()
+			&& !context.engine.isWrappingUp())
+		{
+			context.menus.setMenu(menus.mainMenu);
+		}
+	}
+	else if (currentScene == "GameWorld")
+	{
+		bool isPaused = context.scenes.isPaused();
+		bool fading = !context.scenes.isFadeFinished();
+		bool gameplayRunning = !isPaused && !fading;
+		bool menuOpen = context.menus.isOpen();
+
+		// If gameplay is running
+		if (gameplayRunning)
+		{
+			// Offer pause button
+			if (context.inputs.isJustPressed(7))
+			{
+				context.scenes.pause(); // Pause the scene
+				context.menus.setMenu(menus.pauseMenu); // Set pause menu
+			}
+		}
+		else if (!menuOpen) // If gameplay is not running, but we closed the menu
+		{
+			// Unpause!
+			context.scenes.unpause();
+		}
+		else if (fading) // If menu is somehow open during fading
+		{
+			// Close it!!!
+			context.menus.close();
+		}
+	}
 }
 
 void SuperShiny::draw(ssge::DrawContext& context)
@@ -76,8 +115,9 @@ ssge::MenuCommandEx SuperShiny::onHavingBackedOutOfMenus(ssge::PassKey<ssge::Gam
 {
 	ssge::MenuCommandEx cmdEx;
 
-	// TODO: Port this:
-	if (context.currentScene.getSceneClassID()=="TitleScreen") // FIXME: HARDCODED!
+	std::string currentScene = context.currentScene.getSceneClassID();
+
+	if (currentScene==scenes.getMainMenuSceneClassID())
 	{ // If this is the main menu, ask the player do they wanna exit program
 	  
 		//Breakenzi style:
@@ -85,11 +125,11 @@ ssge::MenuCommandEx SuperShiny::onHavingBackedOutOfMenus(ssge::PassKey<ssge::Gam
 	    //setMenu(Breakenzi::confirmExitProgram);
 
 		// TODO: Implement the menus first
-		//cmdEx.smallCmd = ssge::MenuCommand::GOTO_MENU;
-		//cmdEx.targetMenu = nullptr; // TODO: IMPLEMENT ME!
+		cmdEx.smallCmd = ssge::MenuCommand::GOTO_MENU;
+		cmdEx.targetMenu = &menus.confirmExitProgram; // TODO: IMPLEMENT ME!
 		// 
 		// Until it's implemented, we stick to this
-		cmdEx.smallCmd = ssge::MenuCommand::EXIT_PROGRAM;
+		//cmdEx.smallCmd = ssge::MenuCommand::EXIT_PROGRAM;
 	}
 	else
 	{ // Otherwise just close the menu
@@ -265,7 +305,7 @@ void SuperShiny::Menus::init(SuperShiny::Config& config)
 	highScoreMenu.setTitle("High Score");
 
 	// Compose the main menu
-	mainMenu.setTitle("Breakenzi");
+	mainMenu.setTitle("Super Shiny");
 	mainMenu.newItem_NewGame("Start Game");
 	mainMenu.newItem_SubMenu("Level Select", &levelSelect);
 	mainMenu.newItem("Super Duper Secret Menu")->visible = false;
@@ -290,7 +330,7 @@ void SuperShiny::Menus::init(SuperShiny::Config& config)
 	confirmExitGame.newItem_MainMenu("Yes");
 	confirmExitGame.newItem_GoBack("No");
 
-	confirmExitProgram.newLabel("Are you sure you want to exit Breakenzi?");
+	confirmExitProgram.newLabel("Are you sure you want to exit Super Shiny?");
 	confirmExitProgram.newItem_ExitProgram("Yes");
 	confirmExitProgram.newItem_GoBack("No");
 

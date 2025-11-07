@@ -74,10 +74,11 @@ bool Engine::loadInitialResources(SDL_Renderer* renderer)
 	//Game::init(renderer);
 
 	// load fonts once (SDL_ttf already initialized by Program)
-	menuTitle = TTF_OpenFont("Fonts/VCR_OSD_MONO.ttf", 28);
-	menuItem = TTF_OpenFont("Fonts/VCR_OSD_MONO.ttf", 22);
-
-	
+	menuFont = TTF_OpenFont("Fonts/VCR_OSD_MONO.ttf", 28);
+	if (menuFont == nullptr)
+	{
+		std::cout << TTF_GetError() << std::endl;
+	}
 
 	return true;
 }
@@ -242,6 +243,8 @@ bool Engine::update(double deltaTime)
 		LevelAccess(nullptr)
 	);
 
+	game.step(stepContext);
+
 	menus->step(menuContext);
 
 	// Let this be the final update if we're finished
@@ -252,7 +255,8 @@ void Engine::render(DrawContext context)
 {
 	scenes->draw(context);
 	
-	menus->draw(context);
+	auto menuDrawingCtx = context.deriveWithFont(menuFont);
+	menus->draw(menuDrawingCtx);
 }
 
 void Engine::shutdown()
@@ -261,15 +265,10 @@ void Engine::shutdown()
 
 	game.cleanUp(PassKey<Engine>());
 
-	if (menuTitle)
+	if (menuFont)
 	{
-		TTF_CloseFont(menuTitle);
-		menuTitle = nullptr;
-	}
-	if (menuItem)
-	{
-		TTF_CloseFont(menuItem);
-		menuItem = nullptr;
+		TTF_CloseFont(menuFont);
+		menuFont = nullptr;
 	}
 
 	if (window)
@@ -301,4 +300,9 @@ void Engine::finish()
 void Engine::wrapUp()
 {
 	wannaWrapUp = true;
+}
+
+bool Engine::isWrappingUp() const
+{
+	return wannaWrapUp;
 }

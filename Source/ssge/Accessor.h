@@ -20,6 +20,7 @@ namespace ssge {
     class MenuManager;
     class MenuCommandEx;
     class MenuContext;
+    class MenuHeader;
 
     class EngineAccess {
         Engine* actual;
@@ -27,6 +28,7 @@ namespace ssge {
         explicit EngineAccess(Engine* actual) : actual(actual) {};
         void finish();
         void wrapUp();
+        bool isWrappingUp() const;
     };
 
     class GameAccess {
@@ -44,6 +46,7 @@ namespace ssge {
         explicit ScenesAccess(SceneManager* actual, IGame& game)
             : actual(actual), gameScenes(game.getScenes(PassKey<ScenesAccess>())) { }
         void changeScene(std::string newSceneId);
+        std::string getCurrentSceneClassID() const;
         void goToLevel(int wantedLevel);
         void goToMainMenu();
         void pause();
@@ -161,6 +164,8 @@ namespace ssge {
         explicit MenusAccess() : actual(nullptr) {}; // TODO: Remove this later!
         explicit MenusAccess(MenuManager* actual) : actual(actual) {}
         bool isOpen() const;
+        void setMenu(MenuHeader& menuHeader);
+        void setMenu(MenuHeader* menuHeader);
         void openMainMenu();
         void openPauseMenu();
         void close();

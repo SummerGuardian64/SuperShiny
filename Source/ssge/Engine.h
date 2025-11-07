@@ -29,8 +29,7 @@ namespace ssge
 		MenuManager* menus;
 
 		// fonts for menus (init once)
-		TTF_Font* menuTitle = nullptr;
-		TTF_Font* menuItem = nullptr;
+		TTF_Font* menuFont = nullptr;
 
 		bool wannaFinish = false;
 		bool wannaWrapUp = false;
@@ -68,5 +67,6 @@ namespace ssge
 		// Engine control from higher levels
 		void finish();
 		void wrapUp();
+		bool isWrappingUp() const;
 	};
 }

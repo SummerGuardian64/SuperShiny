@@ -123,6 +123,7 @@ public: //TODO: Encapsulate
 
     class Menus
     {
+        friend class SuperShiny;
         ssge::MenuHeader mainMenu;
         ssge::MenuHeader pauseMenu;
         ssge::MenuHeader gameOverMenu;

@@ -104,7 +104,7 @@ void GameWorld::init(SceneStepContext& context)
         // ERROR! Get out of there!
         // TODO! Report the error
         context.scenes.pause();
-        context.scenes.changeScene("TitleScreen");
+        context.scenes.goToMainMenu();
     }
     else
     {
@@ -180,12 +180,6 @@ void GameWorld::step(SceneStepContext& context)
     if (auto e = entityToScrollTo.get())
     {
         scrollTarget = e->position;
-    }
-
-    if (context.inputs.isJustPressed(7))
-    {
-        context.scenes.pause();
-        context.menus.openPauseMenu();
     }
 
     // Warp check

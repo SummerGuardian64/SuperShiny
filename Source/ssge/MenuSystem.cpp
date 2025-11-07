@@ -349,6 +349,10 @@ void MenuManager::properlyAdjustItemIndex()
 
 void MenuManager::setMenu(MenuHeader* menu)
 {
+    if (!currentMenu)
+    {
+        _justOpened = true;
+    }
 	if (menu)
 	{
 		currentMenu = menu;
@@ -356,9 +360,20 @@ void MenuManager::setMenu(MenuHeader* menu)
 	}
 }
 
+bool MenuManager::isOpen() const
+{
+    return currentMenu != nullptr;
+}
+
+void MenuManager::close()
+{
+    currentMenu = nullptr; // Point to no menu
+    while (!previousMenus.empty())previousMenus.pop(); // Forget previous menus
+}
+
 MenuManager::MenuManager(PassKey<Engine> pk)
 {
-	_justCreated = true;
+	_justOpened = true;
 }
 
 void MenuManager::step(MenuContext& context)
@@ -369,7 +384,7 @@ void MenuManager::step(MenuContext& context)
     // Avoid the situation where the player presses a button to open the menu
     // and then the same button does something in the menu on the same frame!
     // *cough* Nokia featurephones *cough*
-    if (_justCreated) { _justCreated = false; return; }
+    if (_justOpened) { _justOpened = false; return; }
 
     // If not just created, then proceed to the menu controls.
 
@@ -448,7 +463,7 @@ void MenuManager::step(MenuContext& context)
     // Make up an elaborate ("extended") command
     MenuCommandEx cmdEx;
     cmdEx.smallCmd = returnedCommand;
-    cmdEx.targetMenu = currentMenuItem->targetMenu;
+    cmdEx.targetMenu = currentMenuItem ? currentMenuItem->targetMenu : nullptr;
 
     // We may need to repeat handling if IGame issues another command!
     bool repeatHandling;
@@ -568,8 +583,7 @@ void MenuManager::step(MenuContext& context)
 
         if (closeMenu)
         { // If the menu should close,
-            currentMenu = nullptr; // Point to no menu
-            while (!previousMenus.empty())previousMenus.pop(); // Forget previous menus
+            close();
         }
     }while (repeatHandling);
 }

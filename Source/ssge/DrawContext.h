@@ -37,6 +37,7 @@ namespace ssge
 		DrawContext clone() const;
 		DrawContext deriveForScrolling(SDL_Point offset) const;
 		DrawContext deriveForEntity(SDL_FPoint entityPosition) const;
+		DrawContext deriveWithFont(TTF_Font* font) const;
 
 		// SDL function help
 
