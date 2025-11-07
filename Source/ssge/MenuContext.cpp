@@ -7,6 +7,7 @@ MenuContext::MenuContext(
 	PassKey<Engine> pk,
 	EngineAccess engine,
 	GameAccess game,
+	WindowAccess window,
 	ScenesAccess scenes,
 	InputsAccess inputs,
 	DrawingAccess drawing,
@@ -17,6 +18,7 @@ MenuContext::MenuContext(
 ) :
 	engine(engine),
 	game(game),
+	window(window),
 	scenes(scenes),
 	inputs(inputs),
 	drawing(drawing),

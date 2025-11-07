@@ -1,4 +1,6 @@
 #include "MenuSystem.h"
+#include "MenuSystem.h"
+#include "MenuSystem.h"
 #include "MenuContext.h"
 #include "DrawContext.h"
 #include <algorithm>
@@ -47,10 +49,16 @@ MenuCommand::operator int() const
 	return _cmd;
 }
 
+MenuSettingInt::MenuSettingInt(int* integer, int min, int max)
+	: integer(integer), min(min), max(max)
+{}
+
 std::string MenuSettingInt::printSetting() const
 {
-	if (!integer)return std::string();
+    // If setting not initialized, say N/A
+	if (!integer)return " N/A";
 	
+    // Otherwise, print space and then the integer as a string
 	return std::string(" ") + std::to_string(*integer);
 }
 
@@ -66,9 +74,45 @@ void MenuSettingInt::change(int direction)
 	*integer = std::clamp(*integer + ((direction > 0) ? 1 : -1), min, max);
 }
 
-MenuSettingInt::MenuSettingInt(int* integer, int min, int max)
-	: integer(integer), min(min), max(max)
+MenuSettingBool::MenuSettingBool(bool* boolean, std::string strOn, std::string strOff)
+    : boolean(boolean), strOn(strOn), strOff(strOff)
 {}
+
+std::string MenuSettingBool::printSetting() const
+{
+    // If setting not initialized, say N/A
+    if (!boolean)return " N/A";
+
+    // Otherwise, print space
+    // and then the on string or the off string depending on the setting
+    return std::string(" ") + (*boolean ? strOn : strOff);
+}
+
+void MenuSettingBool::change(int direction)
+{
+    // Don't run if pointer is null
+    if (!boolean) return;
+
+    bool& theSetting = *boolean;
+
+    // If we press RIGHT while setting is OFF 
+    if (direction > 0 && theSetting == false)
+    { // We turn it ON
+        theSetting = true;
+    }
+
+    // If we press LEFT while setting is ON
+    if (direction < 0 && theSetting == true)
+    { // We turn it OFF
+        theSetting = false;
+    }
+
+    // If we simply activated the item
+    if (direction == 0)
+    { // We TOGGLE it
+        theSetting = !theSetting;
+    }
+}
 
 std::string MenuItem::getText() const
 {
@@ -95,21 +139,14 @@ int MenuItem::execute(int direction)
 		(*onSelect)(direction);
 	}
 
-	// If this item has been selected, return its command
-	if (direction == 0)
-	{
-		return command;
-	}
-	else if (setting) // Otherwise, change a setting if any exists
+    // Change a setting if any exists
+	if (setting)
 	{
 		setting->change(direction);
-		// and return NOTHING
-		return MenuCommand::NOTHING;
 	}
-	else // If there's no setting to set, return nothing
-	{
-		return MenuCommand::NOTHING;
-	}
+
+    // Return the item's command
+    return command;
 }
 
 bool MenuItem::isSelectable() const
@@ -231,11 +268,25 @@ MenuItem* MenuHeader::newItem_MainMenu(const char* text, MenuFunction onSelect)
 	return item;
 }
 
-MenuItem* MenuHeader::newItem_IntSetting(const char* text, int* setting, int min, int max, MenuCommand command)
+MenuItem* MenuHeader::newItem_IntSetting(const char* text, int* setting, int min, int max, MenuCommand command, MenuFunction onSelect)
 {
-	auto item = new MenuItem(text, true, true, true, command, NULL, true, new MenuSettingInt(setting, min, max), NULL);
+	auto item = new MenuItem(text, true, true, true, command, NULL, true, new MenuSettingInt(setting, min, max), onSelect);
 	items.push_back(item);
 	return item;
+}
+
+MenuItem* ssge::MenuHeader::newItem_BoolSetting(const char* text, bool* setting, MenuCommand command, MenuFunction onSelect)
+{
+    auto item = new MenuItem(text, true, true, true, command, NULL, true, new MenuSettingBool(setting), onSelect);
+    items.push_back(item);
+    return item;
+}
+
+MenuItem* ssge::MenuHeader::newItem_BoolSetting(const char* text, bool* setting, std::string strOn, std::string strOff, MenuCommand command, MenuFunction onSelect)
+{
+    auto item = new MenuItem(text, true, true, true, command, NULL, true, new MenuSettingBool(setting, strOn, strOff), onSelect);
+    items.push_back(item);
+    return item;
 }
 
 MenuItem* MenuHeader::newItem_CloseMenu(const char* text, MenuFunction onSelect)

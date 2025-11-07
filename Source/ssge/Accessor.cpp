@@ -1,8 +1,9 @@
 #include "Accessor.h"
-#include "Scene.h"
 #include "Engine.h"
+#include "WindowManager.h"
 #include "SceneManager.h"
 #include "InputManager.h"
+#include "Scene.h"
 #include "Level.h"
 #include "GameWorld.h"
 #include "EntityManager.h"
@@ -95,6 +96,69 @@ void ssge::ScenesAccess::restart()
 		changeScene(currentSceneClassID);
 	}
 }
+
+// WindowAccess
+
+SDL_Window* WindowAccess::getWindow() const
+{
+	if (!actual) return nullptr;
+
+	return actual->getWindow();
+}
+
+SDL_Surface* WindowAccess::getWindowSurface() const
+{
+	if (!actual) return nullptr;
+
+	return actual->getWindowSurface();
+}
+
+SDL_Renderer* WindowAccess::getRenderer() const
+{
+	if (!actual) return nullptr;
+
+	return actual->getRenderer();
+}
+
+int WindowAccess::getVirtualWidth() const
+{
+	if (!actual) return 0;
+
+	return actual->getVirtualWidth();
+}
+
+int WindowAccess::getVirtualHeight() const
+{
+	if (!actual) return 0;
+
+	return actual->getVirtualHeight();
+}
+
+bool WindowAccess::isUpscaleIntegral() const
+{
+	if (!actual)return false;
+
+	return actual->isUpscaleIntegral();
+}
+
+void WindowAccess::setIntegralUpscale(bool integralUpscale)
+{
+	if (actual) actual->setIntegralUpscale(integralUpscale);
+}
+
+void WindowAccess::setBorderedFullScreen(bool borderedFullScreen)
+{
+	if (actual) actual->setBorderedFullScreen(borderedFullScreen);
+}
+
+SDL_Rect WindowAccess::makeBestFitScale() const
+{
+	if (!actual) return SDL_Rect{ 0,0,0,0 };
+
+	return actual->makeBestFitScale();
+}
+
+// InputsAccess
 
 bool InputsAccess::isPressed(int buttonIndex)
 {

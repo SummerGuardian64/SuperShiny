@@ -1,5 +1,6 @@
 #include "WindowManager.h"
 #include "PassKey.h"
+#include <cmath>
 
 using namespace ssge;
 
@@ -39,6 +40,10 @@ const char* WindowManager::init(const char* title, int width, int height)
         return SDL_GetError();
     }
 
+    // Nearest neighbour for scaling
+    // Windows XP may be weak otherwise
+    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0");
+
     // Create renderer for the window
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 
@@ -69,7 +74,47 @@ SDL_Renderer* WindowManager::getRenderer() const
     return renderer;
 }
 
-SDL_Rect WindowManager::makeBestFitScale()
+int ssge::WindowManager::getVirtualWidth() const
+{
+    return virtualWidth;
+}
+
+int ssge::WindowManager::getVirtualHeight() const
+{
+    return virtualHeight;
+}
+
+bool ssge::WindowManager::isUpscaleIntegral() const
+{
+    return integralUpscale;
+}
+
+void ssge::WindowManager::setIntegralUpscale(bool integralUpscale)
+{
+    this->integralUpscale = integralUpscale;
+}
+
+void ssge::WindowManager::setBorderedFullScreen(bool borderedFullScreen)
+{
+    // If things are not the way we're setting them
+    if (this->borderedFullScreen != borderedFullScreen)
+    { // Then we set them, duh
+        if (borderedFullScreen)
+        { // Bordered Fullscreen
+            SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
+        }
+        else
+        { // Windowed
+            SDL_SetWindowFullscreen(window, 0);
+            SDL_SetWindowBordered(window, SDL_TRUE);
+            SDL_RestoreWindow(window);
+        }
+        // Remember the current setting
+        this->borderedFullScreen = borderedFullScreen;
+    }
+}
+
+SDL_Rect WindowManager::makeBestFitScale() const
 {
     int windowWidth;
     int windowHeight;
@@ -78,6 +123,14 @@ SDL_Rect WindowManager::makeBestFitScale()
     float scaleX = (float)windowWidth / virtualWidth;
     float scaleY = (float)windowHeight / virtualHeight;
     float scale = (scaleX < scaleY) ? scaleX : scaleY;
+
+    if (integralUpscale)
+    {
+        // Force integer scale, but never below 1
+        int intScale = (int)std::floor(scale + 1e-6f);
+        if (intScale < 1) intScale = 1;
+        scale = (float)intScale;
+    }
 
     int dstW = (int)(virtualWidth * scale);
     int dstH = (int)(virtualHeight * scale);

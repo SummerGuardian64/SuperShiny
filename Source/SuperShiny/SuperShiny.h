@@ -30,6 +30,9 @@ public:
     SuperShiny(SuperShiny&& toMove) = default;
     ~SuperShiny() = default;
 
+private:
+    void syncSettings(ssge::StepContext& context) const;
+
 public: //TODO: Encapsulate
     // Called once after SDL + engine subsystems are up.
     void init(ssge::StepContext& context) override;
@@ -153,6 +156,8 @@ public: //TODO: Encapsulate
         int sfxVolume = 100;
         int musicVolume = 100;
         int resolutionScaleConfig = 1;
+        bool fullScreen = false;
+        bool integralUpscale = false;
     };
 
     Config config;

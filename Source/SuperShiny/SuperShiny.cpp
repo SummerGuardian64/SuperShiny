@@ -34,6 +34,12 @@ SuperShiny::SuperShiny() :
 {
 }
 
+void SuperShiny::syncSettings(ssge::StepContext& context) const
+{
+	context.window.setIntegralUpscale(config.integralUpscale);
+	context.window.setBorderedFullScreen(config.fullScreen);
+}
+
 void SuperShiny::init(ssge::StepContext& context)
 {
 	SDL_Renderer* renderer = context.drawing.getRenderer();
@@ -84,6 +90,8 @@ void SuperShiny::step(ssge::StepContext& context)
 			context.menus.close();
 		}
 	}
+
+	syncSettings(context);
 }
 
 void SuperShiny::draw(ssge::DrawContext& context)
@@ -317,7 +325,9 @@ void SuperShiny::Menus::init(SuperShiny::Config& config)
 
 	optionsMenu.newItem_IntSetting("Sound Volume:", &config.sfxVolume, 0, 100);
 	optionsMenu.newItem_IntSetting("Music Volume:", &config.musicVolume, 0, 100);
-	optionsMenu.newItem_IntSetting("Resolution Upscale:", &config.resolutionScaleConfig, 1, 4);
+	optionsMenu.newItem_IntSetting("Resolution Upscale:", &config.resolutionScaleConfig, 1, 4)->visible = false;
+	optionsMenu.newItem_BoolSetting("Display Mode:", &config.fullScreen, "Borderless Fullscreen", "Windowed");
+	optionsMenu.newItem_BoolSetting("Stretching:", &config.integralUpscale, "Integral", "Fractional");
 	optionsMenu.newItem_GoBack("Back");
 
 	confirmRestart.newLabel("Restarting a level will discard unsaved score!");

@@ -61,13 +61,23 @@ namespace ssge
         int max = 0;
         std::string printSetting() const;
         void change(int direction);
-        MenuSettingInt(int* integer = NULL, int min = 0, int max = 0);
+        MenuSettingInt(int* integer = nullptr, int min = 0, int max = 0);
     };
     // TODO: More kinds of MenuSetting's
     // For example, MenuSettingInputBinding
     // Idea. A function is allowed to deactivate input for all
     // other components of the engine while we're waiting for
     // the input that will be mapped.
+    class MenuSettingBool : public MenuSetting
+    {
+    public:
+        bool* boolean = nullptr;
+        std::string strOn;
+        std::string strOff;
+        std::string printSetting() const;
+        void change(int direction);
+        MenuSettingBool(bool* boolean = nullptr, std::string strOn = "On", std::string strOff = "Off");
+    };
 
     class MenuItem
     {
@@ -126,7 +136,9 @@ namespace ssge
         MenuItem* newItem_GoBack(const char* text, MenuFunction onSelect = NULL);
         MenuItem* newItem_NextLevel(const char* text);
         MenuItem* newItem_MainMenu(const char* text, MenuFunction onSelect = NULL);
-        MenuItem* newItem_IntSetting(const char* text, int* setting, int min, int max, MenuCommand command = MenuCommand::NOTHING);
+        MenuItem* newItem_IntSetting(const char* text, int* setting, int min, int max, MenuCommand command = MenuCommand::NOTHING, MenuFunction = nullptr);
+        MenuItem* newItem_BoolSetting(const char* text, bool* setting, MenuCommand command = MenuCommand::NOTHING, MenuFunction = nullptr);
+        MenuItem* newItem_BoolSetting(const char* text, bool* setting, std::string strOn, std::string strOff, MenuCommand command = MenuCommand::NOTHING, MenuFunction = nullptr);
         MenuItem* newItem_CloseMenu(const char* text, MenuFunction onSelect = NULL);
         MenuItem* newItem_ExitProgram(const char* text, MenuFunction onSelect = NULL);
         MenuHeader();

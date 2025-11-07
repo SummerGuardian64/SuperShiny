@@ -58,6 +58,31 @@ namespace ssge {
         void restart();
     };
 
+    class WindowAccess {
+        WindowManager* actual;
+    public:
+        explicit WindowAccess(WindowManager* actual)
+            : actual(actual) {}
+        // Gets the window
+        SDL_Window* getWindow() const;
+        // Gets the window surface
+        SDL_Surface* getWindowSurface() const;
+        // Gets the renderer for the window
+        SDL_Renderer* getRenderer() const;
+        // Gets virtual width
+        int getVirtualWidth() const;
+        // Gets virtual height
+        int getVirtualHeight() const;
+        // Returns true if upscale is integral, false if fractional
+        bool isUpscaleIntegral() const;
+        // Sets integral upscale, providing false sets fractional upscale
+        void setIntegralUpscale(bool integralUpscale = true);
+        // Sets bordererd fullscreen or windowed mode
+        void setBorderedFullScreen(bool borderedFullScreen = false);
+        // Makes a SDL_Rect with best scaling
+        SDL_Rect makeBestFitScale() const;
+    };
+
     class InputsAccess {
         InputManager* actual;
     public:

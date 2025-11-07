@@ -8,11 +8,13 @@ namespace ssge
 
 	class WindowManager // Manages the program window
 	{
-		SDL_Window* window;
-		SDL_Surface* windowSurface;
-		SDL_Renderer* renderer;
-		int virtualWidth;
-		int virtualHeight;
+		SDL_Window* window = nullptr;
+		SDL_Surface* windowSurface = nullptr;
+		SDL_Renderer* renderer = nullptr;
+		int virtualWidth = 0;
+		int virtualHeight = 0;
+		bool integralUpscale = false;
+		bool borderedFullScreen = false;
 	public:
 		WindowManager(PassKey<Engine> pk);
 		WindowManager(const WindowManager& toCopy) = delete;
@@ -28,8 +30,18 @@ namespace ssge
 		SDL_Surface* getWindowSurface() const;
 		// Gets the renderer for the window
 		SDL_Renderer* getRenderer() const;
+		// Gets virtual width
+		int getVirtualWidth() const;
+		// Gets virtual height
+		int getVirtualHeight() const;
+		// Returns true if upscale is integral, false if fractional
+		bool isUpscaleIntegral() const;
+		// Sets integral upscale, providing false sets fractional upscale
+		void setIntegralUpscale(bool integralUpscale = true);
+		// Sets bordererd fullscreen or windowed mode
+		void setBorderedFullScreen(bool borderedFullScreen = false);
 		// Makes a SDL_Rect with best scaling
-		SDL_Rect makeBestFitScale();
+		SDL_Rect makeBestFitScale() const;
 		// Updates the window
 		void updateWindow();
 		// Shuts down the window
