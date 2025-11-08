@@ -455,6 +455,7 @@ void MenuManager::close()
 {
     currentMenu = nullptr; // Point to no menu
     while (!previousMenus.empty())previousMenus.pop(); // Forget previous menus
+    while (!previousIndexes.empty())previousIndexes.pop(); // ...and indexes!
 }
 
 MenuManager::MenuManager(PassKey<Engine> pk)
@@ -643,7 +644,9 @@ void MenuManager::step(MenuContext& context)
             if (!currentMenuItem)break; // Validate item
             if (!cmdEx.targetMenu)break; // Validate target pointer
             setMenu(cmdEx.targetMenu); // Set target menu for current menu
-            while (!previousMenus.empty())previousMenus.pop(); // Forget previous menus
+            // Forget previous menus and indexes
+            while (!previousMenus.empty())previousMenus.pop();
+            while (!previousIndexes.empty())previousIndexes.pop();
             break;
 
         case MenuCommand::SUB_MENU:
@@ -651,6 +654,7 @@ void MenuManager::step(MenuContext& context)
             if (!currentMenuItem)break; // Validate item
             if (!cmdEx.targetMenu)break; // Validate target pointer
             previousMenus.push(currentMenu); // Remember current menu
+            previousIndexes.push(itemIndex); // ...and cursor position!
             setMenu(cmdEx.targetMenu); // Set target menu for current menu
             break;
 
@@ -658,7 +662,9 @@ void MenuManager::step(MenuContext& context)
             // Go to the specified target menu treating it as the previous menu
             if (!currentMenuItem)break; // Validate item
             if (!cmdEx.targetMenu)break; // Validate target pointer
-            if (!previousMenus.empty())previousMenus.pop(); // Forget the previous menu
+            // Forget the previous menu
+            if (!previousMenus.empty())previousMenus.pop();
+            if (!previousIndexes.empty())previousIndexes.pop();
             setMenu(cmdEx.targetMenu); // Set target menu for current menu
             break;
 
@@ -675,6 +681,19 @@ void MenuManager::step(MenuContext& context)
             { // If there is a previous menu
                 setMenu(previousMenus.top()); // Set the previous menu for current menu
                 previousMenus.pop(); // That menu is no longer previous
+                itemIndex = previousIndexes.top(); // Restore index
+                previousIndexes.pop(); // ...and it's not previous anymore
+                // Sanitize item index
+                int nOItems = (int)currentMenu->items.size();
+                if (nOItems == 0)
+                { // If there are no items, set index to 0
+                    itemIndex = 0;
+                }
+                else if (itemIndex >= nOItems)
+                { // If number of items somehow shrunk
+                    // Select last item
+                    itemIndex = nOItems - 1;
+                }
             }
             break;
         case MenuCommand::BIND_INPUT:

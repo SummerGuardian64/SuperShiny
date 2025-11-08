@@ -179,6 +179,7 @@ namespace ssge
         int levelSelectorInt = 0;
         MenuHeader* currentMenu = nullptr;
         std::stack<MenuHeader*> previousMenus;
+        std::stack<int> previousIndexes;
         unsigned int itemIndex = 0;
         void properlyAdjustItemIndex();
         void setMenu(MenuHeader* menu);
