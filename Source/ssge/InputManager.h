@@ -17,11 +17,20 @@ namespace ssge
 		void handle(SDL_Event e);
 		void latch();
 
-		InputBinding bindings[32];
+		static const int MAX_BINDINGS = 32;
+		InputBinding bindings[MAX_BINDINGS];
 		uint32_t directInputs = 0;
 		InputPad pad;
 
+		int listeningFor = -1;
+		InputBinding lastBinding;
 	public:
 		const InputPad& getPad();
+		bool isListeningForBinding() const;
+		void listenForBinding(int bindingIndex);
+		void stopListeningForBinding();
+		InputBinding getBinding(int bindingIndex) const;
+		std::string getBindingString(int bindingIndex) const;
+		int getMaxBindings() const;
 	};
 }

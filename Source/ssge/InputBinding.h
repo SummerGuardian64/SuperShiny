@@ -1,5 +1,6 @@
 #pragma once
 #include "SDL.h"
+#include <string>
 
 namespace ssge
 {
@@ -15,7 +16,8 @@ namespace ssge
 			JoystickButton,
 			JoystickAxis,
 			JoystickHat,
-			TouchFinger
+			TouchFinger,
+			TOTAL
 		};
 
 		//TODO: Proper mouse wheel support
@@ -81,6 +83,27 @@ namespace ssge
 			return deviceType;
 		}
 
+		std::string getDeviceTypeString() const
+		{
+			static const char* LUT[] = {
+				"Disconnected",
+				"Keyboard",
+				"Mouse Button",
+				"Mouse Wheel",
+				"Joystick Button",
+				"Joystick Axis",
+				"Joystick Hat",
+				"Touch Finger",
+				nullptr
+			};
+
+			int deviceTypeInt = (int)deviceType;
+
+			if (deviceTypeInt < 0 || deviceTypeInt >= (int)DeviceType::TOTAL)
+				return "UNKNOWN";
+			else return LUT[deviceTypeInt];
+		}
+
 		SDL_Scancode getScancode() const
 		{
 			if (deviceType != DeviceType::Keyboard)
@@ -88,11 +111,26 @@ namespace ssge
 			else return boundTo.key;
 		}
 
+		std::string getScancodeString() const
+		{
+			return SDL_GetScancodeName(getScancode());
+		}
+
 		Uint8 getMouseButton() const
 		{
 			if (deviceType != DeviceType::MouseButton)
 				return -1;
 			else return boundTo.mouseButton;
+		}
+
+		std::string getMouseButtonString() const
+		{
+			return std::to_string(getMouseButton());
+		}
+
+		std::string getMouseWheelString() const
+		{
+			return "UNIMPLEMENTED!";
 		}
 
 		Uint8 getJoystickID() const
@@ -130,6 +168,36 @@ namespace ssge
 			if (deviceType != DeviceType::JoystickHat)
 				return -1;
 			else return boundTo.joystickHat;
+		}
+
+		std::string getJoystickName() const
+		{
+			return std::to_string(getJoystickID());
+		}
+
+		std::string makeBindingString() const
+		{
+			switch (deviceType)
+			{
+			case ssge::InputBinding::DeviceType::Disconnected:
+				return "Disconnected";
+			case ssge::InputBinding::DeviceType::Keyboard:
+				return std::string("Key ") + getScancodeString();
+			case ssge::InputBinding::DeviceType::MouseButton:
+				return std::string("Mouse button ") + getMouseButtonString();
+			case ssge::InputBinding::DeviceType::MouseWheel:
+				return std::string("Mouse wheel ") + getMouseWheelString();
+			case ssge::InputBinding::DeviceType::JoystickButton:
+				return std::string("Joystick ") + getJoystickName() + " button " + std::to_string(getJoystickButton());
+			case ssge::InputBinding::DeviceType::JoystickAxis:
+				return std::string("Joystick ") + getJoystickName() + " axis " + std::to_string(getJoystickAxis());
+			case ssge::InputBinding::DeviceType::JoystickHat:
+				return std::string("Joystick ") + getJoystickName() + " hat " + std::to_string(getJoystickHat());
+			case ssge::InputBinding::DeviceType::TouchFinger:
+				return "FINGER UNIMPLEMENTED!";
+			default:
+				return "UNKNOWN";
+			}
 		}
 
 		InputBinding() { disconnect(); }

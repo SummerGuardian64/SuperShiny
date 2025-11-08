@@ -185,6 +185,36 @@ uint32_t InputsAccess::getCurrentButtonsForPlayer(int playerId)
 	//TODO: Support for more players!
 }
 
+bool InputsAccess::isListeningForBinding() const
+{
+	if (!actual)return false;
+	actual->isListeningForBinding();
+}
+
+void InputsAccess::listenForBinding(int bindingIndex)
+{
+	if (!actual)return;
+	else actual->listenForBinding(bindingIndex);
+}
+
+void InputsAccess::stopListeningForBinding()
+{
+	if (!actual)return;
+	else actual->stopListeningForBinding();
+}
+
+InputBinding InputsAccess::getBinding(int bindingIndex) const
+{
+	if (!actual) return InputBinding();
+	else return actual->getBinding(bindingIndex);
+}
+
+int InputsAccess::getMaxBindings() const
+{
+	if (!actual)return 0;
+	else return actual->getMaxBindings();
+}
+
 std::string CurrentSceneAccess::getSceneClassID() const
 {
 	return currentScene->getSceneClassID();

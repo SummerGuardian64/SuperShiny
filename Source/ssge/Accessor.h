@@ -4,6 +4,7 @@
 #include <memory>
 #include "Level.h"
 #include "IGame.h"
+#include "InputBinding.h"
 
 namespace ssge {
 
@@ -91,6 +92,11 @@ namespace ssge {
         bool isJustPressed(int buttonIndex);
         bool isJustReleased(int buttonIndex);
         uint32_t getCurrentButtonsForPlayer(int playerId);
+        bool isListeningForBinding() const;
+        void listenForBinding(int bindingIndex);
+        void stopListeningForBinding();
+        InputBinding getBinding(int bindingIndex) const;
+        int getMaxBindings() const;
     };
     
     class DrawingAccess {
