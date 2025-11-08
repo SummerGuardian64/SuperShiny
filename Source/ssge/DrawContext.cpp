@@ -19,6 +19,17 @@ DrawContext::DrawContext(SDL_Renderer* const renderer)
 	}
 }
 
+DrawContext::DrawContext(SDL_Renderer* const renderer, int virtualWidth, int virtualHeight)
+	:
+	renderer(renderer),
+	bounds({ 0,0,virtualWidth,virtualHeight }),
+	origin({ 0,0 }),
+	deltaTime(0),
+	scrollOffset({ 0,0 }),
+	renderTarget(nullptr)
+{
+}
+
 DrawContext::DrawContext(
 	SDL_Renderer* const renderer,
 	const SDL_Rect bounds,

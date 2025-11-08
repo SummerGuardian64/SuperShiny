@@ -17,6 +17,9 @@ namespace ssge
 	public:
 		DrawContext(SDL_Renderer* const renderer);
 		DrawContext(SDL_Renderer* const renderer,
+			int virtualWidth,
+			int virtualHeight);
+		DrawContext(SDL_Renderer* const renderer,
 			const SDL_Rect bounds,
 			const SDL_Point origin,
 			const double deltaTime,

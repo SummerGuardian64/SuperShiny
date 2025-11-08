@@ -117,23 +117,15 @@ bool Engine::mainLoop(PassKey<Program> pk)
 	const int virtualWidth = game.getVirtualWidth();
 	const int virtualHeight = game.getVirtualHeight();
 
-	// Create a render target texture for the virtual screen.
-	// TODO: If render targets aren’t supported on some old GPUs, consider the
-	// "logical size" approach shown below. For now we keep your target.
-	SDL_Texture* gameScreen =
-		SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET,
-			virtualWidth, virtualHeight);
-
-	if (!gameScreen)
-	{
-		std::cout << "SDL_CreateTexture (gameScreen) error: " << SDL_GetError();
-		return false;
-	}
+	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0");
+	SDL_RenderSetLogicalSize(renderer, virtualWidth, virtualHeight);
+	SDL_RenderSetIntegerScale(renderer, SDL_FALSE);
 
 	// Fixed timestep
 	const double fps = 60.0;
 	const Uint32 deltaTimeMS = (Uint32)(1000.0 / fps + 0.5); // 16 or 17 ms
 	const Uint32 MAX_STEPS = 5;                        // frameskip cap
+	const double deltaTime = (double)deltaTimeMS / 1000.0f;
 
 	Uint32 prevTicks = SDL_GetTicks();
 	Uint32 accumulatorMS = 0;
@@ -161,34 +153,25 @@ bool Engine::mainLoop(PassKey<Program> pk)
 		unsigned steps = 0;
 		while (accumulatorMS >= deltaTimeMS && steps < MAX_STEPS)
 		{
-			const double dt = (double)deltaTimeMS / 1000.0f;
-
+			// Additional responsiveness
+			handleEvents();
 			// Update the engine and see if it's done (wants to quit)
-			done |= !update(dt);
+			done |= !update(deltaTime);
 			accumulatorMS -= deltaTimeMS;
 			steps++;
 		}
 
-		// Render the game onto the virtual gameScreen texture.
-		SDL_SetRenderTarget(renderer, gameScreen);
-		render(DrawContext(renderer));
-		SDL_SetRenderTarget(renderer, nullptr);
-
-		// Clear the window (black background for letterboxing).
 		SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 		SDL_RenderClear(renderer);
-
-		// Render the gameScreen texture scaled to best fit the window.
-		SDL_Rect fitRect = window->makeBestFitScale();
-		SDL_RenderCopy(renderer, gameScreen, nullptr, &fitRect);
-
+		render(DrawContext(renderer, virtualWidth, virtualHeight));
 		SDL_RenderPresent(renderer);
 
 		// Cooperative yield (keeps XP/old drivers happy)
-		SDL_Delay(0);
+		if (accumulatorMS < frameMS)
+		{
+			SDL_Delay(1);
+		}
 	}
-
-	SDL_DestroyTexture(gameScreen);
 
 	return false;
 }
