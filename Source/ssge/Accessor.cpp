@@ -209,6 +209,12 @@ InputBinding InputsAccess::getBinding(int bindingIndex) const
 	else return actual->getBinding(bindingIndex);
 }
 
+std::string ssge::InputsAccess::getBindingString(int bindingIndex) const
+{
+	if (!actual)return "(err: InputsAccess->actual==nullptr)";
+	else return actual->getBindingString(bindingIndex);
+}
+
 int InputsAccess::getMaxBindings() const
 {
 	if (!actual)return 0;

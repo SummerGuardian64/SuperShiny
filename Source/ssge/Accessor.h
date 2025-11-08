@@ -96,6 +96,7 @@ namespace ssge {
         void listenForBinding(int bindingIndex);
         void stopListeningForBinding();
         InputBinding getBinding(int bindingIndex) const;
+        std::string getBindingString(int bindingIndex) const;
         int getMaxBindings() const;
     };
     

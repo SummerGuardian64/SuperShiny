@@ -34,6 +34,7 @@ namespace ssge
         static const int SUB_MENU = -11;
         static const int POP_AND_GOTO = -12;
         static const int GO_BACK = -13;
+        static const int BIND_INPUT = -14;
     private:
         int _cmd = NOTHING;
     public:
@@ -77,6 +78,18 @@ namespace ssge
         std::string printSetting() const;
         void change(int direction);
         MenuSettingBool(bool* boolean = nullptr, std::string strOn = "On", std::string strOff = "Off");
+    };
+
+    class MenuSettingBindingIndex : public MenuSetting
+    {
+        std::string text;
+        int bindingIndex = -1;
+    public:
+        void setText(std::string text);
+        int getBindingIndex() const;
+        std::string printSetting() const;
+        void change(int direction);
+        MenuSettingBindingIndex(int bindingIndex);
     };
 
     class MenuItem
@@ -139,6 +152,7 @@ namespace ssge
         MenuItem* newItem_IntSetting(const char* text, int* setting, int min, int max, MenuCommand command = MenuCommand::NOTHING, MenuFunction = nullptr);
         MenuItem* newItem_BoolSetting(const char* text, bool* setting, MenuCommand command = MenuCommand::NOTHING, MenuFunction = nullptr);
         MenuItem* newItem_BoolSetting(const char* text, bool* setting, std::string strOn, std::string strOff, MenuCommand command = MenuCommand::NOTHING, MenuFunction = nullptr);
+        MenuItem* newItem_InputBinding(const char* bindingName, int bindingIndex);
         MenuItem* newItem_CloseMenu(const char* text, MenuFunction onSelect = NULL);
         MenuItem* newItem_ExitProgram(const char* text, MenuFunction onSelect = NULL);
         MenuHeader();

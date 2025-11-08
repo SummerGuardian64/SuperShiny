@@ -60,6 +60,31 @@ std::string MenuSettingInt::printSetting() const
 	return std::string(" ") + std::to_string(*integer);
 }
 
+void ssge::MenuSettingBindingIndex::setText(std::string text)
+{
+    this->text = text;
+}
+
+int MenuSettingBindingIndex::getBindingIndex() const
+{
+    return bindingIndex;
+}
+
+std::string MenuSettingBindingIndex::printSetting() const
+{
+    return text;
+}
+
+void MenuSettingBindingIndex::change(int direction)
+{
+    // We don't do the binding here
+    return;
+}
+
+MenuSettingBindingIndex::MenuSettingBindingIndex(int bindingIndex)
+    :bindingIndex(bindingIndex)
+{}
+
 void MenuSettingInt::change(int direction)
 {
 	// Don't run if direction equals zero
@@ -287,6 +312,13 @@ MenuItem* ssge::MenuHeader::newItem_BoolSetting(const char* text, bool* setting,
     return item;
 }
 
+MenuItem* ssge::MenuHeader::newItem_InputBinding(const char* bindingName, int bindingIndex)
+{
+    auto item = new MenuItem(bindingName, true, true, true, MenuCommand::BIND_INPUT, nullptr, false, new MenuSettingBindingIndex(bindingIndex), nullptr);
+    items.push_back(item);
+    return nullptr;
+}
+
 MenuItem* MenuHeader::newItem_CloseMenu(const char* text, MenuFunction onSelect)
 {
 	auto item = new MenuItem(text, true, true, true, MenuCommand::CLOSE_MENU);
@@ -439,7 +471,7 @@ void MenuManager::step(MenuContext& context)
 
     int returnedCommand = MenuCommand::NOTHING; // A menu item will return a MenuCommand
     bool closeMenu = false; // Should the menu close?
-    MenuItem* currentMenuItem = NULL; // A pointer to simplify redundant code
+    MenuItem* currentMenuItem = nullptr; // A pointer to simplify redundant code
 
     if (currentMenu->items.size() > 0)
     {
@@ -507,6 +539,27 @@ void MenuManager::step(MenuContext& context)
     else if (context.inputs.isJustPressed(5))
     { // Escape key is for going back.
         returnedCommand = MenuCommand::GO_BACK;
+    }
+
+    // Update input binding items' labels
+    for (auto& item : currentMenu->items)
+    {
+        if (item->command == MenuCommand::BIND_INPUT)
+        { // This one ought to have a setting
+            if (auto setting = item->setting)
+            { // Let's hope it's a binding index type
+                if (auto bindingIndexSetting
+                    = dynamic_cast<MenuSettingBindingIndex*>(setting))
+                { // Get its binding index
+                    int bindingIndex =
+                        bindingIndexSetting->getBindingIndex();
+                    // Update its text
+                    bindingIndexSetting->setText(
+                        context.inputs.getBindingString(bindingIndex)
+                    );
+                }
+            }
+        }
     }
 
     // Make up an elaborate ("extended") command
@@ -619,7 +672,24 @@ void MenuManager::step(MenuContext& context)
                 previousMenus.pop(); // That menu is no longer previous
             }
             break;
-
+        case MenuCommand::BIND_INPUT:
+            // Bind the input command
+            if (!currentMenuItem)break; // Validate item
+            if (currentMenuItem->command == MenuCommand::BIND_INPUT)
+            { // This one ought to have a setting
+                if (auto setting = currentMenuItem->setting)
+                { // Let's hope it's a binding index type
+                    if (auto bindingIndexSetting
+                        = dynamic_cast<MenuSettingBindingIndex*>(setting))
+                    { // Get its binding index
+                        int bindingIndex =
+                            bindingIndexSetting->getBindingIndex();
+                        // Tell InputManager to listen for this binding
+                        context.inputs.listenForBinding(bindingIndex);
+                    }
+                }
+            }
+            break;
         default:
             // This is for any command number not covered previously
             if (returnedCommand >= 0)
