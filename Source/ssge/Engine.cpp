@@ -248,15 +248,6 @@ bool Engine::update(double deltaTime)
 
 	scenes->step(stepContext);
 
-	// map inputs to menu intents (replace with your real buttons)
-	const bool openPause = inputs->pad.isJustPressed(7);   // e.g. Esc/Start
-	const bool up = inputs->pad.isJustPressed(0);
-	const bool down = inputs->pad.isJustPressed(1);
-	const bool left = inputs->pad.isJustPressed(2);
-	const bool right = inputs->pad.isJustPressed(3);
-	const bool accept = inputs->pad.isJustPressed(4);
-	const bool back = inputs->pad.isJustPressed(5);
-
 	game.step(stepContext);
 
 	{ // Prepare MenuContext
