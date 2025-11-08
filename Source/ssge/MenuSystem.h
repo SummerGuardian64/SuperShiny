@@ -85,6 +85,7 @@ namespace ssge
         std::string text;
         int bindingIndex = -1;
     public:
+        std::string getText() const;
         void setText(std::string text);
         int getBindingIndex() const;
         std::string printSetting() const;

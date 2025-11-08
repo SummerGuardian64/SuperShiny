@@ -60,6 +60,11 @@ std::string MenuSettingInt::printSetting() const
 	return std::string(" ") + std::to_string(*integer);
 }
 
+std::string MenuSettingBindingIndex::getText() const
+{
+    return text;
+}
+
 void ssge::MenuSettingBindingIndex::setText(std::string text)
 {
     this->text = text;
@@ -72,7 +77,7 @@ int MenuSettingBindingIndex::getBindingIndex() const
 
 std::string MenuSettingBindingIndex::printSetting() const
 {
-    return text;
+    return std::string(" = ") + text;
 }
 
 void MenuSettingBindingIndex::change(int direction)

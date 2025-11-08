@@ -182,7 +182,7 @@ namespace ssge
 			case ssge::InputBinding::DeviceType::Disconnected:
 				return "Disconnected";
 			case ssge::InputBinding::DeviceType::Keyboard:
-				return std::string("Key ") + getScancodeString();
+				return getScancodeString() + " key";
 			case ssge::InputBinding::DeviceType::MouseButton:
 				return std::string("Mouse button ") + getMouseButtonString();
 			case ssge::InputBinding::DeviceType::MouseWheel:

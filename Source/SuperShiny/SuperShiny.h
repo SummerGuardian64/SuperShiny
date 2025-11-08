@@ -135,6 +135,9 @@ public: //TODO: Encapsulate
         ssge::MenuHeader highScoreMenu;
         ssge::MenuHeader confirmExitProgram;
         ssge::MenuHeader optionsMenu;
+        ssge::MenuHeader inputConfigMenu;
+        ssge::MenuHeader volumeControlMenu;
+        ssge::MenuHeader displaySettingsMenu;
         ssge::MenuHeader confirmRestart;
         ssge::MenuHeader confirmExitGame;
         ssge::MenuHeader levelSelect;
@@ -153,6 +156,7 @@ public: //TODO: Encapsulate
     class Config
     {
     public:
+        int masterVolume = 100;
         int sfxVolume = 100;
         int musicVolume = 100;
         int resolutionScaleConfig = 1;

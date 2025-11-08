@@ -314,8 +314,9 @@ void SuperShiny::Menus::init(SuperShiny::Config& config)
 
 	// Compose the main menu
 	mainMenu.setTitle("Super Shiny");
-	mainMenu.newItem_NewGame("Start Game");
-	mainMenu.newItem_SubMenu("Level Select", &levelSelect);
+	mainMenu.newItem_NewGame("New Game");
+	mainMenu.newItem("Load Game")->enabled = false;
+	mainMenu.newItem_SubMenu("Level Select", &levelSelect)->visible = false;
 	mainMenu.newItem("Super Duper Secret Menu")->visible = false;
 	mainMenu.newItem_SubMenu("High Score", &highScoreMenu, (MenuFunction)refreshHighScoreMenu);
 	mainMenu.newItem_SubMenu("Options", &optionsMenu);
@@ -323,12 +324,36 @@ void SuperShiny::Menus::init(SuperShiny::Config& config)
 	mainMenu.newLabel("Created by Summer Guardian 64");
 	mainMenu.newLabel("Thank you for playing!");
 
-	optionsMenu.newItem_IntSetting("Sound Volume:", &config.sfxVolume, 0, 100);
-	optionsMenu.newItem_IntSetting("Music Volume:", &config.musicVolume, 0, 100);
-	optionsMenu.newItem_IntSetting("Resolution Upscale:", &config.resolutionScaleConfig, 1, 4)->visible = false;
-	optionsMenu.newItem_BoolSetting("Display Mode:", &config.fullScreen, "Borderless Fullscreen", "Windowed");
-	optionsMenu.newItem_BoolSetting("Stretching:", &config.integralUpscale, "Integral", "Fractional");
-	optionsMenu.newItem_GoBack("Back");
+	optionsMenu.newItem_SubMenu("Input Configuration", &inputConfigMenu);
+	{
+		inputConfigMenu.setTitle("Input Configuration");
+		inputConfigMenu.newItem_InputBinding("Up", 0);
+		inputConfigMenu.newItem_InputBinding("Down", 1);
+		inputConfigMenu.newItem_InputBinding("Left", 2);
+		inputConfigMenu.newItem_InputBinding("Right", 3);
+		inputConfigMenu.newItem_InputBinding("Jump/Accept", 4);
+		inputConfigMenu.newItem_InputBinding("Run/Shoot/Grab/Back", 5);
+		inputConfigMenu.newItem_InputBinding("Dash/Pounce", 6);
+		inputConfigMenu.newItem_InputBinding("Pause", 7);
+		inputConfigMenu.newItem_GoBack("Save & Back"); // TODO: Config saving
+	}
+	optionsMenu.newItem_SubMenu("Volume Control", &volumeControlMenu);
+	{
+		volumeControlMenu.setTitle("Volume Control");
+		volumeControlMenu.newItem_IntSetting("Master:", &config.masterVolume, 0, 100);
+		volumeControlMenu.newItem_IntSetting("Music:", &config.musicVolume, 0, 100);
+		volumeControlMenu.newItem_IntSetting("Sounds:", &config.sfxVolume, 0, 100);
+		volumeControlMenu.newItem_GoBack("Save & Back"); // TODO: Config saving
+	}
+	optionsMenu.newItem_SubMenu("Display Settings", &displaySettingsMenu);
+	{
+		displaySettingsMenu.setTitle("Display Settings");
+		displaySettingsMenu.newItem_IntSetting("Resolution Upscale:", &config.resolutionScaleConfig, 1, 4)->visible = false;
+		displaySettingsMenu.newItem_BoolSetting("Display Mode:", &config.fullScreen, "Borderless Fullscreen", "Windowed");
+		displaySettingsMenu.newItem_BoolSetting("Stretching:", &config.integralUpscale, "Integral", "Fractional");
+		displaySettingsMenu.newItem_GoBack("Save & Back"); // TODO: Config saving
+	}
+	optionsMenu.newItem_GoBack("Save & Back"); // TODO: Config saving
 
 	confirmRestart.newLabel("Restarting a level will discard unsaved score!");
 	confirmRestart.newLabel("Are you sure you want to restart this level?");
