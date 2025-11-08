@@ -5,8 +5,36 @@ using namespace ssge;
 
 InputManager::InputManager(PassKey<Engine> pk) {}
 
+void InputManager::init(PassKey<Engine> pk)
+{
+
+    // Enable joystick and game controller events
+    SDL_JoystickEventState(SDL_ENABLE);
+    SDL_GameControllerEventState(SDL_ENABLE);
+
+    // Open every game device that's plugged in
+    prepareJoypadSlots();
+}
+
 void InputManager::handle(SDL_Event e)
 {
+    // Joypad hardware change
+    switch (e.type)
+    {
+    case SDL_CONTROLLERDEVICEADDED:
+        onControllerAdded(e.cdevice.which); // device index
+        return;
+    case SDL_CONTROLLERDEVICEREMOVED:
+        onControllerRemoved(e.cdevice.which); // instance id
+        return;
+    case SDL_JOYDEVICEADDED:
+        onJoystickAdded(e.jdevice.which); // device index
+        return;
+    case SDL_JOYDEVICEREMOVED:
+        onJoystickRemoved(e.jdevice.which); // instance id
+        return;
+    }
+
     // Do not parse direct inputs if listening for binding
     if (isListeningForBinding())
     {
@@ -35,19 +63,41 @@ void InputManager::handle(SDL_Event e)
 
         // Not listening anymore. We've got our binding
         stopListeningForBinding();
+
+        // All is handled
+        return;
     }
     else
     { // Normal listening and parsing into directInputs
+
+        // Clear all SDL_MOUSEWHEEL-bound inputs
+        // because we don't have a MouseWheelRelease event.
+        // Without this, the mousewheel inputs get jammed!
+        for (int index = 0; index < 32; index++)
+        {
+            if (bindings[index].getDeviceType()
+                == InputBinding::DeviceType::MouseWheel)
+            { // Clear
+                directInputs &= ~(1 << index);
+            }
+        }
+
+        // See if incoming event matches a binding
         for (int index = 0; index < 32; index++)
         {
             if (bindings[index].matchesEvent(e))
-            {
-                if (e.type == SDL_KEYDOWN || e.type == SDL_MOUSEBUTTONDOWN || e.type == SDL_JOYBUTTONDOWN)
-                {
+            { // We support
+                if (e.type == SDL_KEYDOWN // key press
+                 || e.type == SDL_MOUSEBUTTONDOWN // mouse button press
+                 || e.type == SDL_MOUSEWHEEL // mouse wheel roll
+                 || e.type == SDL_JOYBUTTONDOWN) // joystick button press
+                { // Set the bit
                     directInputs |= 1 << index;
                 }
-                else if (e.type == SDL_KEYUP || e.type == SDL_MOUSEBUTTONUP || e.type == SDL_JOYBUTTONUP)
-                {
+                else if (e.type == SDL_KEYUP // key release
+                      || e.type == SDL_MOUSEBUTTONUP // mouse button release
+                      || e.type == SDL_JOYBUTTONUP) // joystick button release
+                { // Clear the bit
                     directInputs &= ~(1 << index);
                 }
             }
@@ -60,7 +110,135 @@ void InputManager::latch()
     pad.latchButtons(directInputs);
 }
 
-const InputPad& InputManager::getPad()
+// Joypad stuff
+
+void InputManager::prepareJoypadSlots()
+{
+    int n = SDL_NumJoysticks();
+    for (int i = 0; i < n; i++)
+    {
+        if (SDL_IsGameController(i))
+            onControllerAdded(i);
+        else
+            onJoystickAdded(i);
+    }
+}
+
+void InputManager::onControllerAdded(int deviceIndex)
+{
+    int slot = getFreeJoypadSlot();
+    if (slot < 0)
+        return;
+
+    SDL_GameController* c = SDL_GameControllerOpen(deviceIndex);
+    if (!c)
+        return;
+
+    joypadSlots[slot].ctrl = c;
+    SDL_Joystick* j = SDL_GameControllerGetJoystick(c);
+    joypadSlots[slot].instance = SDL_JoystickInstanceID(j);
+}
+
+void InputManager::onControllerRemoved(SDL_JoystickID id)
+{
+    int slot = getJoypadSlotByInstance(id);
+    if (slot < 0)
+        return;
+
+    if (joypadSlots[slot].ctrl)
+    {
+        SDL_GameControllerClose(joypadSlots[slot].ctrl);
+        joypadSlots[slot].ctrl = nullptr;
+    }
+
+    joypadSlots[slot].joy = nullptr; // just in case
+    joypadSlots[slot].instance = -1;
+}
+
+void InputManager::onJoystickAdded(int deviceIndex)
+{
+    // Only if NOT a GameController
+    if (SDL_IsGameController(deviceIndex))
+        return;
+
+    int slot = getFreeJoypadSlot();
+    if (slot < 0)
+        return;
+
+    SDL_Joystick* j = SDL_JoystickOpen(deviceIndex);
+    if (!j)
+        return;
+
+    joypadSlots[slot].joy = j;
+    joypadSlots[slot].instance = SDL_JoystickInstanceID(j);
+}
+
+void InputManager::onJoystickRemoved(SDL_JoystickID id)
+{
+    int slot = getJoypadSlotByInstance(id);
+    if (slot < 0)
+        return;
+
+    if (joypadSlots[slot].joy)
+    {
+        SDL_JoystickClose(joypadSlots[slot].joy);
+        joypadSlots[slot].joy = nullptr;
+    }
+    joypadSlots[slot].ctrl = nullptr; // just in case
+    joypadSlots[slot].instance = -1;
+}
+
+int InputManager::getJoypadSlotByInstance(SDL_JoystickID id) const
+{
+    for (int i = 0; i < MAX_JOYPADS; i++)
+    {
+        if (joypadSlots[i].instance == id)
+        {
+            return i;
+        }
+    }
+    return -1;
+}
+
+InputManager::Joypad* ssge::InputManager::getJoypadByInstance(SDL_JoystickID id)
+{
+    for (int i = 0; i < MAX_JOYPADS; i++)
+    {
+        Joypad* joypad = &joypadSlots[i];
+        if (joypad->instance == id)
+        {
+            return joypad;
+        }
+    }
+    return nullptr;
+}
+
+int InputManager::getFreeJoypadSlot() const
+{
+    for (int i = 0; i < MAX_JOYPADS; i++)
+    {
+        if (!joypadSlots[i].ctrl && !joypadSlots[i].joy)
+        {
+            return i;
+        }
+    }
+    return -1;
+}
+
+InputManager::Joypad* ssge::InputManager::getFreeJoyPad()
+{
+    for (int i = 0; i < MAX_JOYPADS; i++)
+    {
+        Joypad* joypad = &joypadSlots[i];
+        if (joypad->ctrl && joypad->joy)
+        {
+            return joypad;
+        }
+    }
+    return nullptr;
+}
+
+const InputPad& InputManager::getPad() const
 {
     return pad;
 }

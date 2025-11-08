@@ -33,6 +33,9 @@ bool Engine::init(PassKey<Program> pk)
 	std::cout << "initSDL" << std::endl;
 	bool success = true;
 
+	// Handy tweak so joysticks don't fail at the con
+	SDL_SetHint(SDL_HINT_JOYSTICK_ALLOW_BACKGROUND_EVENTS, "1");
+
 	// Initialize SDL
 	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_EVENTS | SDL_INIT_AUDIO |
 		SDL_INIT_JOYSTICK | SDL_INIT_GAMECONTROLLER | SDL_INIT_HAPTIC) != 0)
@@ -40,6 +43,9 @@ bool Engine::init(PassKey<Program> pk)
 		std::cout << "SDL_Init error: ", SDL_GetError();
 		success = false;
 	}
+
+	// Initialize input stuff via InputManager
+	inputs->init(PassKey<Engine>());
 
 	// Initialize SDL_image for PNG support
 	int imgFlags = IMG_INIT_PNG;
@@ -98,6 +104,7 @@ bool Engine::prepareInitialState()
 	game.init(stepContext);
 
 	//scenes->changeScene("SplashScreen");
+	// TODO: MOVE TO game.init() and encapsulate bindings[]
 	inputs->bindings[0].bindToKey(SDL_Scancode::SDL_SCANCODE_UP);
 	inputs->bindings[1].bindToKey(SDL_Scancode::SDL_SCANCODE_DOWN);
 	inputs->bindings[2].bindToKey(SDL_Scancode::SDL_SCANCODE_LEFT);

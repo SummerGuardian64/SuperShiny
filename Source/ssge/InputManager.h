@@ -2,6 +2,7 @@
 #include "InputBinding.h"
 #include "InputPad.h"
 #include "PassKey.h"
+#include <list>
 
 namespace ssge
 {
@@ -14,8 +15,34 @@ namespace ssge
 		InputManager(const InputManager& toCopy) = delete;
 		InputManager(InputManager&& toMove) = delete;
 
+		void init(PassKey<Engine> pk);
 		void handle(SDL_Event e);
 		void latch();
+
+		// TODO: Encapsulate
+
+		struct Joypad
+		{
+			SDL_GameController* ctrl = nullptr;
+			SDL_Joystick* joy = nullptr;
+			SDL_JoystickID instance = -1;
+		};
+
+		static const int MAX_JOYPADS = 8;
+		Joypad joypadSlots[MAX_JOYPADS];
+
+	private:
+		void prepareJoypadSlots(); // Call only on start
+	public:
+		void onControllerAdded(int deviceIndex);      // SDL_CONTROLLERDEVICEADDED
+		void onControllerRemoved(SDL_JoystickID id);  // SDL_CONTROLLERDEVICEREMOVED
+		void onJoystickAdded(int deviceIndex);        // SDL_JOYDEVICEADDED
+		void onJoystickRemoved(SDL_JoystickID id);    // SDL_JOYDEVICEREMOVED
+
+		int getJoypadSlotByInstance(SDL_JoystickID id) const; // returns slot or -1
+		Joypad* getJoypadByInstance(SDL_JoystickID id);
+		int getFreeJoypadSlot() const;                    // returns slot or -1
+		Joypad* getFreeJoyPad();
 
 		static const int MAX_BINDINGS = 32;
 		InputBinding bindings[MAX_BINDINGS];
@@ -25,7 +52,7 @@ namespace ssge
 		int listeningFor = -1;
 		InputBinding lastBinding;
 	public:
-		const InputPad& getPad();
+		const InputPad& getPad() const;
 		bool isListeningForBinding() const;
 		void listenForBinding(int bindingIndex);
 		void stopListeningForBinding();
