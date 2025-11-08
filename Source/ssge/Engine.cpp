@@ -35,7 +35,7 @@ bool Engine::init(PassKey<Program> pk)
 
 	// Initialize SDL
 	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_EVENTS | SDL_INIT_AUDIO |
-		SDL_INIT_JOYSTICK | SDL_INIT_HAPTIC) != 0)
+		SDL_INIT_JOYSTICK | SDL_INIT_GAMECONTROLLER | SDL_INIT_HAPTIC) != 0)
 	{
 		std::cout << "SDL_Init error: ", SDL_GetError();
 		success = false;
@@ -188,6 +188,9 @@ void Engine::handleEvents()
 			break;
 		case SDL_EventType::SDL_KEYDOWN:
 		case SDL_EventType::SDL_KEYUP:
+		case SDL_EventType::SDL_MOUSEBUTTONDOWN:
+		case SDL_EventType::SDL_MOUSEBUTTONUP:
+		case SDL_EventType::SDL_MOUSEWHEEL:
 		case SDL_EventType::SDL_JOYBUTTONDOWN:
 		case SDL_EventType::SDL_JOYBUTTONUP:
 		case SDL_EventType::SDL_JOYAXISMOTION:
