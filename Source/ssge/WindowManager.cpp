@@ -43,7 +43,7 @@ const char* WindowManager::init(const char* title, int width, int height)
 
 #if defined(_WIN32)
     printf("_WIN32_WINNT=0x%04X\n", _WIN32_WINNT);
-#if _WIN32_WINNT <= 0x0501
+#if _WIN32_WINNT <= 0x0502
     // Nearest neighbour for scaling
     // Windows XP may be weak otherwise
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0");
