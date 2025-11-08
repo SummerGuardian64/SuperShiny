@@ -270,7 +270,7 @@ bool SuperShiny::Sprites::load(std::string sprdefId, SDL_Renderer* renderer)
 	ssge::Sprite::Definition* sprdef = fetchDefinitionNonConst(sprdefId);
 	if (sprdef)
 		return sprdef->load(renderer);
-	else return nullptr;
+	else return false;
 }
 
 void SuperShiny::Sprites::unload(std::string sprdefId)

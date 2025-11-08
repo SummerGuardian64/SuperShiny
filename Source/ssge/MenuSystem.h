@@ -38,7 +38,7 @@ namespace ssge
         int _cmd = NOTHING;
     public:
         MenuCommand& operator=(const int targetLevel);
-        MenuCommand& operator=(MenuCommand& other);
+        MenuCommand& operator=(const MenuCommand& other);
         bool operator==(const int other);
         bool operator==(MenuCommand& other);
         MenuCommand(int command = MenuCommand::NOTHING);

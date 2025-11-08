@@ -7,7 +7,7 @@
 
 using namespace ssge;
 
-MenuCommand& MenuCommand::operator=(MenuCommand& other)
+MenuCommand& MenuCommand::operator=(const MenuCommand& other)
 {
 	_cmd = other._cmd;
 	return *this;
