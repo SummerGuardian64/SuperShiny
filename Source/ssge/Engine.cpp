@@ -99,25 +99,24 @@ bool Engine::loadInitialResources(SDL_Renderer* renderer)
 bool Engine::prepareInitialState()
 {
 	// TODO: MOVE TO game.init() and encapsulate bindings[]
-	inputs->bindings[0].bindToKey(SDL_Scancode::SDL_SCANCODE_UP);
-	inputs->fallbackBindings[0].bindToKey(SDL_Scancode::SDL_SCANCODE_UP);
-	inputs->bindings[1].bindToKey(SDL_Scancode::SDL_SCANCODE_DOWN);
-	inputs->fallbackBindings[1].bindToKey(SDL_Scancode::SDL_SCANCODE_DOWN);
-	inputs->bindings[2].bindToKey(SDL_Scancode::SDL_SCANCODE_LEFT);
-	inputs->fallbackBindings[2].bindToKey(SDL_Scancode::SDL_SCANCODE_LEFT);
-	inputs->bindings[3].bindToKey(SDL_Scancode::SDL_SCANCODE_RIGHT);
-	inputs->fallbackBindings[3].bindToKey(SDL_Scancode::SDL_SCANCODE_RIGHT);
-	inputs->bindings[4].bindToKey(SDL_Scancode::SDL_SCANCODE_X);
-	inputs->bindings[5].bindToKey(SDL_Scancode::SDL_SCANCODE_Z);
-	inputs->bindings[6].bindToKey(SDL_Scancode::SDL_SCANCODE_SPACE);
-	inputs->bindings[7].bindToKey(SDL_Scancode::SDL_SCANCODE_ESCAPE);
-	inputs->fallbackBindings[7].bindToKey(SDL_Scancode::SDL_SCANCODE_ESCAPE);
-	inputs->bindings[8].bindToKey(SDL_Scancode::SDL_SCANCODE_RETURN);
-	inputs->fallbackBindings[8].bindToKey(SDL_Scancode::SDL_SCANCODE_RETURN);
-	inputs->bindings[9].bindToKey(SDL_Scancode::SDL_SCANCODE_ESCAPE);
-	inputs->fallbackBindings[9].bindToKey(SDL_Scancode::SDL_SCANCODE_ESCAPE);
+	inputs->fetchBinding(0)->bindToKey(SDL_Scancode::SDL_SCANCODE_UP);
+	inputs->fetchFallbackBinding(0)->bindToKey(SDL_Scancode::SDL_SCANCODE_UP);
+	inputs->fetchBinding(1)->bindToKey(SDL_Scancode::SDL_SCANCODE_DOWN);
+	inputs->fetchFallbackBinding(1)->bindToKey(SDL_Scancode::SDL_SCANCODE_DOWN);
+	inputs->fetchBinding(2)->bindToKey(SDL_Scancode::SDL_SCANCODE_LEFT);
+	inputs->fetchFallbackBinding(2)->bindToKey(SDL_Scancode::SDL_SCANCODE_LEFT);
+	inputs->fetchBinding(3)->bindToKey(SDL_Scancode::SDL_SCANCODE_RIGHT);
+	inputs->fetchFallbackBinding(3)->bindToKey(SDL_Scancode::SDL_SCANCODE_RIGHT);
+	inputs->fetchBinding(4)->bindToKey(SDL_Scancode::SDL_SCANCODE_X);
+	inputs->fetchBinding(5)->bindToKey(SDL_Scancode::SDL_SCANCODE_Z);
+	inputs->fetchBinding(6)->bindToKey(SDL_Scancode::SDL_SCANCODE_SPACE);
+	inputs->fetchBinding(7)->bindToKey(SDL_Scancode::SDL_SCANCODE_ESCAPE);
+	inputs->fetchFallbackBinding(7)->bindToKey(SDL_Scancode::SDL_SCANCODE_ESCAPE);
+	inputs->fetchBinding(8)->bindToKey(SDL_Scancode::SDL_SCANCODE_RETURN);
+	inputs->fetchFallbackBinding(8)->bindToKey(SDL_Scancode::SDL_SCANCODE_RETURN);
+	inputs->fetchBinding(9)->bindToKey(SDL_Scancode::SDL_SCANCODE_ESCAPE);
+	inputs->fetchFallbackBinding(9)->bindToKey(SDL_Scancode::SDL_SCANCODE_ESCAPE);
 
-	//TODO: Initialize first scene
 	auto stepContext = StepContext(PassKey<Engine>(),
 		0,
 		EngineAccess(this),
@@ -129,7 +128,6 @@ bool Engine::prepareInitialState()
 		DrawingAccess(window->getRenderer()),
 		MenusAccess(menus));
 	game.init(stepContext);
-
 
 	return true;
 }

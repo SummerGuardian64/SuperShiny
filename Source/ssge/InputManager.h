@@ -25,8 +25,7 @@ namespace ssge
 		void handle(SDL_Event e);
 		void latch();
 
-		// TODO: Encapsulate
-
+	private:
 		struct Joypad
 		{
 			SDL_GameController* ctrl = nullptr;
@@ -37,7 +36,6 @@ namespace ssge
 		static const int MAX_JOYPADS = 8;
 		Joypad joypadSlots[MAX_JOYPADS];
 
-	private:
 		void prepareJoypadSlots(); // Call only on start
 	public:
 		void onControllerAdded(int deviceIndex);      // SDL_CONTROLLERDEVICEADDED
@@ -53,6 +51,8 @@ namespace ssge
 		static const int MAX_BINDINGS = 32;
 		InputBinding bindings[MAX_BINDINGS];
 		InputBinding fallbackBindings[MAX_BINDINGS]; // For the con
+
+	private:
 		uint32_t directInputs = 0;
 		InputPad pad;
 
@@ -64,6 +64,8 @@ namespace ssge
 		void listenForBinding(int bindingIndex);
 		void stopListeningForBinding();
 		InputBinding getBinding(int bindingIndex) const;
+		InputBinding* fetchBinding(int bindingIndex);
+		InputBinding* fetchFallbackBinding(int bindingIndex);
 		std::string getBindingString(int bindingIndex) const;
 		int getMaxBindings() const;
 

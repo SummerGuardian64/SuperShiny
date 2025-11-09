@@ -416,6 +416,20 @@ InputBinding ssge::InputManager::getBinding(int bindingIndex) const
     else return bindings[bindingIndex];
 }
 
+InputBinding* ssge::InputManager::fetchBinding(int bindingIndex)
+{
+    if (bindingIndex < 0 || bindingIndex >= MAX_BINDINGS)
+        return nullptr; // Return empty binding on bad index
+    else return &bindings[bindingIndex];
+}
+
+InputBinding* ssge::InputManager::fetchFallbackBinding(int bindingIndex)
+{
+    if (bindingIndex < 0 || bindingIndex >= MAX_BINDINGS)
+        return nullptr; // Return empty binding on bad index
+    else return &fallbackBindings[bindingIndex];
+}
+
 std::string ssge::InputManager::getBindingString(int bindingIndex) const
 {
     if (bindingIndex < 0 || bindingIndex >= MAX_BINDINGS)
