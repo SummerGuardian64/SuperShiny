@@ -132,7 +132,15 @@ void SuperShiny::step(ssge::StepContext& context)
 		wannaSaveSettings = false;
 	}
 
-	syncSettings(context);
+	if (context.engine.isWrappingUp())
+	{
+		// Fade out on wrapping up
+		context.audio.setMasterVolume(context.audio.getMasterVolume() - 5);
+	}
+	else // Avoid synchronizing settings while wrapping up
+	{
+		syncSettings(context);
+	}
 }
 
 void SuperShiny::draw(ssge::DrawContext& context)
