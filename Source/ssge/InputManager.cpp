@@ -16,25 +16,31 @@ void InputManager::init(PassKey<Engine> pk)
     prepareJoypadSlots();
 }
 
-void InputManager::handle(SDL_Event e)
+bool ssge::InputManager::handleHardwareChange(SDL_Event e)
 {
     // Joypad hardware change
     switch (e.type)
     {
-    /*case SDL_CONTROLLERDEVICEADDED:
-        onControllerAdded(e.cdevice.which); // device index
-        return;
-    case SDL_CONTROLLERDEVICEREMOVED:
-        onControllerRemoved(e.cdevice.which); // instance id
-        return;*/
+        /*case SDL_CONTROLLERDEVICEADDED:
+            onControllerAdded(e.cdevice.which); // device index
+            return true;
+        case SDL_CONTROLLERDEVICEREMOVED:
+            onControllerRemoved(e.cdevice.which); // instance id
+            return true;*/
     case SDL_JOYDEVICEADDED:
         onJoystickAdded(e.jdevice.which); // device index
-        return;
+        return true;
     case SDL_JOYDEVICEREMOVED:
         onJoystickRemoved(e.jdevice.which); // instance id
-        return;
+        return true;
     }
 
+    // Don't swallow the event!
+    return false;
+}
+
+bool ssge::InputManager::handleListeningForBinding(SDL_Event e)
+{
     // Do not parse direct inputs if listening for binding
     if (isListeningForBinding())
     {
@@ -63,7 +69,7 @@ void InputManager::handle(SDL_Event e)
                 lastBinding.bindToControllerAxis(e.caxis.which, e.caxis.axis, 1);
             else if (e.caxis.value < -16000) // Negative direction
                 lastBinding.bindToControllerAxis(e.caxis.which, e.caxis.axis, -1);
-            else return; // Not enough pushed axis. Irrelevant!
+            else return true; // Not enough pushed axis. Irrelevant!
             break;
 
             // Legacy joysticks
@@ -77,126 +83,169 @@ void InputManager::handle(SDL_Event e)
             else if (e.jaxis.value < -16000) // Negative direction
                 lastBinding.bindToJoystickAxis(
                     e.jaxis.which, e.jaxis.axis, -1);
-            else return; // Not enough pushed axis. Irrelevant!
+            else return true; // Not enough pushed axis. Irrelevant!
             break;
         case SDL_JOYHATMOTION:
             lastBinding.bindToJoystickHat(e.jhat.which, e.jhat.hat, e.jhat.value);
             break;
         default:
             // Bail out if nothing was pressed
-            return;
+            return true;
         }
 
-        // Bind!
-        bindings[listeningFor] = lastBinding;
+        // Check if this binding is used as a fallback already
+        bool alreadyExists = false;
+        for (int i = 0; i < MAX_BINDINGS; i++)
+        {
+            if (fallbackBindings[i] == lastBinding)
+            {
+                // We will tolerate if the user wants to bring it back
+                if (i == listeningFor)
+                    continue;
+
+                alreadyExists = true;
+                break;
+            }
+        }
+        if (!alreadyExists)
+        {
+            // Bind!
+            bindings[listeningFor] = lastBinding;
+        }
 
         // Not listening anymore. We've got our binding
         stopListeningForBinding();
 
         // All is handled
-        return;
+        return true;
     }
     else
-    { // Normal listening and parsing into directInputs
+    {
+        // Don't swallow the event!
+        return false;
+    }
+}
 
-        // Clear all SDL_MOUSEWHEEL-bound inputs
-        // because we don't have a MouseWheelRelease event.
-        // Without this, the mousewheel inputs get jammed!
-        for (int index = 0; index < 32; index++)
-        {
-            if (bindings[index].getDeviceType()
-                == InputBinding::DeviceType::MouseWheel)
-            { // Clear no matter what
-                directInputs &= ~(1 << index);
-            }
+bool ssge::InputManager::handleBindings(SDL_Event e, InputBinding* chosenBindings)
+{
+    bool eventSwallowed = false;
+
+    // Clear all SDL_MOUSEWHEEL-bound inputs
+    // because we don't have a MouseWheelRelease event.
+    // Without this, the mousewheel inputs get jammed!
+    for (int index = 0; index < 32; index++)
+    {
+        if (chosenBindings[index].getDeviceType()
+            == InputBinding::DeviceType::MouseWheel)
+        { // Clear no matter what
+            directInputs &= ~(1 << index);
         }
+    }
 
-        // See if incoming event matches a binding
-        for (int index = 0; index < 32; index++)
-        {
-            auto& binding = bindings[index];
-            if (binding.matchesEvent(e))
-            { // We support
-                if (e.type == SDL_KEYDOWN // key press
-                    || e.type == SDL_MOUSEBUTTONDOWN // mouse button press
-                    || e.type == SDL_MOUSEWHEEL // mouse wheel roll
-                    || e.type == SDL_JOYBUTTONDOWN // joystick button press
-                    || e.type == SDL_CONTROLLERBUTTONDOWN) // controller -||-
-                { // Set the bit
+    // See if incoming event matches a binding
+    for (int index = 0; index < 32; index++)
+    {
+        auto& binding = chosenBindings[index];
+        if (binding.matchesEvent(e))
+        { // We support
+            if (e.type == SDL_KEYDOWN // key press
+                || e.type == SDL_MOUSEBUTTONDOWN // mouse button press
+                || e.type == SDL_MOUSEWHEEL // mouse wheel roll
+                || e.type == SDL_JOYBUTTONDOWN // joystick button press
+                || e.type == SDL_CONTROLLERBUTTONDOWN) // controller -||-
+            { // Set the bit
+                directInputs |= 1 << index;
+                eventSwallowed = true;
+            }
+            else if (e.type == SDL_KEYUP // key release
+                || e.type == SDL_MOUSEBUTTONUP // mouse button release
+                || e.type == SDL_JOYBUTTONUP // joystick button release
+                || e.type == SDL_CONTROLLERBUTTONUP) // controller -||-
+            { // Clear the bit
+                directInputs &= ~(1 << index);
+                eventSwallowed = true;
+            }
+            else if (e.type == SDL_JOYHATMOTION)
+            {
+                // We must check hat direction
+                if (e.jhat.value == binding.getJoystickHatDirection())
+                {
                     directInputs |= 1 << index;
+                    eventSwallowed = true;
                 }
-                else if (e.type == SDL_KEYUP // key release
-                    || e.type == SDL_MOUSEBUTTONUP // mouse button release
-                    || e.type == SDL_JOYBUTTONUP // joystick button release
-                    || e.type == SDL_CONTROLLERBUTTONUP) // controller -||-
-                { // Clear the bit
+                else
+                { // The hat has moved AWAY from the mapped direction!
                     directInputs &= ~(1 << index);
+                    eventSwallowed = true;
                 }
-                else if (e.type == SDL_JOYHATMOTION)
+            }
+            else if (e.type == SDL_JOYAXISMOTION)
+            {
+                // We must check the axis direction
+                int wantedDirection = binding.getJoystickAxisDirection();
+                Sint16 axisValue = e.jaxis.value;
+                if (std::abs(axisValue) > 8000)
                 {
-                    // We must check hat direction
-                    if (e.jhat.value == binding.getJoystickHatDirection())
-                    {
+                    // If the signs are the same,
+                    // then this is what we want
+                    if (wantedDirection * axisValue > 0)
+                    { // Count it as pressed
                         directInputs |= 1 << index;
+                        eventSwallowed = true;
+                    }
+                    else if (wantedDirection * axisValue < 0)
+                    { // Count it as released
+                        directInputs &= ~(1 << index);
+                        eventSwallowed = true;
                     }
                     else
-                    { // The hat has moved AWAY from the mapped direction!
-                        directInputs &= ~(1 << index);
+                    {
+                        // WHAT!? This is impossible!
                     }
                 }
-                else if (e.type == SDL_JOYAXISMOTION)
+                else
+                { // If it's below the threshold, then it's surely released
+                    directInputs &= ~(1 << index);
+                    eventSwallowed = true;
+                }
+            }
+            else if (e.type == SDL_CONTROLLERAXISMOTION)
+            {
+                // We must check the axis direction
+                int wantedDirection = binding.getJoystickAxisDirection();
+                Sint16 axisValue = e.caxis.value;
+                if (std::abs(axisValue) > 8000)
                 {
-                    // We must check the axis direction
-                    int wantedDirection = binding.getJoystickAxisDirection();
-                    Sint16 axisValue = e.jaxis.value;
-                    if (std::abs(axisValue) > 8000)
-                    {
-                        // If the signs are the same,
-                        // then this is what we want
-                        if (wantedDirection * axisValue > 0)
-                        { // Count it as pressed
-                            directInputs |= 1 << index;
-                        }
-                        else if (wantedDirection * axisValue < 0)
-                        { // Count it as released
-                            directInputs &= ~(1 << index);
-                        }
-                        else
-                        {
-                            // WHAT!? This is impossible!
-                        }
+                    // If the signs are the same,
+                    // then this is what we want
+                    if (wantedDirection * axisValue > 0)
+                    { // Count it as pressed
+                        directInputs |= 1 << index;
+                        eventSwallowed = true;
+                    }
+                    else if (wantedDirection * axisValue < 0)
+                    { // Count it as released
+                        directInputs &= ~(1 << index);
+                        eventSwallowed = true;
                     }
                     else
-                    { // If it's below the threshold, then it's surely released
-                        directInputs &= ~(1 << index);
-                    }
-                }
-                else if (e.type == SDL_CONTROLLERAXISMOTION)
-                {
-                    // We must check the axis direction
-                    int wantedDirection = binding.getJoystickAxisDirection();
-                    Sint16 axisValue = e.caxis.value;
-                    if (std::abs(axisValue) > 8000)
                     {
-                        // If the signs are the same,
-                        // then this is what we want
-                        if (wantedDirection * axisValue > 0)
-                        { // Count it as pressed
-                            directInputs |= 1 << index;
-                        }
-                        else if (wantedDirection * axisValue < 0)
-                        { // Count it as released
-                            directInputs &= ~(1 << index);
-                        }
-                        else
-                        {
-                            // WHAT!? This is impossible!
-                        }
+                        // WHAT!? This is impossible!
                     }
                 }
             }
         }
     }
+
+    return eventSwallowed;
+}
+
+void InputManager::handle(SDL_Event e)
+{
+    if (handleHardwareChange(e)) return;
+    if (handleListeningForBinding(e)) return;
+    if (handleBindings(e, bindings)) return;
+    if (handleBindings(e, fallbackBindings)) return;
 }
 
 void InputManager::latch()

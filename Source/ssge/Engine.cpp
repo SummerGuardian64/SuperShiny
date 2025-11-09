@@ -106,13 +106,22 @@ bool Engine::prepareInitialState()
 	//scenes->changeScene("SplashScreen");
 	// TODO: MOVE TO game.init() and encapsulate bindings[]
 	inputs->bindings[0].bindToKey(SDL_Scancode::SDL_SCANCODE_UP);
+	inputs->fallbackBindings[0].bindToKey(SDL_Scancode::SDL_SCANCODE_UP);
 	inputs->bindings[1].bindToKey(SDL_Scancode::SDL_SCANCODE_DOWN);
+	inputs->fallbackBindings[1].bindToKey(SDL_Scancode::SDL_SCANCODE_DOWN);
 	inputs->bindings[2].bindToKey(SDL_Scancode::SDL_SCANCODE_LEFT);
+	inputs->fallbackBindings[2].bindToKey(SDL_Scancode::SDL_SCANCODE_LEFT);
 	inputs->bindings[3].bindToKey(SDL_Scancode::SDL_SCANCODE_RIGHT);
+	inputs->fallbackBindings[3].bindToKey(SDL_Scancode::SDL_SCANCODE_RIGHT);
 	inputs->bindings[4].bindToKey(SDL_Scancode::SDL_SCANCODE_X);
 	inputs->bindings[5].bindToKey(SDL_Scancode::SDL_SCANCODE_Z);
-	inputs->bindings[6].bindToKey(SDL_Scancode::SDL_SCANCODE_C);
+	inputs->bindings[6].bindToKey(SDL_Scancode::SDL_SCANCODE_SPACE);
 	inputs->bindings[7].bindToKey(SDL_Scancode::SDL_SCANCODE_ESCAPE);
+	inputs->fallbackBindings[7].bindToKey(SDL_Scancode::SDL_SCANCODE_ESCAPE);
+	inputs->bindings[8].bindToKey(SDL_Scancode::SDL_SCANCODE_RETURN);
+	inputs->fallbackBindings[8].bindToKey(SDL_Scancode::SDL_SCANCODE_RETURN);
+	inputs->bindings[9].bindToKey(SDL_Scancode::SDL_SCANCODE_ESCAPE);
+	inputs->fallbackBindings[9].bindToKey(SDL_Scancode::SDL_SCANCODE_ESCAPE);
 
 	return true;
 }

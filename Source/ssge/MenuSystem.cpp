@@ -489,7 +489,7 @@ void MenuManager::step(MenuContext& context)
     }
 
     if (context.inputs.isJustPressed(0))
-    {
+    { // UP BUTTON
         if (currentMenuItem) // Check if an item has been selected
         {
             int oldIndex = itemIndex; // Remember the previous index to prevent infinite loop
@@ -501,7 +501,7 @@ void MenuManager::step(MenuContext& context)
         }
     }
     else if (context.inputs.isJustPressed(1))
-    {
+    { // DOWN BUTTON
         if (currentMenuItem) // Check if an item has been selected
         {
             int oldIndex = itemIndex; // Remember the previous index to prevent infinite loop
@@ -513,7 +513,7 @@ void MenuManager::step(MenuContext& context)
         }
     }
     else if (context.inputs.isJustPressed(2))
-    {
+    { // LEFT BUTTON
         if (currentMenuItem) // Check if an item has been selected
         {
             if (currentMenuItem->isRightLeftable())
@@ -523,7 +523,7 @@ void MenuManager::step(MenuContext& context)
         }
     }
     else if (context.inputs.isJustPressed(3))
-    {
+    { // RIGHT BUTTON
         if (currentMenuItem)
         {
             if (currentMenuItem->isRightLeftable())
@@ -532,8 +532,8 @@ void MenuManager::step(MenuContext& context)
             }
         }
     }
-    else if (context.inputs.isJustPressed(4))
-    {
+    else if (context.inputs.isJustPressed(8))
+    { // ACCEPT BUTTON
         if (currentMenuItem)
         {
             if (currentMenuItem->isEnabled())
@@ -542,8 +542,8 @@ void MenuManager::step(MenuContext& context)
             }
         }
     }
-    else if (context.inputs.isJustPressed(5))
-    { // Escape key is for going back.
+    else if (context.inputs.isJustPressed(9) || context.inputs.isJustPressed(7))
+    { // BACK BUTTON || PAUSE BUTTON
         returnedCommand = MenuCommand::GO_BACK;
     }
 

@@ -380,5 +380,56 @@ namespace ssge
 				return false;
 			}
 		}
+
+		bool operator==(const InputBinding& b) const
+		{
+			const InputBinding& a = *this;
+
+			if (a.deviceType != b.deviceType) return false;
+
+			// For the con
+			//if (a.deviceInstanceID != b.deviceInstanceID) return false;
+
+			switch (a.deviceType)
+			{
+			case InputBinding::DeviceType::Disconnected:
+				return true;
+
+			case InputBinding::DeviceType::Keyboard:
+				return a.boundTo.key == b.boundTo.key;
+
+			case InputBinding::DeviceType::MouseButton:
+				return a.boundTo.mouseButton == b.boundTo.mouseButton;
+
+			case InputBinding::DeviceType::MouseWheel:
+				return a.boundTo.mouseWheel.direction == b.boundTo.mouseWheel.direction;
+
+			case InputBinding::DeviceType::JoystickButton:
+			case InputBinding::DeviceType::GameControllerButton:
+				return a.boundTo.joypadButton == b.boundTo.joypadButton;
+
+			case InputBinding::DeviceType::JoystickAxis:
+			case InputBinding::DeviceType::GameControllerAxis:
+				return (a.boundTo.joypadAxis.axis == b.boundTo.joypadAxis.axis) &&
+					(a.boundTo.joypadAxis.direction == b.boundTo.joypadAxis.direction);
+
+			case InputBinding::DeviceType::JoystickHat:
+				return (a.boundTo.joystickHat.index == b.boundTo.joystickHat.index) &&
+					(a.boundTo.joystickHat.direction == b.boundTo.joystickHat.direction);
+
+			case InputBinding::DeviceType::TouchFinger:
+				return a.boundTo.finger == b.boundTo.finger;
+
+			default:
+				return false;
+			}
+		}
+
+		bool operator!=(const InputBinding& b) const
+		{
+			const InputBinding& a = *this;
+
+			return !(a == b);
+		}
 	};
 }

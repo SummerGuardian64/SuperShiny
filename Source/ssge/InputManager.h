@@ -16,6 +16,11 @@ namespace ssge
 		InputManager(InputManager&& toMove) = delete;
 
 		void init(PassKey<Engine> pk);
+	private:
+		bool handleHardwareChange(SDL_Event e);
+		bool handleListeningForBinding(SDL_Event e);
+		bool handleBindings(SDL_Event e, InputBinding* chosenBindings);
+	public:
 		void handle(SDL_Event e);
 		void latch();
 
@@ -46,6 +51,7 @@ namespace ssge
 
 		static const int MAX_BINDINGS = 32;
 		InputBinding bindings[MAX_BINDINGS];
+		InputBinding fallbackBindings[MAX_BINDINGS]; // For the con
 		uint32_t directInputs = 0;
 		InputPad pad;
 

@@ -331,10 +331,12 @@ void SuperShiny::Menus::init(SuperShiny::Config& config)
 		inputConfigMenu.newItem_InputBinding("Down", 1);
 		inputConfigMenu.newItem_InputBinding("Left", 2);
 		inputConfigMenu.newItem_InputBinding("Right", 3);
-		inputConfigMenu.newItem_InputBinding("Jump/Accept", 4);
-		inputConfigMenu.newItem_InputBinding("Run/Shoot/Grab/Back", 5);
+		inputConfigMenu.newItem_InputBinding("Jump", 4);
+		inputConfigMenu.newItem_InputBinding("Run/Shoot/Grab", 5);
 		inputConfigMenu.newItem_InputBinding("Dash/Pounce", 6);
-		inputConfigMenu.newItem_InputBinding("Pause", 7);
+		inputConfigMenu.newItem_InputBinding("Pause Game", 7);
+		inputConfigMenu.newItem_InputBinding("Menu Accept", 8);
+		inputConfigMenu.newItem_InputBinding("Menu Back", 9);
 		inputConfigMenu.newItem_GoBack("Save & Back"); // TODO: Config saving
 	}
 	optionsMenu.newItem_SubMenu("Volume Control", &volumeControlMenu);
