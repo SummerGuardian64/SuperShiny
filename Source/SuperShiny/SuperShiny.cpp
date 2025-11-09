@@ -127,21 +127,11 @@ ssge::MenuCommandEx SuperShiny::onHavingBackedOutOfMenus(ssge::PassKey<ssge::Gam
 
 	if (currentScene==scenes.getMainMenuSceneClassID())
 	{ // If this is the main menu, ask the player do they wanna exit program
-	  
-		//Breakenzi style:
-		//previousMenus.push(currentMenu);
-	    //setMenu(Breakenzi::confirmExitProgram);
-
-		// TODO: Implement the menus first
 		cmdEx.smallCmd = ssge::MenuCommand::SUB_MENU;
-		cmdEx.targetMenu = &menus.confirmExitProgram; // TODO: IMPLEMENT ME!
-		// 
-		// Until it's implemented, we stick to this
-		//cmdEx.smallCmd = ssge::MenuCommand::EXIT_PROGRAM;
+		cmdEx.targetMenu = &menus.confirmExitProgram;
 	}
 	else
 	{ // Otherwise just close the menu
-	    //closeMenu = true;
 		cmdEx.smallCmd = ssge::MenuCommand::CLOSE_MENU;
 	}
 
