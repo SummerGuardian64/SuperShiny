@@ -561,10 +561,9 @@ namespace ssge
 			}
 		}
 	}
-	void Level::Loader::logError(std::string error)
-	{
-		errorLog += "Level Loader error: " + error + '\n';
-	}
+
+	// Level loader
+
 	Level::Loader::Loader(PassKey<GameWorld> pk)
 	{}
 	std::unique_ptr<Level> Level::Loader::loadLevel(const char* path)
@@ -609,68 +608,6 @@ namespace ssge
 	std::string Level::Loader::getErrorLog() const
 	{
 		return errorLog;
-	}
-	bool Level::Loader::loadIni(const char* path)
-	{
-		std::ifstream iniFile(path);
-		if (!iniFile)
-		{
-			logError("Cannot open INI file.");
-			return false;
-		}
-
-		// Remove UTF-8 BOM if present
-		{
-			char bom[3] = { 0,0,0 };
-			iniFile.read(bom, 3);
-			bool hasBOM = (iniFile.gcount() == 3 &&
-				(unsigned char)bom[0] == 0xEF &&
-				(unsigned char)bom[1] == 0xBB &&
-				(unsigned char)bom[2] == 0xBF);
-			if (!hasBOM) { iniFile.clear(); iniFile.seekg(0, std::ios::beg); }
-		}
-
-		std::string line;
-		Section* currentSection = nullptr;
-		while (std::getline(iniFile, line))
-		{
-			if (line.empty())
-				continue; // Line empty. Seek onward.
-
-			// Do we have a new section?
-			if (line.front() == '[' && line.back() == ']')
-			{
-				// Read section caption
-				std::string sectionCaption = line.substr(1, line.size() - 2);
-
-				// Store section
-				sections.push_back(Section(sectionCaption));
-
-				// Select section
-				currentSection = &sections.back();
-
-				continue;
-			}
-
-			// Read through the section
-			if (currentSection)
-			{
-				// Find equals sign in line
-				auto eq = line.find('=');
-
-				if (eq == std::string::npos)
-					continue; // No equals sign. Seek onward.
-
-				// Read item
-				auto key = line.substr(0, eq); // Read item key
-				auto value = line.substr(eq + 1); // Read item value
-
-				// Store item
-				currentSection->items.push_back(Item(key, value));
-			}
-		}
-
-		return true;
 	}
 	std::unique_ptr<Level> Level::Loader::parseAndConstruct()
 	{
@@ -795,53 +732,6 @@ namespace ssge
 			logError("Spawn list could not be read!");
 			return false;
 		}
-
-	}
-	std::string Level::Loader::getValue(std::string caption, std::string key) const
-	{
-		static const char* FALLBACK = "";
-		return getValue(caption, key, FALLBACK);
-	}
-	std::string Level::Loader::getValue(std::string caption, std::string key, std::string fallback) const
-	{
-		for (auto& section : sections)
-		{
-			if (section.caption == caption)
-			{
-				for (auto& item : section.items)
-				{
-					if (item.key == key)
-					{
-						return item.value;
-					}
-				}
-				return fallback;
-			}
-		}
-		return fallback;
-	}
-	std::string Level::Loader::getValue(std::string caption, int numericKey) const
-	{
-		static const char* FALLBACK = "";
-		for (auto& section : sections)
-		{
-			if (section.caption == caption)
-			{
-				for (auto& item : section.items)
-				{
-					try
-					{
-						if (std::stoi(item.key) == numericKey)
-						{
-							return item.value;
-						}
-					}
-					catch (...) { ; }
-				}
-				return FALLBACK;
-			}
-		}
-		return FALLBACK;
 	}
 	Level::Block::Collision Level::Loader::parseOOB(std::string side)
 	{

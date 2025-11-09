@@ -7,6 +7,7 @@
 #include "PassKey.h"
 #include <cmath>
 #include <memory>
+#include "IniFile.h"
 
 namespace ssge
 {
@@ -271,42 +272,14 @@ namespace ssge
 
 		void draw(DrawContext context) const; // conservative draw (no templates)
 
-		class Loader
+		class Loader : public IniFile
 		{
-			// INI-related stuff
-
-			struct Item
-			{
-				std::string key;
-				std::string value;
-				Item() = default;
-				Item(std::string key, std::string value) : key(key), value(value) {};
-			};
-			struct Section
-			{
-				std::string caption;
-				std::vector<Item> items;
-				Section() = default;
-				Section(std::string caption) : caption(caption) {};
-			};
-			std::vector<Section> sections;
-
-			// Loading and parsing
-			// Please execute these functions in proper order!
-
-			bool loadIni(const char* path); // Reads INI file into sections
 			std::unique_ptr<Level> newLevel; // Level we're making
 			std::unique_ptr<Level> parseAndConstruct(); // Parses arguments for Level ctor and creates the level
 			bool parseAfterConstruct(); // Populates all data fields using sections
 			bool parseBlockDefinitions(); // Parse Block definitions
 			bool parseGrid(); // Parse grid
 			bool parseSpawnList(); // Parse spawn list
-
-			// Post-load traversal
-
-			std::string getValue(std::string caption, std::string key) const;
-			std::string getValue(std::string caption, std::string key, std::string fallback) const;
-			std::string getValue(std::string caption, int numericKey) const;
 
 			// Advanced parsing
 
@@ -315,10 +288,6 @@ namespace ssge
 			Block::Collision parseBlockCollision(std::string blockItemValue);
 			int parseTileIndex(std::string blockItemValue);
 			std::string parseCallbackName(std::string blockItemValue);
-
-			// Error logging
-			std::string errorLog;
-			void logError(std::string error);
 
 			// Spawn list
 
