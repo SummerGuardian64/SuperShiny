@@ -684,7 +684,7 @@ void MenuManager::step(MenuContext& context)
                 itemIndex = previousIndexes.top(); // Restore index
                 previousIndexes.pop(); // ...and it's not previous anymore
                 // Sanitize item index
-                int nOItems = (int)currentMenu->items.size();
+                unsigned int nOItems = (unsigned int)currentMenu->items.size();
                 if (nOItems == 0)
                 { // If there are no items, set index to 0
                     itemIndex = 0;

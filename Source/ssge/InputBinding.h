@@ -16,6 +16,8 @@ namespace ssge
 			JoystickButton,
 			JoystickAxis,
 			JoystickHat,
+			GameControllerButton,
+			GameControllerAxis,
 			TouchFinger,
 			TOTAL
 		};
@@ -30,13 +32,14 @@ namespace ssge
 		union {
 			SDL_Scancode key;
 			Uint8 mouseButton; // SDL_BUTTON_LEFT, etc.
-			struct { int axis; int direction; } joystickAxis;
-			Uint8 joystickButton;
-			Uint8 joystickHat;
+			struct { int direction; } mouseWheel;
+			struct { int axis; int direction; } joypadAxis;
+			Uint8 joypadButton;
+			struct { Uint8 index; Uint8 direction; } joystickHat;
 			SDL_FingerID finger; // touchscreen finger
 		} boundTo;
 
-		int deviceInstanceID = -1; // SDL joystick/touch device index
+		SDL_JoystickID deviceInstanceID = -1; // SDL joystick/touch device index
 
 	public:
 		void disconnect()
@@ -50,32 +53,53 @@ namespace ssge
 			boundTo.key = key;
 		}
 
-		void bindToMouse(Uint8 button)
+		void bindToMouseButton(Uint8 button)
 		{
 			deviceType = DeviceType::MouseButton;
 			boundTo.mouseButton = button;
 		}
+
+		void bindToMouseWheel(int direction)
+		{
+			deviceType = DeviceType::MouseWheel;
+			boundTo.mouseWheel.direction = direction;
+		}
 		
-		void bindToJoystickButton(int joystickID, Uint8 button)
+		void bindToJoystickButton(SDL_JoystickID joystickID, Uint8 button)
 		{
 			deviceType = DeviceType::JoystickButton;
 			deviceInstanceID = joystickID;
-			boundTo.joystickButton = button;
+			boundTo.joypadButton = button;
 		}
 
-		void bindToJoystickAxis(int joystickID, int axis, int direction)
+		void bindToJoystickAxis(SDL_JoystickID joystickID, int axis, int direction)
 		{
 			deviceType = DeviceType::JoystickAxis;
 			deviceInstanceID = joystickID;
-			boundTo.joystickAxis.axis = axis;
-			boundTo.joystickAxis.direction = direction; // -1 or 1
+			boundTo.joypadAxis.axis = axis;
+			boundTo.joypadAxis.direction = direction; // -1 or 1
 		}
 
-		void bindToJoystickHat(int joystickID, Uint8 hat)
+		void bindToJoystickHat(SDL_JoystickID joystickID, Uint8 hatIndex, Uint8 direction)
 		{
 			deviceType = DeviceType::JoystickHat;
 			deviceInstanceID = joystickID;
-			boundTo.joystickHat = hat;
+			boundTo.joystickHat.index = hatIndex;
+			boundTo.joystickHat.direction = direction;
+		}
+
+		void bindToControllerButton(SDL_JoystickID which, Uint8 button)
+		{
+			deviceType = DeviceType::GameControllerButton;
+			deviceInstanceID = which;
+			boundTo.joypadButton = button;
+		}
+
+		void bindToControllerAxis(SDL_JoystickID which, Uint8 axis, int direction)
+		{
+			deviceType = DeviceType::GameControllerAxis;
+			deviceInstanceID = which;
+			boundTo.joypadAxis;
 		}
 
 		DeviceType getDeviceType() const
@@ -130,7 +154,14 @@ namespace ssge
 
 		std::string getMouseWheelString() const
 		{
-			return "UNIMPLEMENTED!";
+			if (deviceType != DeviceType::MouseWheel)
+				return "which isn't a mousewheel!";
+			
+			if (boundTo.mouseWheel.direction > 0)
+				return "up";
+			else if (boundTo.mouseWheel.direction < 0)
+				return "down";
+			else return "in an unknown direction!";
 		}
 
 		Uint8 getJoystickID() const
@@ -146,28 +177,107 @@ namespace ssge
 		{
 			if (deviceType != DeviceType::JoystickAxis)
 				return -1;
-			else return boundTo.joystickAxis.axis;
+			else return boundTo.joypadAxis.axis;
 		}
-		
-		Uint8 getJoystickAxisDirection() const
+
+		int getJoystickAxisDirection() const
 		{
 			if (deviceType != DeviceType::JoystickAxis)
 				return -1;
-			else return boundTo.joystickAxis.direction;
+			else return boundTo.joypadAxis.direction;
+		}
+
+		std::string getJoypadAxisString() const
+		{
+			if (deviceType != DeviceType::JoystickAxis
+				&& deviceType != DeviceType::GameControllerAxis)
+				return "of an unknown kind!";
+
+			std::string axisString = std::to_string(boundTo.joypadAxis.axis);
+			
+			if (boundTo.joypadAxis.direction > 0) axisString += "+";
+			else if (boundTo.joypadAxis.direction < 0) axisString += "-";
+			else axisString += "?";
+
+			return axisString;
 		}
 		
 		Uint8 getJoystickButton() const
 		{
 			if (deviceType != DeviceType::JoystickButton)
 				return -1;
-			else return boundTo.joystickButton;
+			else return boundTo.joypadButton;
 		}
 
-		Uint8 getJoystickHat() const
+		std::string getJoypadButtonString() const
+		{
+			// TODO: More user-friendly printing for Gamepad
+
+			if (deviceType != DeviceType::JoystickButton
+				&& deviceType != DeviceType::GameControllerButton)
+				return "of an unknown kind!";
+
+			std::string buttonString = std::to_string(boundTo.joypadButton);
+
+			return buttonString;
+		}
+
+		Uint8 getJoystickHatIndex() const
 		{
 			if (deviceType != DeviceType::JoystickHat)
 				return -1;
-			else return boundTo.joystickHat;
+			else return boundTo.joystickHat.index;
+		}
+
+		Uint8 getJoystickHatDirection() const
+		{
+			if (deviceType != DeviceType::JoystickHat)
+				return -1;
+			else return boundTo.joystickHat.direction;
+		}
+
+		std::string getJoystickHatString() const
+		{
+			if (deviceType != DeviceType::JoystickHat)
+				return "that isn't a hat";
+
+			std::string hatString = std::to_string(boundTo.joystickHat.index) + " ";
+			
+			switch (boundTo.joystickHat.direction)
+			{
+			case SDL_HAT_UP:
+				hatString += "up";
+				break;
+			case SDL_HAT_DOWN:
+				hatString += "down";
+				break;
+			case SDL_HAT_LEFT:
+				hatString += "left";
+				break;
+			case SDL_HAT_RIGHT:
+				hatString += "right";
+				break;
+			case SDL_HAT_LEFTUP:
+				hatString += "upleft";
+				break;
+			case SDL_HAT_RIGHTUP:
+				hatString += "upright";
+				break;
+			case SDL_HAT_LEFTDOWN:
+				hatString += "downleft";
+				break;
+			case SDL_HAT_RIGHTDOWN:
+				hatString += "downright";
+				break;
+			case SDL_HAT_CENTERED:
+				hatString += "center";
+				break;
+			default:
+				hatString += "in an unknown state";
+				break;
+			}
+
+			return hatString;
 		}
 
 		std::string getJoystickName() const
@@ -189,10 +299,14 @@ namespace ssge
 				return std::string("Mouse wheel ") + getMouseWheelString();
 			case ssge::InputBinding::DeviceType::JoystickButton:
 				return std::string("Joystick ") + getJoystickName() + " button " + std::to_string(getJoystickButton());
+			case ssge::InputBinding::DeviceType::GameControllerButton:
+				return std::string("Game controller ") + getJoystickName() + " button " + std::to_string(getJoystickButton());
 			case ssge::InputBinding::DeviceType::JoystickAxis:
-				return std::string("Joystick ") + getJoystickName() + " axis " + std::to_string(getJoystickAxis());
+				return std::string("Joystick ") + getJoystickName() + " axis " + getJoypadAxisString();
+			case ssge::InputBinding::DeviceType::GameControllerAxis:
+				return std::string("Game controller ") + getJoystickName() + " axis " + getJoypadAxisString();
 			case ssge::InputBinding::DeviceType::JoystickHat:
-				return std::string("Joystick ") + getJoystickName() + " hat " + std::to_string(getJoystickHat());
+				return std::string("Joystick ") + getJoystickName() + " hat " + getJoystickHatString();
 			case ssge::InputBinding::DeviceType::TouchFinger:
 				return "FINGER UNIMPLEMENTED!";
 			default:
@@ -202,31 +316,63 @@ namespace ssge
 
 		InputBinding() { disconnect(); }
 		explicit InputBinding(SDL_Scancode key) { bindToKey(key); }
-		explicit InputBinding(Uint8 mouseButton) { bindToMouse(mouseButton); }
+		explicit InputBinding(Uint8 mouseButton) { bindToMouseButton(mouseButton); }
 		InputBinding(int joystickID, Uint8 mouseButton) { bindToJoystickButton(joystickID, mouseButton); }
 		InputBinding(int joystickID, int axis, int direction) { bindToJoystickAxis(joystickID, axis, direction); }
-		InputBinding(int joystickID, int hat) { bindToJoystickHat(joystickID, hat); }
+		InputBinding(int joystickID, Uint8 hat, Uint8 direction) { bindToJoystickHat(joystickID, hat, direction); }
 
 		bool matchesEvent(const SDL_Event& e) const
 		{
 			switch (deviceType)
 			{
 			case DeviceType::Keyboard:
-				return (e.type == SDL_KEYDOWN || e.type == SDL_KEYUP) &&
+				return (e.type == SDL_KEYDOWN
+					|| e.type == SDL_KEYUP) &&
 				        e.key.keysym.scancode == boundTo.key;
 			case DeviceType::MouseButton:
-				return (e.type == SDL_MOUSEBUTTONDOWN || e.type == SDL_MOUSEBUTTONUP) &&
+				return (e.type == SDL_MOUSEBUTTONDOWN
+					|| e.type == SDL_MOUSEBUTTONUP) &&
 				        e.button.button == boundTo.mouseButton;
+			case DeviceType::MouseWheel:
+				return (e.type == SDL_MOUSEWHEEL
+					&& e.wheel.direction == boundTo.mouseWheel.direction);
 			case DeviceType::JoystickButton:
-				return (e.type == SDL_JOYBUTTONDOWN || e.type == SDL_JOYBUTTONUP) &&
-				        e.jbutton.which == deviceInstanceID &&
-				        e.jbutton.button == boundTo.joystickButton;
+				return (e.type == SDL_JOYBUTTONDOWN
+					|| e.type == SDL_JOYBUTTONUP) &&
+				        /*e.jbutton.which == deviceInstanceID &&*/
+				        e.jbutton.button == boundTo.joypadButton;
 			case DeviceType::JoystickAxis:
-				if (e.type == SDL_JOYAXISMOTION && e.jaxis.which == deviceInstanceID)
+				if (e.type == SDL_JOYAXISMOTION
+					/* && e.jaxis.which == deviceInstanceID*/) // for the con
 				{
-					if (e.jaxis.axis == boundTo.joystickAxis.axis) {
-						if (boundTo.joystickAxis.direction < 0) return e.jaxis.value < -8000;
-						if (boundTo.joystickAxis.direction > 0) return e.jaxis.value > 8000;
+					if (e.jaxis.axis == boundTo.joypadAxis.axis)
+					{
+						return true;
+					}
+				}
+				return false;
+			case DeviceType::JoystickHat:
+				if (e.type == SDL_JOYHATMOTION
+					/* && e.jhat.which == deviceInstanceID*/) // for the con
+				{
+					if (e.jhat.hat == boundTo.joystickHat.index)
+					{
+						return true;
+					}
+				}
+				return false;
+			case DeviceType::GameControllerButton:
+				return (e.type == SDL_CONTROLLERBUTTONDOWN // If pressed
+					|| e.type == SDL_CONTROLLERBUTTONUP) && // or released
+					e.cbutton.which == deviceInstanceID && // this device
+					e.cbutton.button == boundTo.joypadButton; // this button
+			case DeviceType::GameControllerAxis:
+				if (e.type == SDL_JOYAXISMOTION
+					&& e.caxis.which == deviceInstanceID)
+				{
+					if (e.caxis.axis == boundTo.joypadAxis.axis)
+					{
+						return true;
 					}
 				}
 				return false;

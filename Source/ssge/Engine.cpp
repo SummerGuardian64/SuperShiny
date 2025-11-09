@@ -32,7 +32,7 @@ bool Engine::init(PassKey<Program> pk)
 {
 	std::cout << "initSDL" << std::endl;
 	bool success = true;
-
+	
 	// Handy tweak so joysticks don't fail at the con
 	SDL_SetHint(SDL_HINT_JOYSTICK_ALLOW_BACKGROUND_EVENTS, "1");
 
@@ -191,13 +191,17 @@ void Engine::handleEvents()
 		switch (event.type)
 		{
 		case SDL_QUIT:
+			//TODO: Let IGame handle this
 			wrapUp();
 			break;
+		// Keyboard events
 		case SDL_EventType::SDL_KEYDOWN:
 		case SDL_EventType::SDL_KEYUP:
+		// Mouse events
 		case SDL_EventType::SDL_MOUSEBUTTONDOWN:
 		case SDL_EventType::SDL_MOUSEBUTTONUP:
 		case SDL_EventType::SDL_MOUSEWHEEL:
+		// Joystick events
 		case SDL_EventType::SDL_JOYBUTTONDOWN:
 		case SDL_EventType::SDL_JOYBUTTONUP:
 		case SDL_EventType::SDL_JOYAXISMOTION:
@@ -205,6 +209,12 @@ void Engine::handleEvents()
 		case SDL_EventType::SDL_JOYHATMOTION:
 		case SDL_EventType::SDL_JOYDEVICEADDED:
 		case SDL_EventType::SDL_JOYDEVICEREMOVED:
+		// GameController events
+		/*case SDL_EventType::SDL_CONTROLLERDEVICEADDED:
+		case SDL_EventType::SDL_CONTROLLERDEVICEREMOVED:
+		case SDL_EventType::SDL_CONTROLLERBUTTONDOWN:
+		case SDL_EventType::SDL_CONTROLLERBUTTONUP:
+		case SDL_EventType::SDL_CONTROLLERAXISMOTION:*/
 			inputs->handle(event);
 			break;
 		default:

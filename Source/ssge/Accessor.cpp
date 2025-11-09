@@ -188,7 +188,7 @@ uint32_t InputsAccess::getCurrentButtonsForPlayer(int playerId)
 bool InputsAccess::isListeningForBinding() const
 {
 	if (!actual)return false;
-	actual->isListeningForBinding();
+	return actual->isListeningForBinding();
 }
 
 void InputsAccess::listenForBinding(int bindingIndex)

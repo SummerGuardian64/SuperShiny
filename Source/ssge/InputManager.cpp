@@ -21,12 +21,12 @@ void InputManager::handle(SDL_Event e)
     // Joypad hardware change
     switch (e.type)
     {
-    case SDL_CONTROLLERDEVICEADDED:
+    /*case SDL_CONTROLLERDEVICEADDED:
         onControllerAdded(e.cdevice.which); // device index
         return;
     case SDL_CONTROLLERDEVICEREMOVED:
         onControllerRemoved(e.cdevice.which); // instance id
-        return;
+        return;*/
     case SDL_JOYDEVICEADDED:
         onJoystickAdded(e.jdevice.which); // device index
         return;
@@ -48,10 +48,39 @@ void InputManager::handle(SDL_Event e)
             lastBinding.bindToKey(e.key.keysym.scancode);
             break;
         case SDL_MOUSEBUTTONDOWN:
-            lastBinding.bindToMouse(e.button.button);
+            lastBinding.bindToMouseButton(e.button.button);
             break;
+        case SDL_MOUSEWHEEL:
+            lastBinding.bindToMouseWheel(e.wheel.direction);
+            break;
+
+            // GameController (XInput-style, preferred on Windows)
+        case SDL_CONTROLLERBUTTONDOWN:
+            lastBinding.bindToControllerButton(e.cbutton.which, e.cbutton.button);
+            break;
+        case SDL_CONTROLLERAXISMOTION:
+            if (e.caxis.value > 16000) // Positive direction
+                lastBinding.bindToControllerAxis(e.caxis.which, e.caxis.axis, 1);
+            else if (e.caxis.value < -16000) // Negative direction
+                lastBinding.bindToControllerAxis(e.caxis.which, e.caxis.axis, -1);
+            else return; // Not enough pushed axis. Irrelevant!
+            break;
+
+            // Legacy joysticks
         case SDL_JOYBUTTONDOWN:
             lastBinding.bindToJoystickButton(e.jbutton.which, e.jbutton.button);
+            break;
+        case SDL_JOYAXISMOTION:
+            if (e.jaxis.value > 16000) // Positive direction
+                lastBinding.bindToJoystickAxis(
+                    e.jaxis.which, e.jaxis.axis, 1);
+            else if (e.jaxis.value < -16000) // Negative direction
+                lastBinding.bindToJoystickAxis(
+                    e.jaxis.which, e.jaxis.axis, -1);
+            else return; // Not enough pushed axis. Irrelevant!
+            break;
+        case SDL_JOYHATMOTION:
+            lastBinding.bindToJoystickHat(e.jhat.which, e.jhat.hat, e.jhat.value);
             break;
         default:
             // Bail out if nothing was pressed
@@ -77,7 +106,7 @@ void InputManager::handle(SDL_Event e)
         {
             if (bindings[index].getDeviceType()
                 == InputBinding::DeviceType::MouseWheel)
-            { // Clear
+            { // Clear no matter what
                 directInputs &= ~(1 << index);
             }
         }
@@ -85,20 +114,85 @@ void InputManager::handle(SDL_Event e)
         // See if incoming event matches a binding
         for (int index = 0; index < 32; index++)
         {
-            if (bindings[index].matchesEvent(e))
+            auto& binding = bindings[index];
+            if (binding.matchesEvent(e))
             { // We support
                 if (e.type == SDL_KEYDOWN // key press
-                 || e.type == SDL_MOUSEBUTTONDOWN // mouse button press
-                 || e.type == SDL_MOUSEWHEEL // mouse wheel roll
-                 || e.type == SDL_JOYBUTTONDOWN) // joystick button press
+                    || e.type == SDL_MOUSEBUTTONDOWN // mouse button press
+                    || e.type == SDL_MOUSEWHEEL // mouse wheel roll
+                    || e.type == SDL_JOYBUTTONDOWN // joystick button press
+                    || e.type == SDL_CONTROLLERBUTTONDOWN) // controller -||-
                 { // Set the bit
                     directInputs |= 1 << index;
                 }
                 else if (e.type == SDL_KEYUP // key release
-                      || e.type == SDL_MOUSEBUTTONUP // mouse button release
-                      || e.type == SDL_JOYBUTTONUP) // joystick button release
+                    || e.type == SDL_MOUSEBUTTONUP // mouse button release
+                    || e.type == SDL_JOYBUTTONUP // joystick button release
+                    || e.type == SDL_CONTROLLERBUTTONUP) // controller -||-
                 { // Clear the bit
                     directInputs &= ~(1 << index);
+                }
+                else if (e.type == SDL_JOYHATMOTION)
+                {
+                    // We must check hat direction
+                    if (e.jhat.value == binding.getJoystickHatDirection())
+                    {
+                        directInputs |= 1 << index;
+                    }
+                    else
+                    { // The hat has moved AWAY from the mapped direction!
+                        directInputs &= ~(1 << index);
+                    }
+                }
+                else if (e.type == SDL_JOYAXISMOTION)
+                {
+                    // We must check the axis direction
+                    int wantedDirection = binding.getJoystickAxisDirection();
+                    Sint16 axisValue = e.jaxis.value;
+                    if (std::abs(axisValue) > 8000)
+                    {
+                        // If the signs are the same,
+                        // then this is what we want
+                        if (wantedDirection * axisValue > 0)
+                        { // Count it as pressed
+                            directInputs |= 1 << index;
+                        }
+                        else if (wantedDirection * axisValue < 0)
+                        { // Count it as released
+                            directInputs &= ~(1 << index);
+                        }
+                        else
+                        {
+                            // WHAT!? This is impossible!
+                        }
+                    }
+                    else
+                    { // If it's below the threshold, then it's surely released
+                        directInputs &= ~(1 << index);
+                    }
+                }
+                else if (e.type == SDL_CONTROLLERAXISMOTION)
+                {
+                    // We must check the axis direction
+                    int wantedDirection = binding.getJoystickAxisDirection();
+                    Sint16 axisValue = e.caxis.value;
+                    if (std::abs(axisValue) > 8000)
+                    {
+                        // If the signs are the same,
+                        // then this is what we want
+                        if (wantedDirection * axisValue > 0)
+                        { // Count it as pressed
+                            directInputs |= 1 << index;
+                        }
+                        else if (wantedDirection * axisValue < 0)
+                        { // Count it as released
+                            directInputs &= ~(1 << index);
+                        }
+                        else
+                        {
+                            // WHAT!? This is impossible!
+                        }
+                    }
                 }
             }
         }
@@ -158,8 +252,8 @@ void InputManager::onControllerRemoved(SDL_JoystickID id)
 void InputManager::onJoystickAdded(int deviceIndex)
 {
     // Only if NOT a GameController
-    if (SDL_IsGameController(deviceIndex))
-        return;
+    //if (SDL_IsGameController(deviceIndex))
+    //    return;
 
     int slot = getFreeJoypadSlot();
     if (slot < 0)
@@ -266,7 +360,7 @@ InputBinding ssge::InputManager::getBinding(int bindingIndex) const
 {
     if (bindingIndex < 0 || bindingIndex >= MAX_BINDINGS)
         return InputBinding(); // Return empty binding on bad index
-    else bindings[bindingIndex];
+    else return bindings[bindingIndex];
 }
 
 std::string ssge::InputManager::getBindingString(int bindingIndex) const
