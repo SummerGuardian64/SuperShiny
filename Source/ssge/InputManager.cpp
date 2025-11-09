@@ -103,6 +103,10 @@ bool ssge::InputManager::handleListeningForBinding(SDL_Event e)
                 if (i == listeningFor)
                     continue;
 
+                if (lastBinding.getDeviceType()
+                    == InputBinding::DeviceType::Disconnected)
+                    continue;
+
                 alreadyExists = true;
                 break;
             }
