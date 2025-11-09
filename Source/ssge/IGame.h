@@ -44,6 +44,8 @@ namespace ssge
 
         virtual void saveSettings() = 0;
 
+        virtual void queryQuit() = 0;
+
         // Get application title
         virtual const char* getApplicationTitle() = 0;
 

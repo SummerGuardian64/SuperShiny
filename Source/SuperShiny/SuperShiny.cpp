@@ -43,6 +43,22 @@ void SuperShiny::syncSettings(ssge::StepContext& context) const
 	context.audio.setSfxVolume(config.musicVolume);
 }
 
+void SuperShiny::_queryQuit(ssge::StepContext& context)
+{
+	std::string currentScene = context.scenes.getCurrentSceneClassID();
+
+	if (currentScene != "GameWorld")
+	{
+		context.engine.wrapUp();
+		context.menus.close();
+	}
+	else
+	{
+		context.menus.abruptMenu(menus.confirmAbruptExit);
+		context.scenes.pause();
+	}
+}
+
 void SuperShiny::init(ssge::StepContext& context)
 {
 	SDL_Renderer* renderer = context.drawing.getRenderer();
@@ -84,6 +100,12 @@ void SuperShiny::init(ssge::StepContext& context)
 
 void SuperShiny::step(ssge::StepContext& context)
 {
+	if (queriedToQuit)
+	{
+		_queryQuit(context);
+		queriedToQuit = false;
+	}
+
 	std::string currentScene = context.scenes.getCurrentSceneClassID();
 
 	if (currentScene == scenes.getMainMenuSceneClassID())
@@ -177,6 +199,11 @@ bool SuperShiny::saveSettings(ssge::StepContext& context)
 void SuperShiny::saveSettings()
 {
 	wannaSaveSettings = true;
+}
+
+void SuperShiny::queryQuit()
+{
+	queriedToQuit = true;
 }
 
 const char* SuperShiny::getApplicationTitle()
@@ -431,6 +458,10 @@ void SuperShiny::Menus::init(SuperShiny::Config& config)
 	confirmExitGame.newLabel("Are you sure you want to return to the main menu?");
 	confirmExitGame.newItem_MainMenu("Yes");
 	confirmExitGame.newItem_GoBack("No");
+
+	confirmAbruptExit.setTitle("Exit without saving?");
+	confirmAbruptExit.newItem_ExitProgram("Exit");
+	confirmAbruptExit.newItem_GoBack("Go back");
 
 	confirmExitProgram.newLabel("Are you sure you want to exit Super Shiny?");
 	confirmExitProgram.newItem_ExitProgram("Yes");

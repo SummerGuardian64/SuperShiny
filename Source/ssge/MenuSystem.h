@@ -187,6 +187,7 @@ namespace ssge
         unsigned int itemIndex = 0;
         void properlyAdjustItemIndex();
         void setMenu(MenuHeader* menu);
+        void subMenu(MenuHeader* menu);
         bool isOpen() const;
         void close();
         MenuManager(PassKey<Engine> pk);

@@ -188,8 +188,7 @@ void Engine::handleEvents()
 		switch (event.type)
 		{
 		case SDL_QUIT:
-			//TODO: Let IGame handle this
-			wrapUp();
+			game.queryQuit();
 			break;
 		// Keyboard events
 		case SDL_EventType::SDL_KEYDOWN:

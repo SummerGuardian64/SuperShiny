@@ -34,6 +34,9 @@ public:
 private:
     void syncSettings(ssge::StepContext& context) const;
     bool wannaSaveSettings = false;
+    bool queriedToQuit = false;
+
+    void _queryQuit(ssge::StepContext& context);
 
 public: //TODO: Encapsulate
     // Called once after SDL + engine subsystems are up.
@@ -52,6 +55,8 @@ public: //TODO: Encapsulate
 
     // The game will save the settings later, don't worry
     void saveSettings() override;
+
+    void queryQuit() override;
 
     // Get application title
     const char* getApplicationTitle() override;
@@ -147,6 +152,7 @@ public: //TODO: Encapsulate
         ssge::MenuHeader displaySettingsMenu;
         ssge::MenuHeader confirmRestart;
         ssge::MenuHeader confirmExitGame;
+        ssge::MenuHeader confirmAbruptExit;
         ssge::MenuHeader levelSelect;
         ssge::MenuHeader friendlyReminderReset;
         ssge::MenuHeader friendlyReminderExit;

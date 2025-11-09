@@ -453,6 +453,18 @@ void MenuManager::setMenu(MenuHeader* menu)
 	}
 }
 
+void MenuManager::subMenu(MenuHeader* menu)
+{
+    // Go to the specified target menu while remembering the way back
+    if (!menu)return; // Validate target pointer
+    if (currentMenu)
+    {
+        previousMenus.push(currentMenu); // Remember current menu
+        previousIndexes.push(itemIndex); // ...and cursor position!
+    }
+    setMenu(menu); // Set target menu for current menu
+}
+
 bool MenuManager::isOpen() const
 {
     return currentMenu != nullptr;

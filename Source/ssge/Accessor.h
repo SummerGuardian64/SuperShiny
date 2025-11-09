@@ -234,6 +234,8 @@ namespace ssge {
         bool isOpen() const;
         void setMenu(MenuHeader& menuHeader);
         void setMenu(MenuHeader* menuHeader);
+        void abruptMenu(MenuHeader& menuHeader);
+        void abruptMenu(MenuHeader* menuHeader);
         void openMainMenu();
         void openPauseMenu();
         void close();

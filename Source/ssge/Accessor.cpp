@@ -446,6 +446,32 @@ void ssge::MenusAccess::setMenu(MenuHeader* menuHeader)
 	actual->setMenu(menuHeader);
 }
 
+void ssge::MenusAccess::abruptMenu(MenuHeader& menuHeader)
+{
+	abruptMenu(&menuHeader);
+}
+
+void ssge::MenusAccess::abruptMenu(MenuHeader* menuHeader)
+{
+	if (!actual) return;
+	
+	auto currentMenu = actual->currentMenu;
+
+	// Is our abrupt menu currently displaying
+	if (currentMenu != menuHeader)
+	{ // If it isn't...
+		// Is there another menu?
+		if (currentMenu == nullptr) // No?
+		{ // Then we set ours
+			actual->setMenu(menuHeader);
+		}
+		else
+		{ // Then we make ours into a submenu
+			actual->subMenu(menuHeader);
+		}
+	}
+}
+
 void ssge::MenusAccess::openMainMenu()
 {
 	//TODO: Wire up IGameMenus
