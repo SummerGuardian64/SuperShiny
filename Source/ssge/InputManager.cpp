@@ -426,3 +426,210 @@ int ssge::InputManager::getMaxBindings() const
 {
     return MAX_BINDINGS;
 }
+
+bool ssge::InputManager::loadFromIniFile(IniFile& iniFile)
+{
+    static const char* INI_SECTION = "InputBindings";
+
+    InputBinding* inputBinding = nullptr;
+
+    for (int i = 0; i < MAX_BINDINGS; i++)
+    {
+        inputBinding = &bindings[i];
+
+        std::string bindingIdxStr = std::to_string(i);
+
+        // DeviceType integer from INI
+        int deviceTypeInt = iniFile.getInt(
+            INI_SECTION, // Section
+            std::string("DeviceType") + bindingIdxStr, // Key
+            0 // Fallback value (Disconnected)
+        );
+        
+        // Sanitize DeviceType integer
+        if (deviceTypeInt < 0
+            || deviceTypeInt >= (int)InputBinding::DeviceType::TOTAL)
+        { // Fallback to disconnected
+            deviceTypeInt = (int)InputBinding::DeviceType::Disconnected;
+        }
+
+        // Sanitized DeviceType for InputBinding
+        auto deviceType = (InputBinding::DeviceType)deviceTypeInt;
+
+        switch (deviceType)
+        {
+        case ssge::InputBinding::DeviceType::Keyboard:
+            inputBinding->bindToKey((SDL_Scancode)
+                iniFile.getInt(
+                    INI_SECTION, // Section
+                    std::string("Scancode") + bindingIdxStr, // Key
+                    SDL_SCANCODE_UNKNOWN // Fallback value
+                )
+            );
+            break;
+        case ssge::InputBinding::DeviceType::MouseButton:
+            inputBinding->bindToMouseButton(
+                iniFile.getInt(
+                    INI_SECTION, // Section
+                    std::string("MouseButton") + bindingIdxStr, // Key
+                    0 // Fallback value
+                )
+            );
+            break;
+        case ssge::InputBinding::DeviceType::MouseWheel:
+            inputBinding->bindToMouseWheel(
+                iniFile.getInt(
+                    INI_SECTION, // Section
+                    std::string("Direction") + bindingIdxStr, // Key
+                    0 // Fallback value
+                )
+            );
+            break;
+        case ssge::InputBinding::DeviceType::JoystickButton:
+            inputBinding->bindToJoystickButton(
+                0, // JoystickID // TODO: Better detection of joystick slots!
+                iniFile.getInt( // Button index
+                    INI_SECTION, // Section
+                    std::string("Button") + bindingIdxStr, // Key
+                    0 // Fallback value
+                )
+            );
+            break;
+        case ssge::InputBinding::DeviceType::JoystickAxis:
+            inputBinding->bindToJoystickAxis(
+                0, // JoystickID // TODO: Better detection of joystick slots!
+                iniFile.getInt( // Axis index
+                    INI_SECTION, // Section
+                    std::string("Axis") + bindingIdxStr, // Key
+                    0 // Fallback value
+                ),
+                iniFile.getInt( // Axis direction
+                    INI_SECTION, // Section
+                    std::string("Direction") + bindingIdxStr, // Key
+                    0 // Fallback value
+                )
+            );
+            break;
+        case ssge::InputBinding::DeviceType::JoystickHat:
+            inputBinding->bindToJoystickHat(
+                0, // JoystickID // TODO: Better detection of joystick slots!
+                iniFile.getInt( // Hat index
+                    INI_SECTION, // Section
+                    std::string("Hat") + bindingIdxStr, // Key
+                    0 // Fallback value
+                ),
+                iniFile.getInt( // Hat side
+                    INI_SECTION, // Side
+                    std::string("Direction") + bindingIdxStr, // Key
+                    0 // Fallback value
+                )
+                // TODO: Sanitize further!
+            );
+            break;
+        case ssge::InputBinding::DeviceType::GameControllerButton:
+            // TODO: Support GameController when it actually works
+            break;
+        case ssge::InputBinding::DeviceType::GameControllerAxis:
+            // TODO: Support GameController when it actually works
+            break;
+        case ssge::InputBinding::DeviceType::TouchFinger:
+            // TODO: No touch support yet
+            break;
+        case ssge::InputBinding::DeviceType::Disconnected:
+        default:
+            inputBinding->disconnect();
+            break;
+        }
+    }
+
+    return false;
+}
+
+bool ssge::InputManager::saveToIniFile(IniFile& iniFile)
+{
+    static const char* INI_SECTION = "InputBindings";
+
+    InputBinding* binding = nullptr;
+    for (int i = 0; i < MAX_BINDINGS; i++)
+    {
+        binding = &bindings[i];
+
+        std::string bindingIdxStr = std::to_string(i);
+
+        InputBinding::DeviceType deviceType = binding->getDeviceType();
+
+        iniFile.setInt(
+            INI_SECTION,
+            "DeviceType" + bindingIdxStr,
+            (int)deviceType
+        );
+
+        switch (deviceType)
+        {
+        case ssge::InputBinding::DeviceType::Keyboard:
+            iniFile.setInt(
+                INI_SECTION,
+                "Scancode" + bindingIdxStr,
+                binding->getScancode()
+            );
+            break;
+        case ssge::InputBinding::DeviceType::MouseButton:
+            iniFile.setInt(
+                INI_SECTION,
+                "Button" + bindingIdxStr,
+                binding->getMouseButton()
+            );
+            break;
+        case ssge::InputBinding::DeviceType::MouseWheel:
+            iniFile.setInt(
+                INI_SECTION,
+                "Direction" + bindingIdxStr,
+                binding->getMouseWheelDirection()
+            );
+            break;
+        case ssge::InputBinding::DeviceType::JoystickButton:
+            iniFile.setInt(
+                INI_SECTION,
+                "Button" + bindingIdxStr,
+                binding->getJoystickButton()
+            );
+            break;
+        case ssge::InputBinding::DeviceType::JoystickAxis:
+            iniFile.setInt(
+                INI_SECTION,
+                "Axis" + bindingIdxStr,
+                binding->getJoystickAxis()
+            );
+            iniFile.setInt(
+                INI_SECTION,
+                "Direction" + bindingIdxStr,
+                binding->getJoystickAxisDirection()
+            );
+            break;
+        case ssge::InputBinding::DeviceType::JoystickHat:
+            iniFile.setInt(
+                INI_SECTION,
+                "Hat" + bindingIdxStr,
+                binding->getJoystickHatIndex()
+            );
+            iniFile.setInt(
+                INI_SECTION,
+                "Direction" + bindingIdxStr,
+                binding->getJoystickHatDirection()
+            );
+            break;
+        case ssge::InputBinding::DeviceType::GameControllerButton:
+            // TODO: Support GameController when it actually works
+            break;
+        case ssge::InputBinding::DeviceType::GameControllerAxis:
+            // TODO: Support GameController when it actually works
+            break;
+        case ssge::InputBinding::DeviceType::TouchFinger:
+            // TODO: No touch support yet
+            break;
+        default:
+            break;
+        }
+    }
+    return false;
+}

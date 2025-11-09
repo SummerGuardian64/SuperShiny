@@ -49,6 +49,17 @@ void SuperShiny::init(ssge::StepContext& context)
 	sprites.load("Shiny", renderer);
 	sprites.load("Orb", renderer);
 	context.scenes.changeScene("SplashScreen");
+
+	// Load settings
+
+	IniFile configIni;
+
+	if (configIni.loadIni("config.ini"))
+	{ // Only parse if we have something loaded
+		config.load(configIni);
+		context.inputs.loadFromIniFile(configIni);
+	}
+
 	menus.init(config);
 }
 
@@ -107,6 +118,23 @@ void SuperShiny::cleanUp(ssge::PassKey<ssge::Engine> pk)
 {
 	sprites.unload("Shiny");
 	sprites.unload("Orb");
+}
+
+bool SuperShiny::saveSettings(ssge::StepContext& context)
+{
+	// Save settings
+
+	IniFile configIni;
+
+	config.save(configIni);
+	context.inputs.saveToIniFile(configIni);
+
+	if (!configIni.saveIni("config.ini"))
+	{
+		std::cout << configIni.getErrorLog() << std::endl;
+		return false;
+	}
+	else return true;
 }
 
 const char* SuperShiny::getApplicationTitle()
@@ -413,4 +441,26 @@ void SuperShiny::Menus::init(SuperShiny::Config& config)
 
 void SuperShiny::Menus::refreshHighScoreMenu(int direction)
 {
+}
+
+bool SuperShiny::Config::load(ssge::IniFile& iniFile)
+{
+	masterVolume = iniFile.getInt("Config", "MasterVolume", 100);
+	sfxVolume = iniFile.getInt("Config", "SfxVolume", 100);
+	musicVolume = iniFile.getInt("Config", "MusicVolume", 100);
+	resolutionScaleConfig = iniFile.getInt("Config", "ResolutionScaleConfig", 1);
+	fullScreen = iniFile.getBool("Config", "FullScreen", false);
+	integralUpscale = iniFile.getBool("Config", "IntegralUpscale", false);
+	return true;
+}
+
+bool SuperShiny::Config::save(ssge::IniFile& iniFile) const
+{
+	iniFile.setInt("Config", "MasterVolume", masterVolume);
+	iniFile.setInt("Config", "SfxVolume", sfxVolume);
+	iniFile.setInt("Config", "MusicVolume", musicVolume);
+	iniFile.setInt("Config", "ResolutionScaleConfig", resolutionScaleConfig);
+	iniFile.setBool("Config", "FullScreen", fullScreen);
+	iniFile.setBool("Config", "IntegralUpscale", integralUpscale);
+	return false;
 }

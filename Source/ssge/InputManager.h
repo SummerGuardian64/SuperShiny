@@ -3,6 +3,7 @@
 #include "InputPad.h"
 #include "PassKey.h"
 #include <list>
+#include "IniFile.h"
 
 namespace ssge
 {
@@ -65,5 +66,8 @@ namespace ssge
 		InputBinding getBinding(int bindingIndex) const;
 		std::string getBindingString(int bindingIndex) const;
 		int getMaxBindings() const;
+
+		bool loadFromIniFile(IniFile& iniFile);
+		bool saveToIniFile(IniFile& iniFile);
 	};
 }

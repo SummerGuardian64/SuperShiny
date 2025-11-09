@@ -39,6 +39,7 @@ namespace ssge {
         explicit GameAccess(IGame& actual) : actual(actual) {}
         IGame& get() { return actual; }
         MenuCommandEx onHavingBackedOutOfMenus(PassKey<MenuManager> pk, MenuContext& context);
+        bool saveSettings(StepContext& context);
     };
 
     class ScenesAccess {
@@ -121,6 +122,9 @@ namespace ssge {
         InputBinding getBinding(int bindingIndex) const;
         std::string getBindingString(int bindingIndex) const;
         int getMaxBindings() const;
+        // TODO: Further encapsulation
+        bool loadFromIniFile(IniFile& iniFile);
+        bool saveToIniFile(IniFile& iniFile);
     };
     
     class DrawingAccess {

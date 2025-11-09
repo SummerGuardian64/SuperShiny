@@ -314,6 +314,18 @@ int InputsAccess::getMaxBindings() const
 	else return actual->getMaxBindings();
 }
 
+bool InputsAccess::loadFromIniFile(IniFile& iniFile)
+{
+	if (!actual)return false;
+	else return actual->loadFromIniFile(iniFile);
+}
+
+bool InputsAccess::saveToIniFile(IniFile& iniFile)
+{
+	if (!actual)return false;
+	else return actual->saveToIniFile(iniFile);
+}
+
 std::string CurrentSceneAccess::getSceneClassID() const
 {
 	return currentScene->getSceneClassID();
@@ -440,4 +452,9 @@ void ssge::GameWorldAccess::reportHeroDeadth()
 MenuCommandEx ssge::GameAccess::onHavingBackedOutOfMenus(PassKey<MenuManager> pk, MenuContext& context)
 {
 	return actual.onHavingBackedOutOfMenus(PassKey<GameAccess>(), context);
+}
+
+bool GameAccess::saveSettings(StepContext& context)
+{
+	return actual.saveSettings(context);
 }

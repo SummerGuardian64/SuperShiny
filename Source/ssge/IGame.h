@@ -40,6 +40,8 @@ namespace ssge
         // Called when it's time to clean up before SDL quits
         virtual void cleanUp(PassKey<Engine> pk) = 0;
 
+        virtual bool saveSettings(StepContext& context) = 0;
+
         // Get application title
         virtual const char* getApplicationTitle() = 0;
 

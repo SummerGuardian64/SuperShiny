@@ -152,6 +152,13 @@ namespace ssge
 			return std::to_string(getMouseButton());
 		}
 
+		int getMouseWheelDirection() const
+		{
+			if (deviceType != DeviceType::MouseWheel)
+				return 0;
+			else boundTo.mouseWheel.direction;
+		}
+
 		std::string getMouseWheelString() const
 		{
 			if (deviceType != DeviceType::MouseWheel)

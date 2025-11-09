@@ -2,6 +2,7 @@
 #include "../ssge/IGame.h"
 #include "../ssge/PassKey.h"
 #include "../ssge/MenuSystem.h"
+#include "../ssge/IniFile.h"
 
 class Scene;
 class ScenesAccess;
@@ -45,6 +46,8 @@ public: //TODO: Encapsulate
 
     // Called when it's time to clean up before SDL quits
     void cleanUp(ssge::PassKey<ssge::Engine> pk) override;
+
+    bool saveSettings(ssge::StepContext& context) override;
 
     // Get application title
     const char* getApplicationTitle() override;
@@ -162,6 +165,9 @@ public: //TODO: Encapsulate
         int resolutionScaleConfig = 1;
         bool fullScreen = false;
         bool integralUpscale = false;
+
+        bool load(ssge::IniFile& iniFile);
+        bool save(ssge::IniFile& iniFile) const;
     };
 
     Config config;

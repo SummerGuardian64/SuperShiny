@@ -98,20 +98,6 @@ bool Engine::loadInitialResources(SDL_Renderer* renderer)
 
 bool Engine::prepareInitialState()
 {
-	//TODO: Initialize first scene
-	auto stepContext = StepContext(PassKey<Engine>(),
-		0,
-		EngineAccess(this),
-		GameAccess(game),
-		WindowAccess(window),
-		AudioAccess(audio),
-		ScenesAccess(scenes, game),
-		InputsAccess(inputs),
-		DrawingAccess(window->getRenderer()),
-		MenusAccess(menus));
-	game.init(stepContext);
-
-	//scenes->changeScene("SplashScreen");
 	// TODO: MOVE TO game.init() and encapsulate bindings[]
 	inputs->bindings[0].bindToKey(SDL_Scancode::SDL_SCANCODE_UP);
 	inputs->fallbackBindings[0].bindToKey(SDL_Scancode::SDL_SCANCODE_UP);
@@ -130,6 +116,20 @@ bool Engine::prepareInitialState()
 	inputs->fallbackBindings[8].bindToKey(SDL_Scancode::SDL_SCANCODE_RETURN);
 	inputs->bindings[9].bindToKey(SDL_Scancode::SDL_SCANCODE_ESCAPE);
 	inputs->fallbackBindings[9].bindToKey(SDL_Scancode::SDL_SCANCODE_ESCAPE);
+
+	//TODO: Initialize first scene
+	auto stepContext = StepContext(PassKey<Engine>(),
+		0,
+		EngineAccess(this),
+		GameAccess(game),
+		WindowAccess(window),
+		AudioAccess(audio),
+		ScenesAccess(scenes, game),
+		InputsAccess(inputs),
+		DrawingAccess(window->getRenderer()),
+		MenusAccess(menus));
+	game.init(stepContext);
+
 
 	return true;
 }
@@ -311,6 +311,21 @@ void Engine::render(DrawContext context)
 void Engine::shutdown()
 {
 	std::cout << "shutdown()" << std::endl;
+
+	// Save settings
+	StepContext context(
+		PassKey<Engine>(),
+		0,
+		EngineAccess(this),
+		GameAccess(game),
+		WindowAccess(window),
+		AudioAccess(audio),
+		ScenesAccess(scenes, game),
+		InputsAccess(inputs),
+		DrawingAccess(window->getRenderer()),
+		MenusAccess(menus)
+	);
+	game.saveSettings(context);
 
 	game.cleanUp(PassKey<Engine>());
 
