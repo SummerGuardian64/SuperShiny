@@ -495,7 +495,40 @@ void MenuManager::step(MenuContext& context)
         currentMenuItem = currentMenu->items[itemIndex];
     }
 
-    if (context.inputs.isJustPressed(0))
+    // UP BUTTON
+    bool upPressed = context.inputs.isJustPressed(0);
+    // DOWN BUTTON
+    bool downPressed = context.inputs.isJustPressed(1);
+    // LEFT BUTTON
+    bool leftPressed = context.inputs.isJustPressed(2);
+    bool leftHeld = context.inputs.isPressed(2);
+    // RIGHT BUTTON
+    bool rightPressed = context.inputs.isJustPressed(3);
+    bool rightHeld = context.inputs.isPressed(3);
+    // ACCEPT BUTTON || JUMP BUTTON
+    bool acceptPressed = context.inputs.isJustPressed(8)
+        || context.inputs.isJustPressed(4);
+    // BACK BUTTON || RUN BUTTON || PAUSE BUTTON
+    bool backPressed = context.inputs.isJustPressed(9)
+        || context.inputs.isJustPressed(5)
+        || context.inputs.isJustPressed(7);
+
+    // Repeat rate counting
+    if (leftHeld || rightHeld)
+    {
+        leftRightHoldingTime++;
+    }
+    else leftRightHoldingTime = 0;
+
+    int leftRightRepeatDelay = 12;
+    int leftRightRepeatRate = 4;
+
+    if (leftRightHoldingTime >= leftRightRepeatDelay + leftRightRepeatRate)
+    {
+        leftRightHoldingTime = leftRightRepeatDelay;
+    }
+
+    if (upPressed)
     { // UP BUTTON
         if (currentMenuItem) // Check if an item has been selected
         {
@@ -507,7 +540,7 @@ void MenuManager::step(MenuContext& context)
             } while (oldIndex != itemIndex); // Prevent infinite loop
         }
     }
-    else if (context.inputs.isJustPressed(1))
+    else if (downPressed)
     { // DOWN BUTTON
         if (currentMenuItem) // Check if an item has been selected
         {
@@ -519,7 +552,8 @@ void MenuManager::step(MenuContext& context)
             } while (oldIndex != itemIndex); // Prevent infinite loop
         }
     }
-    else if (context.inputs.isJustPressed(2))
+    else if (leftPressed ||
+        (leftHeld && leftRightHoldingTime == leftRightRepeatDelay))
     { // LEFT BUTTON
         if (currentMenuItem) // Check if an item has been selected
         {
@@ -529,7 +563,8 @@ void MenuManager::step(MenuContext& context)
             }
         }
     }
-    else if (context.inputs.isJustPressed(3))
+    else if (rightPressed ||
+        (rightHeld && leftRightHoldingTime == leftRightRepeatDelay))
     { // RIGHT BUTTON
         if (currentMenuItem)
         {
@@ -539,8 +574,8 @@ void MenuManager::step(MenuContext& context)
             }
         }
     }
-    else if (context.inputs.isJustPressed(8) || context.inputs.isJustPressed(4))
-    { // ACCEPT BUTTON || JUMP BUTTON
+    else if (acceptPressed)
+    { // ACCEPT BUTTON
         if (currentMenuItem)
         {
             if (currentMenuItem->isEnabled())
@@ -549,8 +584,8 @@ void MenuManager::step(MenuContext& context)
             }
         }
     }
-    else if (context.inputs.isJustPressed(9) || context.inputs.isJustPressed(5) || context.inputs.isJustPressed(7))
-    { // BACK BUTTON || RUN BUTTON || PAUSE BUTTON
+    else if (backPressed)
+    { // BACK BUTTON
         returnedCommand = MenuCommand::GO_BACK;
     }
 

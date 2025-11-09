@@ -179,6 +179,7 @@ namespace ssge
         constexpr static SDL_Color cMenuBackground = SDL_Color{ 32, 32, 192, 64 };
         constexpr static SDL_Color cTextShadow = SDL_Color{ 64, 64, 64, 255 };
         static void drawText(DrawContext& drawContext, SDL_Color color, int height, std::string text);
+        int leftRightHoldingTime = 0;
         int levelSelectorInt = 0;
         MenuHeader* currentMenu = nullptr;
         std::stack<MenuHeader*> previousMenus;
