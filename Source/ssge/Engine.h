@@ -5,20 +5,24 @@
 
 namespace ssge
 {
+	class Program;
 	class IGame;
-	class SceneManager;
 	class WindowManager;
+	class AudioManager;
+	class SceneManager;
 	class InputManager;
 	class MenuManager;
 	class Scene;
-	class Program;
 	class DrawContext;
 
 	class Engine // The game engine core
 	{
+		// Interface to the game's implementation
 		IGame& game;
-
+		// Manages the window
 		WindowManager* window;
+		// Manages audio
+		AudioManager* audio;
 		// Manages scenes
 		SceneManager* scenes;
 		// Manages inputs

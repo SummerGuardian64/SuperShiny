@@ -1,23 +1,25 @@
 #include "Engine.h"
-#include "SceneManager.h"
-#include "InputManager.h"
-#include <memory>
-#include "StepContext.h"
-#include "DrawContext.h"
 #include <SDL.h>
-#include "PassKey.h"
-#include "MenuSystem.h"
-#include "WindowManager.h"
-#include "Accessor.h"
 #include <SDL_ttf.h>
-#include "GameWorld.h"
+#include <memory>
+#include "PassKey.h"
+#include "SceneManager.h"
+#include "WindowManager.h"
+#include "AudioManager.h"
+#include "InputManager.h"
+#include "MenuSystem.h"
 #include "MenuContext.h"
+#include "StepContext.h"
+#include "Accessor.h"
+#include "DrawContext.h"
+#include "GameWorld.h"
 
 using namespace ssge;
 
 Engine::Engine(PassKey<Program> pk, IGame& game) : game(game)
 {
 	window = new WindowManager(PassKey<Engine>());
+	audio = new AudioManager(PassKey<Engine>());
 	scenes = new SceneManager(PassKey<Engine>());
 	inputs = new InputManager(PassKey<Engine>());
 	menus = new MenuManager(PassKey<Engine>());
@@ -67,6 +69,11 @@ bool Engine::init(PassKey<Program> pk)
 		std::cout << TTF_GetError() << std::endl;
 	}
 
+	if (!audio->init(PassKey<Engine>()))
+	{
+		/* handle error or continue with no audio */
+	}
+
 	//TODO: Better error handling
 	loadInitialResources(window->getRenderer());
 
@@ -97,6 +104,7 @@ bool Engine::prepareInitialState()
 		EngineAccess(this),
 		GameAccess(game),
 		WindowAccess(window),
+		AudioAccess(audio),
 		ScenesAccess(scenes, game),
 		InputsAccess(inputs),
 		DrawingAccess(window->getRenderer()),
@@ -252,6 +260,7 @@ bool Engine::update(double deltaTime)
 		EngineAccess(this),
 		GameAccess(game),
 		WindowAccess(window),
+		AudioAccess(audio),
 		ScenesAccess(scenes, game),
 		InputsAccess(inputs),
 		DrawingAccess(window->getRenderer()),
@@ -311,20 +320,25 @@ void Engine::shutdown()
 		menuFont = nullptr;
 	}
 
-	if (window)
+	if (inputs)
 	{
-		delete window;
-		window = nullptr;
+		delete inputs;
+		inputs = nullptr;
+	}
+	if (audio)
+	{
+		delete audio;
+		audio = nullptr;
 	}
 	if (scenes)
 	{
 		delete scenes;
 		scenes = nullptr;
 	}
-	if (inputs)
+	if (window)
 	{
-		delete inputs;
-		inputs = nullptr;
+		delete window;
+		window = nullptr;
 	}
 
 	TTF_Quit();

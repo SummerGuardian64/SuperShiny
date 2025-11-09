@@ -1,6 +1,7 @@
 #include "Accessor.h"
 #include "Engine.h"
 #include "WindowManager.h"
+#include "AudioManager.h"
 #include "SceneManager.h"
 #include "InputManager.h"
 #include "Scene.h"
@@ -156,6 +157,98 @@ SDL_Rect WindowAccess::makeBestFitScale() const
 	if (!actual) return SDL_Rect{ 0,0,0,0 };
 
 	return actual->makeBestFitScale();
+}
+
+// AudioAccess
+
+void AudioAccess::setMasterVolume(int v)
+{
+	if (!actual)return;
+	actual->setMasterVolume(v);
+}
+
+void AudioAccess::setMusicVolume(int v)
+{
+	if (!actual)return;
+	actual->setMusicVolume(v);
+}
+
+void AudioAccess::setSfxVolume(int v)
+{
+	if (!actual)return;
+	actual->setSfxVolume(v);
+}
+
+int  AudioAccess::getMasterVolume() const
+{
+	if (!actual)return 0;
+	return actual->getMasterVolume();
+}
+
+int  AudioAccess::getMusicVolume() const
+{
+	if (!actual)return 0;
+	return actual->getMusicVolume();
+}
+
+int  AudioAccess::getSfxVolume() const
+{
+	if (!actual)return 0;
+	return actual->getSfxVolume();
+}
+
+bool AudioAccess::playMusic(const std::string& path, int loops)
+{
+	if (!actual)return false;
+	return actual->playMusic(path, loops);
+}
+
+void AudioAccess::stopMusic()
+{
+	if (!actual)return;
+	actual->stopMusic();
+}
+
+void AudioAccess::pauseMusic()
+{
+	if (!actual)return;
+	actual->pauseMusic();
+}
+
+void AudioAccess::resumeMusic()
+{
+	if (!actual)return;
+	actual->resumeMusic();
+}
+
+bool AudioAccess::loadSfx(const std::string& path)
+{
+	if (!actual)return false;
+	return actual->loadSfx(path);
+}
+
+int  AudioAccess::playSfx(const std::string& path, int loops)
+{
+	if (!actual)return 0;
+	return actual->playSfx(path, loops);
+}
+
+bool AudioAccess::isMusicPlaying() const
+{
+	if (!actual)return false;
+	return actual->isMusicPlaying();
+}
+
+bool AudioAccess::isMusicPlaying(const std::string& path) const
+{
+	if (!actual)return false;
+	return actual->isMusicPlaying(path);
+}
+
+bool AudioAccess::playMusicIfNotPlaying(const std::string& path, int loops)
+{
+	if (!actual)return false;
+	return actual->playMusicIfNotPlaying(path, loops);
 }
 
 // InputsAccess

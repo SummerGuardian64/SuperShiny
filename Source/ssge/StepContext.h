@@ -31,6 +31,7 @@ namespace ssge {
         EngineAccess engine;
         GameAccess game;
         WindowAccess window;
+        AudioAccess audio;
         ScenesAccess scenes;
         InputsAccess inputs;
         DrawingAccess drawing;
@@ -42,6 +43,7 @@ namespace ssge {
             EngineAccess engine,
             GameAccess game,
             WindowAccess window,
+            AudioAccess audio,
             ScenesAccess scenes,
             InputsAccess inputs,
             DrawingAccess drawing,

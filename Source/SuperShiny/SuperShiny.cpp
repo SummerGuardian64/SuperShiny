@@ -38,6 +38,9 @@ void SuperShiny::syncSettings(ssge::StepContext& context) const
 {
 	context.window.setIntegralUpscale(config.integralUpscale);
 	context.window.setBorderedFullScreen(config.fullScreen);
+	context.audio.setMasterVolume(config.masterVolume);
+	context.audio.setMusicVolume(config.musicVolume);
+	context.audio.setSfxVolume(config.musicVolume);
 }
 
 void SuperShiny::init(ssge::StepContext& context)
@@ -55,6 +58,8 @@ void SuperShiny::step(ssge::StepContext& context)
 
 	if (currentScene == scenes.getMainMenuSceneClassID())
 	{
+		context.audio.playMusicIfNotPlaying("Music/ShinyTheme.ogg");
+
 		if (!context.menus.isOpen()
 			&& context.scenes.isFadeFinished()
 			&& !context.engine.isWrappingUp())

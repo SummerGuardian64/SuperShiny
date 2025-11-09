@@ -8,12 +8,13 @@
 
 namespace ssge {
 
+    class Engine;
     class WindowManager;
+    class AudioManager;
     class SceneManager;
     class Level;
     class EntityManager;
     class Entity;
-    class Engine;
     class EntityReference;
     class InputManager;
     class Scene;
@@ -82,6 +83,28 @@ namespace ssge {
         void setBorderedFullScreen(bool borderedFullScreen = false);
         // Makes a SDL_Rect with best scaling
         SDL_Rect makeBestFitScale() const;
+    };
+
+    class AudioAccess {
+        AudioManager* actual;
+    public:
+        explicit AudioAccess(AudioManager* actual)
+            : actual(actual) {}
+        void setMasterVolume(int v);
+        void setMusicVolume(int v);
+        void setSfxVolume(int v);
+        int  getMasterVolume() const;
+        int  getMusicVolume() const;
+        int  getSfxVolume() const;
+        bool playMusic(const std::string& path, int loops = -1);
+        void stopMusic();
+        void pauseMusic();
+        void resumeMusic();
+        bool loadSfx(const std::string& path);
+        int  playSfx(const std::string& path, int loops = 0);
+        bool isMusicPlaying() const;
+        bool isMusicPlaying(const std::string& path) const;
+        bool playMusicIfNotPlaying(const std::string& path, int loops = -1);
     };
 
     class InputsAccess {
