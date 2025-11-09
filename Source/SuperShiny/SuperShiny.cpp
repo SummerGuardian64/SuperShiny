@@ -314,8 +314,8 @@ void SuperShiny::Menus::init(SuperShiny::Config& config)
 
 	// Compose the main menu
 	mainMenu.setTitle("Super Shiny");
-	mainMenu.newItem_NewGame("New Game");
-	mainMenu.newItem("Load Game")->enabled = false;
+	mainMenu.newItem_NewGame("Start Game");
+	mainMenu.newItem("Load Game")->visible = false;
 	mainMenu.newItem_SubMenu("Level Select", &levelSelect)->visible = false;
 	mainMenu.newItem("Super Duper Secret Menu")->visible = false;
 	mainMenu.newItem_SubMenu("High Score", &highScoreMenu, (MenuFunction)refreshHighScoreMenu);
@@ -324,6 +324,14 @@ void SuperShiny::Menus::init(SuperShiny::Config& config)
 	mainMenu.newLabel("Created by Summer Guardian 64");
 	mainMenu.newLabel("Thank you for playing!");
 
+	optionsMenu.newItem_SubMenu("Display Settings", &displaySettingsMenu);
+	{
+		displaySettingsMenu.setTitle("Display Settings");
+		displaySettingsMenu.newItem_IntSetting("Resolution Upscale:", &config.resolutionScaleConfig, 1, 4)->visible = false;
+		displaySettingsMenu.newItem_BoolSetting("Display Mode:", &config.fullScreen, "Borderless Fullscreen", "Windowed");
+		displaySettingsMenu.newItem_BoolSetting("Stretching:", &config.integralUpscale, "Integral", "Fractional");
+		displaySettingsMenu.newItem_GoBack("Save & Back"); // TODO: Config saving
+	}
 	optionsMenu.newItem_SubMenu("Input Configuration", &inputConfigMenu);
 	{
 		inputConfigMenu.setTitle("Input Configuration");
@@ -346,14 +354,6 @@ void SuperShiny::Menus::init(SuperShiny::Config& config)
 		volumeControlMenu.newItem_IntSetting("Music:", &config.musicVolume, 0, 100);
 		volumeControlMenu.newItem_IntSetting("Sounds:", &config.sfxVolume, 0, 100);
 		volumeControlMenu.newItem_GoBack("Save & Back"); // TODO: Config saving
-	}
-	optionsMenu.newItem_SubMenu("Display Settings", &displaySettingsMenu);
-	{
-		displaySettingsMenu.setTitle("Display Settings");
-		displaySettingsMenu.newItem_IntSetting("Resolution Upscale:", &config.resolutionScaleConfig, 1, 4)->visible = false;
-		displaySettingsMenu.newItem_BoolSetting("Display Mode:", &config.fullScreen, "Borderless Fullscreen", "Windowed");
-		displaySettingsMenu.newItem_BoolSetting("Stretching:", &config.integralUpscale, "Integral", "Fractional");
-		displaySettingsMenu.newItem_GoBack("Save & Back"); // TODO: Config saving
 	}
 	optionsMenu.newItem_GoBack("Save & Back"); // TODO: Config saving
 
@@ -379,7 +379,7 @@ void SuperShiny::Menus::init(SuperShiny::Config& config)
 	pauseMenu.setTitle("Pause");
 	pauseMenu.newItem_CloseMenu("Resume");
 	pauseMenu.newItem_SubMenu("Restart Level", &confirmRestart);
-	pauseMenu.newItem_SubMenu("High Score", &highScoreMenu, (MenuFunction)&refreshHighScoreMenu);
+	pauseMenu.newItem_SubMenu("High Score", &highScoreMenu, (MenuFunction)&refreshHighScoreMenu)->visible = false;
 	pauseMenu.newItem_SubMenu("Options", &optionsMenu);
 	pauseMenu.newItem_SubMenu("Go To Main Menu", &confirmExitGame);
 

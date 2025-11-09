@@ -532,8 +532,8 @@ void MenuManager::step(MenuContext& context)
             }
         }
     }
-    else if (context.inputs.isJustPressed(8))
-    { // ACCEPT BUTTON
+    else if (context.inputs.isJustPressed(8) || context.inputs.isJustPressed(4))
+    { // ACCEPT BUTTON || JUMP BUTTON
         if (currentMenuItem)
         {
             if (currentMenuItem->isEnabled())
@@ -542,8 +542,8 @@ void MenuManager::step(MenuContext& context)
             }
         }
     }
-    else if (context.inputs.isJustPressed(9) || context.inputs.isJustPressed(7))
-    { // BACK BUTTON || PAUSE BUTTON
+    else if (context.inputs.isJustPressed(9) || context.inputs.isJustPressed(5) || context.inputs.isJustPressed(7))
+    { // BACK BUTTON || RUN BUTTON || PAUSE BUTTON
         returnedCommand = MenuCommand::GO_BACK;
     }
 
