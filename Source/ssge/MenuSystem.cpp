@@ -282,6 +282,13 @@ MenuItem* MenuHeader::newItem_GoBack(const char* text, MenuFunction onSelect)
 	return item;
 }
 
+MenuItem* MenuHeader::newItem_SaveAndBack(const char* text, MenuFunction onSelect)
+{
+    auto item = new MenuItem(text, true, true, true, MenuCommand::SAVE_AND_BACK, NULL, false, NULL, onSelect);
+    items.push_back(item);
+    return item;
+}
+
 MenuItem* MenuHeader::newItem_NextLevel(const char* text)
 {
 	auto item = new MenuItem(text, true, true, true, MenuCommand::NEXT_LEVEL);
@@ -668,6 +675,9 @@ void MenuManager::step(MenuContext& context)
             setMenu(cmdEx.targetMenu); // Set target menu for current menu
             break;
 
+        case MenuCommand::SAVE_AND_BACK:
+            context.game.saveSettings();
+            // Fallthrough OK
         case MenuCommand::GO_BACK:
             // Go to the previous menu
             if (previousMenus.empty())
@@ -713,6 +723,9 @@ void MenuManager::step(MenuContext& context)
                     }
                 }
             }
+            break;
+        case MenuCommand::SAVE_CONFIG:
+            context.game.saveSettings();
             break;
         default:
             // This is for any command number not covered previously

@@ -35,6 +35,8 @@ namespace ssge
         static const int POP_AND_GOTO = -12;
         static const int GO_BACK = -13;
         static const int BIND_INPUT = -14;
+        static const int SAVE_CONFIG = -15;
+        static const int SAVE_AND_BACK = -16;
     private:
         int _cmd = NOTHING;
     public:
@@ -148,6 +150,7 @@ namespace ssge
         MenuItem* newItem_RestartLevel(const char* text, MenuFunction onSelect = NULL);
         MenuItem* newItem_SubMenu(const char* text, MenuHeader* targetMenu, MenuFunction onSelect = NULL);
         MenuItem* newItem_GoBack(const char* text, MenuFunction onSelect = NULL);
+        MenuItem* newItem_SaveAndBack(const char* text, MenuFunction onSelect = NULL);
         MenuItem* newItem_NextLevel(const char* text);
         MenuItem* newItem_MainMenu(const char* text, MenuFunction onSelect = NULL);
         MenuItem* newItem_IntSetting(const char* text, int* setting, int min, int max, MenuCommand command = MenuCommand::NOTHING, MenuFunction = nullptr);

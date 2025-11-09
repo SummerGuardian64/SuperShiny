@@ -42,6 +42,8 @@ namespace ssge
 
         virtual bool saveSettings(StepContext& context) = 0;
 
+        virtual void saveSettings() = 0;
+
         // Get application title
         virtual const char* getApplicationTitle() = 0;
 

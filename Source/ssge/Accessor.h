@@ -39,7 +39,7 @@ namespace ssge {
         explicit GameAccess(IGame& actual) : actual(actual) {}
         IGame& get() { return actual; }
         MenuCommandEx onHavingBackedOutOfMenus(PassKey<MenuManager> pk, MenuContext& context);
-        bool saveSettings(StepContext& context);
+        void saveSettings();
     };
 
     class ScenesAccess {

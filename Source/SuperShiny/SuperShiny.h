@@ -33,6 +33,7 @@ public:
 
 private:
     void syncSettings(ssge::StepContext& context) const;
+    bool wannaSaveSettings = false;
 
 public: //TODO: Encapsulate
     // Called once after SDL + engine subsystems are up.
@@ -48,6 +49,9 @@ public: //TODO: Encapsulate
     void cleanUp(ssge::PassKey<ssge::Engine> pk) override;
 
     bool saveSettings(ssge::StepContext& context) override;
+
+    // The game will save the settings later, don't worry
+    void saveSettings() override;
 
     // Get application title
     const char* getApplicationTitle() override;

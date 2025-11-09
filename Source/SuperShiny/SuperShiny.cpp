@@ -107,6 +107,12 @@ void SuperShiny::step(ssge::StepContext& context)
 		}
 	}
 
+	if (wannaSaveSettings)
+	{
+		saveSettings(context);
+		wannaSaveSettings = false;
+	}
+
 	syncSettings(context);
 }
 
@@ -134,7 +140,16 @@ bool SuperShiny::saveSettings(ssge::StepContext& context)
 		std::cout << configIni.getErrorLog() << std::endl;
 		return false;
 	}
-	else return true;
+	else
+	{
+		std::cout << "Settings saved" << std::endl;
+		return true;
+	}
+}
+
+void SuperShiny::saveSettings()
+{
+	wannaSaveSettings = true;
 }
 
 const char* SuperShiny::getApplicationTitle()
@@ -353,7 +368,7 @@ void SuperShiny::Menus::init(SuperShiny::Config& config)
 		displaySettingsMenu.newItem_IntSetting("Resolution Upscale:", &config.resolutionScaleConfig, 1, 4)->visible = false;
 		displaySettingsMenu.newItem_BoolSetting("Display Mode:", &config.fullScreen, "Borderless Fullscreen", "Windowed");
 		displaySettingsMenu.newItem_BoolSetting("Stretching:", &config.integralUpscale, "Integral", "Fractional");
-		displaySettingsMenu.newItem_GoBack("Save & Back"); // TODO: Config saving
+		displaySettingsMenu.newItem_SaveAndBack("Save & Back"); // TODO: Config saving
 	}
 	optionsMenu.newItem_SubMenu("Input Configuration", &inputConfigMenu);
 	{
@@ -368,7 +383,7 @@ void SuperShiny::Menus::init(SuperShiny::Config& config)
 		inputConfigMenu.newItem_InputBinding("Pause Game", 7);
 		inputConfigMenu.newItem_InputBinding("Menu Accept", 8);
 		inputConfigMenu.newItem_InputBinding("Menu Back", 9);
-		inputConfigMenu.newItem_GoBack("Save & Back"); // TODO: Config saving
+		inputConfigMenu.newItem_SaveAndBack("Save & Back"); // TODO: Config saving
 	}
 	optionsMenu.newItem_SubMenu("Volume Control", &volumeControlMenu);
 	{
@@ -376,9 +391,9 @@ void SuperShiny::Menus::init(SuperShiny::Config& config)
 		volumeControlMenu.newItem_IntSetting("Master:", &config.masterVolume, 0, 100);
 		volumeControlMenu.newItem_IntSetting("Music:", &config.musicVolume, 0, 100);
 		volumeControlMenu.newItem_IntSetting("Sounds:", &config.sfxVolume, 0, 100);
-		volumeControlMenu.newItem_GoBack("Save & Back"); // TODO: Config saving
+		volumeControlMenu.newItem_SaveAndBack("Save & Back"); // TODO: Config saving
 	}
-	optionsMenu.newItem_GoBack("Save & Back"); // TODO: Config saving
+	optionsMenu.newItem_SaveAndBack("Save & Back"); // TODO: Config saving
 
 	confirmRestart.newLabel("Restarting a level will discard unsaved score!");
 	confirmRestart.newLabel("Are you sure you want to restart this level?");

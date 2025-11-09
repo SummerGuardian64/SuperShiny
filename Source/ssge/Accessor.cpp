@@ -454,7 +454,7 @@ MenuCommandEx ssge::GameAccess::onHavingBackedOutOfMenus(PassKey<MenuManager> pk
 	return actual.onHavingBackedOutOfMenus(PassKey<GameAccess>(), context);
 }
 
-bool GameAccess::saveSettings(StepContext& context)
+void GameAccess::saveSettings()
 {
-	return actual.saveSettings(context);
+	actual.saveSettings();
 }
