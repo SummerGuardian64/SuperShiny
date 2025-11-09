@@ -98,25 +98,6 @@ bool Engine::loadInitialResources(SDL_Renderer* renderer)
 
 bool Engine::prepareInitialState()
 {
-	// TODO: MOVE TO game.init() and encapsulate bindings[]
-	inputs->fetchBinding(0)->bindToKey(SDL_Scancode::SDL_SCANCODE_UP);
-	inputs->fetchFallbackBinding(0)->bindToKey(SDL_Scancode::SDL_SCANCODE_UP);
-	inputs->fetchBinding(1)->bindToKey(SDL_Scancode::SDL_SCANCODE_DOWN);
-	inputs->fetchFallbackBinding(1)->bindToKey(SDL_Scancode::SDL_SCANCODE_DOWN);
-	inputs->fetchBinding(2)->bindToKey(SDL_Scancode::SDL_SCANCODE_LEFT);
-	inputs->fetchFallbackBinding(2)->bindToKey(SDL_Scancode::SDL_SCANCODE_LEFT);
-	inputs->fetchBinding(3)->bindToKey(SDL_Scancode::SDL_SCANCODE_RIGHT);
-	inputs->fetchFallbackBinding(3)->bindToKey(SDL_Scancode::SDL_SCANCODE_RIGHT);
-	inputs->fetchBinding(4)->bindToKey(SDL_Scancode::SDL_SCANCODE_X);
-	inputs->fetchBinding(5)->bindToKey(SDL_Scancode::SDL_SCANCODE_Z);
-	inputs->fetchBinding(6)->bindToKey(SDL_Scancode::SDL_SCANCODE_SPACE);
-	inputs->fetchBinding(7)->bindToKey(SDL_Scancode::SDL_SCANCODE_ESCAPE);
-	inputs->fetchFallbackBinding(7)->bindToKey(SDL_Scancode::SDL_SCANCODE_ESCAPE);
-	inputs->fetchBinding(8)->bindToKey(SDL_Scancode::SDL_SCANCODE_RETURN);
-	inputs->fetchFallbackBinding(8)->bindToKey(SDL_Scancode::SDL_SCANCODE_RETURN);
-	inputs->fetchBinding(9)->bindToKey(SDL_Scancode::SDL_SCANCODE_ESCAPE);
-	inputs->fetchFallbackBinding(9)->bindToKey(SDL_Scancode::SDL_SCANCODE_ESCAPE);
-
 	auto stepContext = StepContext(PassKey<Engine>(),
 		0,
 		EngineAccess(this),
@@ -124,9 +105,10 @@ bool Engine::prepareInitialState()
 		WindowAccess(window),
 		AudioAccess(audio),
 		ScenesAccess(scenes, game),
-		InputsAccess(inputs),
+		InputsAccessConfigurable(inputs),
 		DrawingAccess(window->getRenderer()),
 		MenusAccess(menus));
+
 	game.init(stepContext);
 
 	return true;
@@ -260,7 +242,7 @@ bool Engine::update(double deltaTime)
 		WindowAccess(window),
 		AudioAccess(audio),
 		ScenesAccess(scenes, game),
-		InputsAccess(inputs),
+		InputsAccessConfigurable(inputs),
 		DrawingAccess(window->getRenderer()),
 		MenusAccess(menus)
 	);
@@ -283,7 +265,7 @@ bool Engine::update(double deltaTime)
 			GameAccess(game),
 			WindowAccess(window),
 			ScenesAccess(scenes, game),
-			InputsAccess(inputs),
+			InputsAccessConfigurable(inputs),
 			DrawingAccess(window->getRenderer()),
 			MenusAccess(menus),
 			CurrentSceneAccess(currentScene),
@@ -319,7 +301,7 @@ void Engine::shutdown()
 		WindowAccess(window),
 		AudioAccess(audio),
 		ScenesAccess(scenes, game),
-		InputsAccess(inputs),
+		InputsAccessConfigurable(inputs),
 		DrawingAccess(window->getRenderer()),
 		MenusAccess(menus)
 	);

@@ -9,7 +9,7 @@ MenuContext::MenuContext(
 	GameAccess game,
 	WindowAccess window,
 	ScenesAccess scenes,
-	InputsAccess inputs,
+	InputsAccessConfigurable inputs,
 	DrawingAccess drawing,
 	MenusAccess menus,
 	CurrentSceneAccess currentScene,

@@ -13,7 +13,7 @@ namespace ssge
         GameAccess game;
         WindowAccess window;
         ScenesAccess scenes;
-        InputsAccess inputs;
+        InputsAccessConfigurable inputs;
         DrawingAccess drawing;
         MenusAccess menus;
         CurrentSceneAccess currentScene;
@@ -26,7 +26,7 @@ namespace ssge
             GameAccess game,
             WindowAccess window,
             ScenesAccess scenes,
-            InputsAccess inputs,
+            InputsAccessConfigurable inputs,
             DrawingAccess drawing,
             MenusAccess menus,
             CurrentSceneAccess currentScene,

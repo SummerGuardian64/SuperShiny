@@ -33,7 +33,7 @@ namespace ssge {
         WindowAccess window;
         AudioAccess audio;
         ScenesAccess scenes;
-        InputsAccess inputs;
+        InputsAccessConfigurable inputs;
         DrawingAccess drawing;
         MenusAccess menus;
 
@@ -45,7 +45,7 @@ namespace ssge {
             WindowAccess window,
             AudioAccess audio,
             ScenesAccess scenes,
-            InputsAccess inputs,
+            InputsAccessConfigurable inputs,
             DrawingAccess drawing,
             MenusAccess menus
         );

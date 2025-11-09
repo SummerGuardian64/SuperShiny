@@ -109,6 +109,7 @@ namespace ssge {
     };
 
     class InputsAccess {
+    protected:
         InputManager* actual;
     public:
         explicit InputsAccess(InputManager* actual) : actual(actual) {}
@@ -116,17 +117,25 @@ namespace ssge {
         bool isJustPressed(int buttonIndex);
         bool isJustReleased(int buttonIndex);
         uint32_t getCurrentButtonsForPlayer(int playerId);
-        bool isListeningForBinding() const;
-        void listenForBinding(int bindingIndex);
-        void stopListeningForBinding();
         InputBinding getBinding(int bindingIndex) const;
         std::string getBindingString(int bindingIndex) const;
         int getMaxBindings() const;
-        // TODO: Further encapsulation
+    };
+
+    class InputsAccessConfigurable : public InputsAccess {
+    public:
+        explicit InputsAccessConfigurable(InputManager* actual)
+            : InputsAccess(actual) {}
+        InputsAccess accessDowngrade();
+        void listenForBinding(int bindingIndex);
+        bool isListeningForBinding() const;
+        void stopListeningForBinding();
+        InputBinding* fetchBinding(int bindingIndex);
+        InputBinding* fetchFallbackBinding(int bindingIndex);
         bool loadFromIniFile(IniFile& iniFile);
         bool saveToIniFile(IniFile& iniFile);
     };
-    
+
     class DrawingAccess {
         SDL_Renderer* renderer;
     public:

@@ -278,19 +278,24 @@ uint32_t InputsAccess::getCurrentButtonsForPlayer(int playerId)
 	//TODO: Support for more players!
 }
 
-bool InputsAccess::isListeningForBinding() const
+bool InputsAccessConfigurable::isListeningForBinding() const
 {
 	if (!actual)return false;
 	return actual->isListeningForBinding();
 }
 
-void InputsAccess::listenForBinding(int bindingIndex)
+InputsAccess ssge::InputsAccessConfigurable::accessDowngrade()
+{
+	return InputsAccess(actual);
+}
+
+void InputsAccessConfigurable::listenForBinding(int bindingIndex)
 {
 	if (!actual)return;
 	else actual->listenForBinding(bindingIndex);
 }
 
-void InputsAccess::stopListeningForBinding()
+void InputsAccessConfigurable::stopListeningForBinding()
 {
 	if (!actual)return;
 	else actual->stopListeningForBinding();
@@ -314,13 +319,25 @@ int InputsAccess::getMaxBindings() const
 	else return actual->getMaxBindings();
 }
 
-bool InputsAccess::loadFromIniFile(IniFile& iniFile)
+InputBinding* InputsAccessConfigurable::fetchBinding(int bindingIndex)
+{
+	if (!actual)return nullptr;
+	else return actual->fetchBinding(bindingIndex);
+}
+
+InputBinding* InputsAccessConfigurable::fetchFallbackBinding(int bindingIndex)
+{
+	if (!actual)return nullptr;
+	else return actual->fetchFallbackBinding(bindingIndex);
+}
+
+bool InputsAccessConfigurable::loadFromIniFile(IniFile& iniFile)
 {
 	if (!actual)return false;
 	else return actual->loadFromIniFile(iniFile);
 }
 
-bool InputsAccess::saveToIniFile(IniFile& iniFile)
+bool InputsAccessConfigurable::saveToIniFile(IniFile& iniFile)
 {
 	if (!actual)return false;
 	else return actual->saveToIniFile(iniFile);

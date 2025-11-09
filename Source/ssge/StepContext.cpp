@@ -14,7 +14,7 @@ StepContext::StepContext(
     WindowAccess window_,
     AudioAccess audio_,
     ScenesAccess scenes_,
-    InputsAccess inputs_,
+    InputsAccessConfigurable inputs_,
     DrawingAccess drawing_,
     MenusAccess menus_
 )

@@ -28,7 +28,7 @@ void SceneManager::step(StepContext& context)
 				context.engine,
 				context.game,
 				context.scenes,
-				context.inputs,
+				context.inputs.accessDowngrade(),
 				context.drawing,
 				context.menus,
 				CurrentSceneAccess(scene)
@@ -44,7 +44,7 @@ void SceneManager::step(StepContext& context)
 				context.engine,
 				context.game,
 				context.scenes,
-				context.inputs,
+				context.inputs.accessDowngrade(),
 				context.drawing,
 				context.menus,
 				CurrentSceneAccess(scene)
