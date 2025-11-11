@@ -25,6 +25,12 @@ file(GLOB_RECURSE SRC_FILES CONFIGURE_DEPENDS
 # If you use SRC_FILES, make sure your target uses it:
 add_executable(${PROJECT_NAME} ${SRC_FILES})
 
+# Resource file
+set(APP_ICON_RC "${CMAKE_SOURCE_DIR}/Resource/SuperShiny.rc")
+if (WIN32)
+  target_sources(SuperShiny PRIVATE "${APP_ICON_RC}")
+endif()
+
 # Link against SDL2 and SDL2_image
 # SDL2main is needed on Windows to provide a main() wrapper
 # SDL2_image is needed for image loading support
