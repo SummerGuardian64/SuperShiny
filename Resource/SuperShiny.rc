@@ -1,38 +1,38 @@
-// App icon
-IDI_APP_ICON ICON "SuperShiny.ico"
+#include "winres.h"
 
-// Optional: XP-friendly fallback you can swap in for XP builds.
-// IDI_APP_ICON ICON "res/supershiny_xp.ico"
+IDI_APP ICON "SuperShiny.ico"
 
-// Optional version info (edit strings as needed)
 VS_VERSION_INFO VERSIONINFO
-FILEVERSION 0, 1, 0, 0
-PRODUCTVERSION 0, 1, 0, 0
-FILEFLAGSMASK 0x3fL
+	FILEVERSION 0,1,0,0
+	PRODUCTVERSION 0,1,0,0
+	FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
-FILEFLAGS 0x1L
+	FILEFLAGS 0x1L
 #else
-FILEFLAGS 0x0L
+	FILEFLAGS 0x0L
 #endif
-FILEOS 0x40004L
-FILETYPE 0x1L
-FILESUBTYPE 0x0L
+	FILEOS 0x40004L
+	FILETYPE 0x1L
+	FILESUBTYPE 0x0L
 BEGIN
-BLOCK "StringFileInfo"
-BEGIN
-BLOCK "040904b0"  // U.S. English + Unicode
-BEGIN
-VALUE "CompanyName", "Summer Guardian 64\0"
-VALUE "FileDescription", "Super Shiny\0"
-VALUE "FileVersion", "0.1.0\0"
-VALUE "InternalName", "SuperShiny.exe\0"
-VALUE "OriginalFilename", "SuperShiny.exe\0"
-VALUE "ProductName", "Super Shiny\0"
-VALUE "ProductVersion", "0.1.0\0"
-END
-END
-BLOCK "VarFileInfo"
-BEGIN
-VALUE "Translation", 0x0409, 1200
-END
+	BLOCK "StringFileInfo"
+	BEGIN
+		// 0409 = en-US, 04B0 = Unicode codepage
+		BLOCK "040904B0"
+		BEGIN
+			VALUE "CompanyName",      "Summer Guardian 64\0"
+			VALUE "FileDescription",  "Super Shiny\0"
+			VALUE "FileVersion",      "0.1.0\0"
+			VALUE "InternalName",     "SuperShiny.exe\0"
+			VALUE "LegalCopyright",   "© 2025 Summer Guardian 64\0"
+			VALUE "OriginalFilename", "SuperShiny.exe\0"
+			VALUE "ProductName",      "Super Shiny\0"
+			VALUE "ProductVersion",   "0.1.0\0"
+		END
+	END
+	
+	BLOCK "VarFileInfo"
+	BEGIN
+		VALUE "Translation", 0x0409, 0x04B0
+	END
 END
