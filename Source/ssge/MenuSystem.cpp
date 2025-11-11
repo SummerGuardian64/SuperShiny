@@ -724,7 +724,7 @@ void MenuManager::step(MenuContext& context)
 
         case MenuCommand::SAVE_AND_BACK:
             context.game.saveSettings();
-            // Fallthrough OK
+            [[fallthrough]]; // Fallthrough OK
         case MenuCommand::GO_BACK:
             // Go to the previous menu
             if (previousMenus.empty())
