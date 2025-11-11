@@ -48,11 +48,11 @@ namespace ssge
 		int getFreeJoypadSlot() const;                    // returns slot or -1
 		Joypad* getFreeJoyPad();
 
+	private:
 		static const int MAX_BINDINGS = 32;
 		InputBinding bindings[MAX_BINDINGS];
 		InputBinding fallbackBindings[MAX_BINDINGS]; // For the con
 
-	private:
 		uint32_t directInputs = 0;
 		InputPad pad;
 
