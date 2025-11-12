@@ -23,7 +23,7 @@ bool ssge::GameWorld::initLevel(SceneStepContext& context)
         }
         else
         {
-            lvl->loadTileset(context.drawing.getRenderer());
+            lvl->loadTextures(context.drawing.getRenderer());
             level = std::move(lvl);
         }
     }

@@ -189,11 +189,45 @@ namespace ssge
 			float newY = 0.f;                 // resolved y (after axis move)
 		};
 
+		class Background
+		{
+			SdlTexture texture;
+			std::string path;
+			float parallaxX = 0;
+			float parallaxY = 0;
+		public:
+			Background() = default;
+			Background(std::string path, float parallaxX, float parallaxY);
+			Background(const Background& toCopy) = default;
+			Background(Background&& toMove) = default;
+			~Background() = default;
+
+			const SdlTexture& getTexture() const;
+			void setTexture(SdlTexture texture);
+			bool loadTexture(SDL_Renderer* renderer);
+
+			std::string getPath() const;
+			void setPath(std::string path);
+
+			float getParallaxX() const;
+			void setParallaxX(float parallaxX);
+
+			float getParallaxY() const;
+			void setParallaxY(float parallaxY);
+
+			bool isValid() const;
+		};
+
 	public:
 		// Level never changes dimensions once constructed.
 		const int columns;
 		const int rows;
 		const SDL_Rect blockSize; // width/height of a single block in pixels
+
+		// Backgrounds
+		//TODO: Harden
+		std::vector<Background> backgrounds;
+
 	private:
 		SdlTexture tileset;
 		TilesetMeta tilesMeta;
@@ -269,6 +303,8 @@ namespace ssge
 		void setTileset(SdlTexture SdlTexture);
 		std::string tilesetTexturePath;
 		bool loadTileset(SDL_Renderer* renderer);
+		bool loadBackgrounds(SDL_Renderer* renderer);
+		bool loadTextures(SDL_Renderer* renderer);
 
 		void draw(DrawContext context) const; // conservative draw (no templates)
 
@@ -277,6 +313,7 @@ namespace ssge
 			std::unique_ptr<Level> newLevel; // Level we're making
 			std::unique_ptr<Level> parseAndConstruct(); // Parses arguments for Level ctor and creates the level
 			bool parseAfterConstruct(); // Populates all data fields using sections
+			bool parseBackgrounds(); // Parse information about backgrounds
 			bool parseBlockDefinitions(); // Parse Block definitions
 			bool parseGrid(); // Parse grid
 			bool parseSpawnList(); // Parse spawn list

@@ -37,27 +37,6 @@ namespace ssge
 		{
 			blockDefinitions[i] = Block::Definition();
 		}
-
-		//HARDCODED PLACEHOLDER
-
-		//blockDefinitions[0].tileIndex = -1;
-		//blockDefinitions[1].tileIndex = 0;
-		//blockDefinitions[2].tileIndex = 1;
-		//blockDefinitions[3].tileIndex = 2;
-		//blockDefinitions[4].tileIndex = 3;
-		//blockDefinitions[5].tileIndex = 4;
-		//blockDefinitions[6].tileIndex = 5;
-		//blockDefinitions[7].tileIndex = 6;
-
-		//blockDefinitions[0].collision = Block::Collision::Air;
-		//blockDefinitions[1].collision = Block::Collision::Solid;
-		//blockDefinitions[2].collision = Block::Collision::Solid;
-		//blockDefinitions[3].collision = Block::Collision::Solid;
-		//blockDefinitions[4].collision = Block::Collision::Solid;
-		//blockDefinitions[5].collision = Block::Collision::Solid;
-		//blockDefinitions[6].collision = Block::Collision::Solid;
-		//blockDefinitions[7].collision = Block::Collision::Solid;
-
 	}
 
 	Level::~Level()
@@ -81,6 +60,7 @@ namespace ssge
 		, throughBottom(other.throughBottom)
 		, throughBottomRight(other.throughBottomRight)
 		, nextSection(other.nextSection)
+		, backgrounds(std::move(other.backgrounds))
 	{
 		other.array = nullptr;
 
@@ -508,6 +488,24 @@ namespace ssge
 		return tileset.isValid();
 	}
 
+	bool Level::loadBackgrounds(SDL_Renderer* renderer)
+	{
+		bool success = true;
+		for (auto& background : backgrounds)
+		{
+			success &= background.loadTexture(renderer);
+		}
+		return success;
+	}
+
+	bool Level::loadTextures(SDL_Renderer* renderer)
+	{
+		bool success = true;
+		success &= loadTileset(renderer);
+		success &= loadBackgrounds(renderer);
+		return success;
+	}
+
 	void Level::draw(DrawContext context) const
 	{
 		SDL_Renderer* renderer = context.getRenderer();
@@ -526,6 +524,48 @@ namespace ssge
 		int rightExtent = std::clamp(leftExtent + (viewport.w + tile.w - 1) / tile.w + 1, 0, columns);
 		int topExtent = std::clamp(scroll.y / tile.h, 0, rows);
 		int bottomExtent = std::clamp(topExtent + (viewport.h + tile.h - 1) / tile.h + 1, 0, rows);
+
+		for (const auto& background : backgrounds)
+		{
+			if (!background.isValid())
+				continue; // Skip invalid/unused/uninited backgrounds
+
+			const SdlTexture& texture = background.getTexture();
+			SDL_Texture* rawTexture = texture.get();
+
+			// Query background dimensions
+			auto dimensions = background.getTexture().getDimensions();
+			int bkgWidth = dimensions.w;
+			int bkgHeight = dimensions.h;
+
+			// Sanitize dimensions!
+			if (bkgWidth <= 0 || bkgHeight <= 0)
+				continue; // TODO: Error logging
+
+			int parallaxOffsetX = (float)(background.getParallaxX() * (float)leftOffset * -1);
+			// Make sure the first background tile is visible (horizontally)
+			while (parallaxOffsetX + bkgWidth < 0)
+				parallaxOffsetX += bkgWidth;
+
+			int parallaxOffsetY = (float)(background.getParallaxY() * (float)topOffset * -1);
+			// Make sure the first background tile is visible (vertically)
+			while (parallaxOffsetY + bkgHeight < 0)
+				parallaxOffsetY += bkgHeight;
+
+			for (int bkgTileY = parallaxOffsetY; bkgTileY < viewport.h; bkgTileY += bkgHeight)
+			{
+				for (int bkgTileX = parallaxOffsetX; bkgTileX < viewport.w; bkgTileX += bkgWidth)
+				{
+					SDL_Rect dest{ // Where to put this tile
+						bkgTileX,
+						bkgTileY,
+						bkgWidth,
+						bkgHeight
+					};
+					SDL_RenderCopy(renderer, rawTexture, nullptr, &dest);
+				}
+			}
+		}
 
 		if (tileset)
 		{
@@ -579,6 +619,9 @@ namespace ssge
 				break; // goto failure
 
 			if (!parseAfterConstruct())
+				break; // goto failure
+
+			if (!parseBackgrounds())
 				break; // goto failure
 
 			if (!parseBlockDefinitions())
@@ -656,6 +699,22 @@ namespace ssge
 			// TODO: Better error handling
 			logError("Failed to specify next section! Player may be stuck here!");
 			return false;
+		}
+
+		return true;
+	}
+	bool Level::Loader::parseBackgrounds()
+	{
+		int howManyBackgrounds = getInt("Background", "Layers", 0);
+
+		for (int bkgIndex = 0; bkgIndex < howManyBackgrounds; bkgIndex++)
+		{
+			std::string layerCaption = "Background.Layer" + std::to_string(bkgIndex);
+			std::string bkgTexturePath = getValue(layerCaption, "Texture");
+			int parallaxX = getFloat(layerCaption, "ParallaxX", 1);
+			int parallaxY = getFloat(layerCaption, "ParallaxY", 1);
+
+			newLevel->backgrounds.emplace_back(bkgTexturePath, parallaxX, parallaxY);
 		}
 
 		return true;
@@ -835,4 +894,36 @@ namespace ssge
 			return "";
 		}
 	}
+	Level::Background::Background(std::string path, float parallaxX, float parallaxY)
+		: path(path), parallaxX(parallaxX), parallaxY(parallaxY) {}
+	
+	const SdlTexture& Level::Background::getTexture() const
+	{
+		return texture;
+	}
+	void Level::Background::setTexture(SdlTexture texture)
+	{
+		this->texture = std::move(texture);
+	}
+	bool Level::Background::loadTexture(SDL_Renderer* renderer)
+	{
+		setTexture(SdlTexture(path.c_str(), renderer));
+		return texture.isValid();
+	}
+	
+	std::string Level::Background::getPath() const { return path; }
+	void Level::Background::setPath(std::string path)
+		{ this->path = path; }
+
+	float Level::Background::getParallaxX() const { return parallaxX;}
+	void Level::Background::setParallaxX(float parallaxX)
+		{ this->parallaxX = parallaxX; }
+
+	float Level::Background::getParallaxY() const { return parallaxY; }
+	void Level::Background::setParallaxY(float parallaxY)
+	{
+		this->parallaxY = parallaxY;
+	}
+
+	bool Level::Background::isValid() const { return texture.isValid(); }
 }
