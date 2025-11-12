@@ -689,7 +689,7 @@ namespace ssge
 				if (blockChar < ' ' || blockChar == '`' || blockChar>'~')
 					continue;
 
-				int blockIndex = blockChar - ' ' - (blockChar == '`' ? 1 : 0);
+				int blockIndex = blockChar - ' ' - (blockChar > '`' ? 1 : 0);
 
 				newLevel->array[column + row * columns].type = blockIndex;
 			}
