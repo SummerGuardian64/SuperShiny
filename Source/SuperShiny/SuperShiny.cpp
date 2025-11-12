@@ -213,12 +213,12 @@ const char* SuperShiny::getApplicationTitle()
 
 int SuperShiny::getVirtualWidth()
 {
-	return 1280;
+	return 1024;
 }
 
 int SuperShiny::getVirtualHeight()
 {
-	return 720;
+	return 768;
 }
 
 ssge::MenuCommandEx SuperShiny::onHavingBackedOutOfMenus(ssge::PassKey<ssge::GameAccess> pk, ssge::MenuContext& context)
@@ -299,7 +299,7 @@ std::shared_ptr<ssge::Entity> SuperShiny::Entities::createEntity(ssge::PassKey<s
 {
 	if (entityId == "Shiny")
 		return shiny();
-	
+
 	else if (entityId == "Orb")
 		return orb();
 

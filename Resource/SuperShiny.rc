@@ -1,4 +1,4 @@
-#include "winres.h"
+#include "windows.h"
 
 IDI_APP ICON "SuperShiny.ico"
 
@@ -30,7 +30,7 @@ BEGIN
 			VALUE "ProductVersion",   "0.1.0\0"
 		END
 	END
-	
+
 	BLOCK "VarFileInfo"
 	BEGIN
 		VALUE "Translation", 0x0409, 0x04B0

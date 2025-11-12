@@ -40,6 +40,9 @@
 			<Add directory="E:/Dev/SDL2_ttf-devel-2.24.0-mingw/SDL2_ttf-2.24.0/i686-w64-mingw32/include/SDL2" />
 			<Add directory="E:/Dev/SDL2_mixer-devel-2.8.1-mingw/SDL2_mixer-2.8.1/i686-w64-mingw32/include/SDL2" />
 		</Compiler>
+		<ResourceCompiler>
+			<Add directory="Resource" />
+		</ResourceCompiler>
 		<Linker>
 			<Add option="-static-libstdc++" />
 			<Add option="-static-libgcc" />
@@ -67,6 +70,9 @@
 			<Add after='XCOPY &quot;$(#sdl2_mixer)\bin\*.dll&quot; &quot;$(TARGET_OUTPUT_DIR)&quot; /D /Y' />
 			<Mode after="always" />
 		</ExtraCommands>
+		<Unit filename="Resource/SuperShiny.rc">
+			<Option compilerVar="WINDRES" />
+		</Unit>
 		<Unit filename="Source/SuperShiny/Orb.cpp" />
 		<Unit filename="Source/SuperShiny/Orb.h" />
 		<Unit filename="Source/SuperShiny/Shiny.cpp" />
