@@ -1,10 +1,11 @@
 #pragma once
 #include "../ssge/Scene.h"
 #include "SDL.h"
+#include "../ssge/SdlTexture.h"
 
 class SplashScreen : public ssge::Scene
 {
-	SDL_Texture* backgroundTexture;
+	SdlTexture background;
 	// Inherited via Scene
 	std::string getSceneClassID() const override;
 	void init(ssge::SceneStepContext& context) override;

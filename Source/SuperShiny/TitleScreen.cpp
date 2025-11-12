@@ -21,7 +21,7 @@ TitleScreen::~TitleScreen()
 
 void TitleScreen::init(ssge::SceneStepContext& context)
 {
-	background = SdlTexture("Backgrounds/ShinyRuns_720p.png", context.drawing.getRenderer());
+	background = SdlTexture("Backgrounds/ShinyRuns_XGA.png", context.drawing.getRenderer());
 }
 
 void TitleScreen::step(ssge::SceneStepContext& context)
