@@ -84,16 +84,16 @@ endif()
 # TODO: Add tests and install targets if needed.
 
 # --- Mirror WithEXE into the target dir (Windows only) ---
-#if (WIN32 AND EXISTS "${CMAKE_SOURCE_DIR}/WithEXE")
-#  add_custom_command(TARGET SuperShiny POST_BUILD
-#    COMMAND ${CMAKE_COMMAND} -E echo "Mirroring WithEXE -> $<TARGET_FILE_DIR:SuperShiny> ..."
-#    COMMAND ${CMAKE_COMMAND} -E env
-#      WITHEXE_SRC=${CMAKE_SOURCE_DIR}/WithEXE
-#      WITHEXE_DST=$<TARGET_FILE_DIR:SuperShiny>
-#      WITHEXE_KEEP=$<TARGET_FILE:SuperShiny>
-#      "${CMAKE_SOURCE_DIR}/tools/WithEXE_Mirror.exe"
-#  )
-#endif()
+if (WIN32 AND EXISTS "${CMAKE_SOURCE_DIR}/WithEXE")
+  add_custom_command(TARGET SuperShiny POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E echo "Mirroring WithEXE - $<TARGET_FILE_DIR:SuperShiny> ..."
+    COMMAND ${CMAKE_COMMAND} -E env
+      WITHEXE_SRC=${CMAKE_SOURCE_DIR}/WithEXE
+      WITHEXE_DST=$<TARGET_FILE_DIR:SuperShiny>
+      WITHEXE_KEEP=$<TARGET_FILE:SuperShiny>
+      "${CMAKE_SOURCE_DIR}/tools/WithEXE_Mirror.exe"
+  )
+endif()
 # --- Copy SDL2 and SDL2_image DLLs after build ---
 add_custom_command(TARGET SuperShiny POST_BUILD
   COMMAND ${CMAKE_COMMAND} -E echo "Copying SDL2 runtime DLLs..."
