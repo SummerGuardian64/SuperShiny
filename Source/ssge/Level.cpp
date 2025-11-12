@@ -542,12 +542,12 @@ namespace ssge
 			if (bkgWidth <= 0 || bkgHeight <= 0)
 				continue; // TODO: Error logging
 
-			int parallaxOffsetX = (float)(background.getParallaxX() * (float)leftOffset * -1);
+			int parallaxOffsetX = (int)(background.getParallaxX() * (float)leftOffset * -1);
 			// Make sure the first background tile is visible (horizontally)
 			while (parallaxOffsetX + bkgWidth < 0)
 				parallaxOffsetX += bkgWidth;
 
-			int parallaxOffsetY = (float)(background.getParallaxY() * (float)topOffset * -1);
+			int parallaxOffsetY = (int)(background.getParallaxY() * (float)topOffset * -1);
 			// Make sure the first background tile is visible (vertically)
 			while (parallaxOffsetY + bkgHeight < 0)
 				parallaxOffsetY += bkgHeight;
@@ -711,8 +711,8 @@ namespace ssge
 		{
 			std::string layerCaption = "Background.Layer" + std::to_string(bkgIndex);
 			std::string bkgTexturePath = getValue(layerCaption, "Texture");
-			int parallaxX = getFloat(layerCaption, "ParallaxX", 1);
-			int parallaxY = getFloat(layerCaption, "ParallaxY", 1);
+			float parallaxX = getFloat(layerCaption, "ParallaxX", 1.f);
+			float parallaxY = getFloat(layerCaption, "ParallaxY", 1.f);
 
 			newLevel->backgrounds.emplace_back(bkgTexturePath, parallaxX, parallaxY);
 		}
