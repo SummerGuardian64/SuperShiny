@@ -470,23 +470,71 @@ void Shiny::postStep(ssge::EntityStepContext& context)
                     {
                         auto rightArrowIndex = callback.find('>');
                         auto upArrowIndex = callback.find('^');
+                        auto dashIndex = callback.find('-');
 
-                        // TODO: Terraformation
-                        // A BlockType that's terraformable will have a callback like this:
-                        // Terraform->10
-                        // Terraform->14^22
-                        // Terraform^43
-                        // Terraform^28->7
-                        // Number after -> means that the current block will be terraformed to that
-                        block->type = 0; // TODO: Terraform to the correct number!
-                        // Number after ^ means that the block above the stepped one will be terraformed
+                        // Coordinates of the block under Shiny's clawbs
                         auto colSpot = collision.coords;
+                        // Coordinates of the block above the block that's under Shiny's clawbs
                         auto upperBlockCoords = Level::Block::Coords(
                             colSpot.column,
                             colSpot.row - 1
                         );
+                        // Block that's above the block that's under Shiny's clawbs
                         auto upperBlock = context.level.getBlockAt(upperBlockCoords);
-                        upperBlock->type = 0; // TOO: Terraform to the correct number
+
+                        // Terraform current block (Terraform->X or Terraform^Y->X)
+                        if (rightArrowIndex != std::string::npos)
+                        {
+                            std::size_t start = rightArrowIndex + 1;
+                            std::size_t end = callback.size();
+
+                            // If there's also a '^' after '>', stop before it
+                            if (upArrowIndex != std::string::npos && upArrowIndex > rightArrowIndex)
+                            {
+                                end = upArrowIndex;
+                            }
+
+                            try
+                            {
+                                std::string numberSubstring = callback.substr(start, end - start);
+                                int newType = std::stoi(numberSubstring);
+                                if (block)
+                                {
+                                    block->type = newType;
+                                }
+                            }
+                            catch (...)
+                            {
+                                // Ignore malformed number, do nothing
+                            }
+                        }
+
+                        // Terraform upper block (Terraform^Y or Terraform->X^Y)
+                        if (upArrowIndex != std::string::npos)
+                        {
+                            std::size_t start = upArrowIndex + 1;
+                            std::size_t end = callback.size();
+
+                            // If there's also a '>' after '^', stop before it
+                            if (dashIndex != std::string::npos && dashIndex > upArrowIndex)
+                            {
+                                end = dashIndex;
+                            }
+
+                            try
+                            {
+                                std::string numberSubstring = callback.substr(start, end - start);
+                                int newType = std::stoi(numberSubstring);
+                                if (upperBlock)
+                                {
+                                    upperBlock->type = newType;
+                                }
+                            }
+                            catch (...)
+                            {
+                                // Ignore malformed number, do nothing
+                            }
+                        }
                     }
                 }
             }
