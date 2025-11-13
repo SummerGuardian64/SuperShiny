@@ -314,7 +314,7 @@ void Shiny::preStep(ssge::EntityStepContext& context)
                     bubbleY = 0;
                     if (left && right)
                     { // Sanitize both left+right pressed
-                        bubbleX = sprite->xscale;
+                        bubbleX = sign(sprite->xscale);
                     }
                 }
 
