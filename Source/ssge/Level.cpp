@@ -542,12 +542,14 @@ namespace ssge
 			if (bkgWidth <= 0 || bkgHeight <= 0)
 				continue; // TODO: Error logging
 
-			int parallaxOffsetX = (int)(background.getParallaxX() * (float)leftOffset * -1);
+			int parallaxOffsetX = background.getOffsetX();
+			parallaxOffsetX += (int)(background.getParallaxX() * (float)leftOffset * -1);
 			// Make sure the first background tile is visible (horizontally)
 			while (parallaxOffsetX + bkgWidth < 0)
 				parallaxOffsetX += bkgWidth;
 
-			int parallaxOffsetY = (int)(background.getParallaxY() * (float)topOffset * -1);
+			int parallaxOffsetY = background.getOffsetY();
+			parallaxOffsetY += (int)(background.getParallaxY() * (float)topOffset * -1);
 			// Make sure the first background tile is visible (vertically)
 			while (parallaxOffsetY + bkgHeight < 0)
 				parallaxOffsetY += bkgHeight;
@@ -713,8 +715,10 @@ namespace ssge
 			std::string bkgTexturePath = getValue(layerCaption, "Texture");
 			float parallaxX = getFloat(layerCaption, "ParallaxX", 1.f);
 			float parallaxY = getFloat(layerCaption, "ParallaxY", 1.f);
+			int offsetX = getInt(layerCaption, "OffsetX", 0);
+			int offsetY = getInt(layerCaption, "OffsetY", 0);
 
-			newLevel->backgrounds.emplace_back(bkgTexturePath, parallaxX, parallaxY);
+			newLevel->backgrounds.emplace_back(bkgTexturePath, parallaxX, parallaxY, offsetX, offsetY);
 		}
 
 		return true;
@@ -894,8 +898,8 @@ namespace ssge
 			return "";
 		}
 	}
-	Level::Background::Background(std::string path, float parallaxX, float parallaxY)
-		: path(path), parallaxX(parallaxX), parallaxY(parallaxY) {}
+	Level::Background::Background(std::string path, float parallaxX, float parallaxY, int offsetX, int offsetY)
+		: path(path), parallaxX(parallaxX), parallaxY(parallaxY), offsetX(offsetX), offsetY(offsetY) {}
 	
 	const SdlTexture& Level::Background::getTexture() const
 	{
@@ -921,9 +925,15 @@ namespace ssge
 
 	float Level::Background::getParallaxY() const { return parallaxY; }
 	void Level::Background::setParallaxY(float parallaxY)
-	{
-		this->parallaxY = parallaxY;
-	}
+		{ this->parallaxY = parallaxY; }
+
+	int Level::Background::getOffsetX() const { return offsetX; }
+	void Level::Background::setOffsetX(int OffsetX)
+		{ this->offsetX = OffsetX; }
+
+	int Level::Background::getOffsetY() const { return offsetY; }
+	void Level::Background::setOffsetY(int OffsetY)
+		{ this->offsetY = OffsetY; }
 
 	bool Level::Background::isValid() const { return texture.isValid(); }
 }

@@ -195,9 +195,11 @@ namespace ssge
 			std::string path;
 			float parallaxX = 0;
 			float parallaxY = 0;
+			int offsetX = 0;
+			int offsetY = 0;
 		public:
 			Background() = default;
-			Background(std::string path, float parallaxX, float parallaxY);
+			Background(std::string path, float parallaxX, float parallaxY, int offsetX, int offsetY);
 			Background(const Background& toCopy) = default;
 			Background(Background&& toMove) = default;
 			~Background() = default;
@@ -214,6 +216,12 @@ namespace ssge
 
 			float getParallaxY() const;
 			void setParallaxY(float parallaxY);
+
+			int getOffsetX() const;
+			void setOffsetX(int offsetX);
+
+			int getOffsetY() const;
+			void setOffsetY(int offsetY);
 
 			bool isValid() const;
 		};
