@@ -4,7 +4,16 @@
 class Shiny : public ssge::Entity
 {
 	bool dying = false;
+	bool bubbling = false;
+	int bubbleTimer = 0;
+	int bubbleDelay = 10;
+	int bubbleAnim = 0;
+	bool bubbleReady = true;
+	int bubbleX = 0;
+	int bubbleY = 0;
 
+	void startBubbling();
+	void quitBubbling();
 	void animate(ssge::EntityStepContext& context);
 
 public:
@@ -15,8 +24,16 @@ public:
 		Walking = 1,
 		Jumping = 2,
 		Falling = 3,
-		Dying = 4
+		Dying = 4,
+		BubbleReady = 5,
+		BubblingForward = 6,
+		BubblingForwardUp = 7,
+		BubblingUp = 8,
+		BubblingForwardDown = 9
 	};
+
+	ssge::Entity::Physics::Abilities makeRegularAbilities() const;
+	ssge::Entity::Physics::Abilities makeBubblingAbilities() const;
 
 	Shiny();
 

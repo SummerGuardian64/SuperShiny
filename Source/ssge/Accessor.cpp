@@ -374,6 +374,16 @@ const Level::Block* ssge::LevelAccess::getConstBlockAt(Level::Block::Coords coor
 	return actual->getBlockAt(coords);
 }
 
+Level::Block* ssge::LevelAccess::getBlockAt(SDL_FPoint point)
+{
+	return actual->getBlockAt(point);
+}
+
+const Level::Block* ssge::LevelAccess::getConstBlockAt(SDL_FPoint point) const
+{
+	return actual->getConstBlockAt(point);
+}
+
 SDL_Rect ssge::LevelAccess::calculateLevelSize() const
 {
 	return actual->calculateLevelSize();

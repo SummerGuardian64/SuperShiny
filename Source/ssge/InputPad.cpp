@@ -53,7 +53,7 @@ bool ssge::InputPad::isJustPressed(int buttonIndex) const
 
 bool ssge::InputPad::isJustReleased(int buttonIndex) const
 {
-	return checkJustPressed(1 << buttonIndex);
+	return checkJustReleased(1 << buttonIndex);
 }
 
 bool InputPad::checkPressed(uint32_t buttonMask) const

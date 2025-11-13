@@ -10,6 +10,27 @@
 using ssge::sign;
 using ssge::Level;
 
+void Shiny::startBubbling()
+{
+    if (!bubbling)
+    {
+        bubbling = true;
+        bubbleTimer = bubbleDelay;
+        physics->abilities = makeBubblingAbilities();
+        bubbleX = sign(sprite->xscale);
+        bubbleY = 0;
+    }
+}
+
+void Shiny::quitBubbling()
+{
+    if (bubbling)
+    {
+        bubbling = false;
+        physics->abilities = makeRegularAbilities();
+    }
+}
+
 void Shiny::animate(ssge::EntityStepContext& context)
 {
     if (sprite && physics)
@@ -31,13 +52,13 @@ void Shiny::animate(ssge::EntityStepContext& context)
         int currentSequence = sprite->getSeqIdx();
         int wantedSequence = currentSequence;
 
-        if (context.inputs.isPressed(6))
-        { // ONLY FOR TESTING
-            wantedSequence = (int)Sequences::Dying;
-        }
-        else if (isDying())
+        if (isDying())
         {
             wantedSequence = (int)Sequences::Dying;
+        }
+        else if (bubbling)
+        {
+            wantedSequence = bubbleAnim;
         }
         else if (walking)
         {
@@ -51,7 +72,14 @@ void Shiny::animate(ssge::EntityStepContext& context)
         }
         else if (grounded)
         {
-            wantedSequence = (int)Sequences::Stopped;
+            if (bubbleReady)
+            {
+                wantedSequence = (int)Sequences::BubbleReady;
+            }
+            else
+            {
+                wantedSequence = (int)Sequences::Stopped;
+            }
         }
         else if (jumping)
         {
@@ -70,21 +98,11 @@ void Shiny::animate(ssge::EntityStepContext& context)
     }
 }
 
-Shiny::Shiny()
+ssge::Entity::Physics::Abilities Shiny::makeRegularAbilities() const
 {
-	//sprite = std::make_unique<Sprite>(Game::Sprites::shiny());
-	physics = std::make_unique<ssge::Entity::Physics>(*this);
-    control = std::make_unique<ssge::Entity::Control>(*this);
-
-    control->mode = ssge::Entity::Control::Mode::Player;
-    control->playable = true;
-    control->playerId = 0;
-
-    position.x = 400;
-    position.y = 100;
-
-    using Ability = ssge::Entity::Physics::Abilities::Flag;
-    auto& abilities = physics->abilities;
+    using Abilities = ssge::Entity::Physics::Abilities;
+    using Ability = Abilities::Flag;
+    Abilities abilities;
     abilities.set(Ability::EnablePhysics);
     abilities.set(Ability::EnableHorizontalMove);
     //abilities.set(Ability::EnableVerticalBounce);
@@ -103,6 +121,49 @@ Shiny::Shiny()
     abilities.jumpStrength = 15;
     abilities.swimPower = 5;
     abilities.gravity = 0.7f;
+    return abilities;
+}
+
+ssge::Entity::Physics::Abilities Shiny::makeBubblingAbilities() const
+{
+    using Abilities = ssge::Entity::Physics::Abilities;
+    using Ability = Abilities::Flag;
+    Abilities abilities;
+    abilities.set(Ability::EnablePhysics);
+    abilities.set(Ability::EnableHorizontalMove);
+    //abilities.set(Ability::EnableVerticalBounce);
+    //abilities.set(Ability::EnableVerticalMove);
+    abilities.reset(Ability::EnableJump);
+    abilities.set(Ability::EnableHorizontalCollision);
+    abilities.set(Ability::EnableVerticalCollision);
+
+    abilities.maxSpeedHor = 8;
+    abilities.maxSpeedUp = 10;
+    abilities.maxSpeedDown = 10;
+    abilities.acc = { 0.0,0.0 };
+    abilities.dec = { 0.5,0.5 };
+
+    abilities.jumpSpeed = 0;
+    abilities.jumpStrength = 15;
+    abilities.swimPower = 0;
+    abilities.gravity = 0.7f;
+    return abilities;
+}
+
+Shiny::Shiny()
+{
+	//sprite = std::make_unique<Sprite>(Game::Sprites::shiny());
+	physics = std::make_unique<ssge::Entity::Physics>(*this);
+    control = std::make_unique<ssge::Entity::Control>(*this);
+
+    control->mode = ssge::Entity::Control::Mode::Player;
+    control->playable = true;
+    control->playerId = 0;
+
+    position.x = 400;
+    position.y = 100;
+
+    physics->abilities = makeRegularAbilities();
 
     // Refactor these into their own abilities
 
@@ -188,7 +249,9 @@ void Shiny::preStep(ssge::EntityStepContext& context)
 
     if (auto ctrl = control.get())
     {
-        if (ctrl->getPad().isJustPressed(5))
+        ssge::InputPad pad = ctrl->getPad();
+
+        if (pad.isJustPressed(5))
         {
             if (auto orbRef = context.entities.addEntity("Orb"))
             {
@@ -198,6 +261,109 @@ void Shiny::preStep(ssge::EntityStepContext& context)
 
                 if(sprite->xscale<0)
                     orb.getPhysics()->velocity.x *= -1;
+            }
+        }
+
+        if (pad.isPressed(6))
+        {
+            // Bubbleshooting
+            if (physics->grounded && physics->side.x == 0)
+            {
+                startBubbling();
+            }
+        }
+        else
+        {
+            // Quit bubbleshooting
+            if (bubbling)
+            {
+                quitBubbling();
+            }
+        }
+
+        if (bubbling)
+        {
+            if (physics->velocity.y != 0)
+            {
+                quitBubbling();
+            }
+            else
+            {
+                bool up = pad.isPressed(0);
+                bool down = pad.isPressed(1);
+                bool left = pad.isPressed(2);
+                bool right = pad.isPressed(3);
+
+                if (up) bubbleY = -1;
+                if (down) bubbleY = 1;
+                if (left) bubbleX = -1;
+                if (right) bubbleX = 1;
+
+                if (up && !down)
+                {
+                    // If left XOR right is NOT pressed, we're shooting up!
+                    if ((left ^ right) == false) bubbleX = 0;
+                }
+                else if (down && !up)
+                { // Shooting down can only be diagonal
+                    if (bubbleX == 0) // Sanitize horizontal direction!
+                        bubbleX = sign(sprite->xscale);
+                }
+                else
+                {
+                    bubbleY = 0;
+                    if (left && right)
+                    { // Sanitize both left+right pressed
+                        bubbleX = sprite->xscale;
+                    }
+                }
+
+                float bubbleSpeed = 10;
+
+                if (bubbleX * bubbleY != 0)
+                { // Diagonal
+                    bubbleSpeed = sqrtf(10);
+                }
+
+                // Bubbling animation
+                if (bubbleY == 0)
+                {
+                    bubbleAnim = (int)Sequences::BubblingForward;
+                }
+                else if (bubbleY < 0)
+                {
+                    if (bubbleX == 0)
+                    {
+                        bubbleAnim = (int)Sequences::BubblingUp;
+                    }
+                    else
+                    {
+                        bubbleAnim = (int)Sequences::BubblingForwardUp;
+                    }
+                }
+                else
+                {
+                    bubbleAnim = (int)Sequences::BubblingForwardDown;
+                }
+
+                if (bubbleX + bubbleY != 0)
+                {
+                    SDL_FPoint bubbleVector{
+                        (float)bubbleX * bubbleSpeed,
+                        (float)bubbleY * bubbleSpeed
+                    };
+
+                    if (bubbleTimer > 0)
+                    {
+                        bubbleTimer--;
+                    }
+                    else
+                    {
+                        bubbleTimer = bubbleDelay;
+                        // TODO: BUBBLE!
+
+                    }
+                }
             }
         }
     }
@@ -223,13 +389,17 @@ void Shiny::postStep(ssge::EntityStepContext& context)
     {
         if (!physics->abilities.collisionIgnored())
         {
+            bool walkingLeft = physics->side.x == -1 || physics->velocity.x < 0;
+            bool walkingRight = physics->side.x == 1 || physics->velocity.x > 0;
+            bool touchingGround = physics->grounded || physics->velocity.y > 0;
+            bool touchingCeiling = physics->side.y == -1 || physics->velocity.y < 0;
             // Overal collisions
             {
                 SDL_FRect collider{
-                    position.x + hitbox.x - 1,
-                    position.y + hitbox.y - 1,
-                    hitbox.w + 2,
-                    hitbox.h + 2
+                    position.x + hitbox.x - (walkingLeft ? 1 : 0),
+                    position.y + hitbox.y - (touchingCeiling ? 1 : 0),
+                    hitbox.w + (walkingLeft ? 1 : 0) + (walkingRight ? 1 : 0),
+                    hitbox.h + (touchingCeiling ? 1 : 0) + (touchingGround ? 1 : 0)
                 };
                 auto allCollisions = context.level.queryBlocksUnderCollider(collider);
                 for (auto& collision : allCollisions)
@@ -239,7 +409,34 @@ void Shiny::postStep(ssge::EntityStepContext& context)
                         || collision.coll == Level::Block::Collision::DeathOnTouch
                         || collision.coll == Level::Block::Collision::DeathIfFullyOutside)
                     {
-                        amIDeadYet = true;
+                        // Eliminate ugly edge case
+                        SDL_FPoint bottomLeft{
+                            position.x + hitbox.x,
+                            position.y + hitbox.y + hitbox.h
+                        };
+                        SDL_FPoint bottomRight{
+                            position.x + hitbox.x + hitbox.w,
+                            position.y + hitbox.y + hitbox.h
+                        };
+                        SDL_FPoint bottomLeftOut{
+                            position.x + hitbox.x - 1,
+                            position.y + hitbox.y + hitbox.h + 1
+                        };
+                        SDL_FPoint bottomRightOut{
+                            position.x + hitbox.x + hitbox.w + 1,
+                            position.y + hitbox.y + hitbox.h + 1
+                        };
+
+                        if (block != context.level.getBlockAt(bottomLeft)
+                            && block == context.level.getBlockAt(bottomLeftOut))
+                        { } // Ugly edge case
+                        else if (block != context.level.getBlockAt(bottomRight)
+                            && block == context.level.getBlockAt(bottomRightOut))
+                        { } // Another ugly edge case
+                        else
+                        {
+                            amIDeadYet = true;
+                        }
                     }
                     if (collision.callback == "Collectable")
                     {
@@ -259,7 +456,8 @@ void Shiny::postStep(ssge::EntityStepContext& context)
                 for (auto& collision : footCollisions)
                 {
                     auto* block = context.level.getBlockAt(collision.coords);
-                    if (collision.callback.substr(0, 3) == "Box")
+                    std::string callback = collision.callback;
+                    if (callback.substr(0, 3) == "Box")
                     {
                         if (physics->oldVelocity.y > 0)
                         {
@@ -267,6 +465,28 @@ void Shiny::postStep(ssge::EntityStepContext& context)
                             physics->jumpTimer = physics->abilities.jumpStrength;
                             block->type = 0;
                         }
+                    }
+                    if (callback.substr(0, 9) == "Terraform")
+                    {
+                        auto rightArrowIndex = callback.find('>');
+                        auto upArrowIndex = callback.find('^');
+
+                        // TODO: Terraformation
+                        // A BlockType that's terraformable will have a callback like this:
+                        // Terraform->10
+                        // Terraform->14^22
+                        // Terraform^43
+                        // Terraform^28->7
+                        // Number after -> means that the current block will be terraformed to that
+                        block->type = 0; // TODO: Terraform to the correct number!
+                        // Number after ^ means that the block above the stepped one will be terraformed
+                        auto colSpot = collision.coords;
+                        auto upperBlockCoords = Level::Block::Coords(
+                            colSpot.column,
+                            colSpot.row - 1
+                        );
+                        auto upperBlock = context.level.getBlockAt(upperBlockCoords);
+                        upperBlock->type = 0; // TOO: Terraform to the correct number
                     }
                 }
             }

@@ -219,7 +219,7 @@ void Entity::Physics::step(EntityStepContext& context)
             }
         }
         // Deccellerate
-        if (side.x == 0)
+        if (side.x == 0 || abilities.acc.x == 0)
         {
             if (abilities.dec.x > abs(velocity.x))
             {
@@ -230,7 +230,7 @@ void Entity::Physics::step(EntityStepContext& context)
                 velocity.x -= sign(velocity.x) * abilities.dec.x;
             }
         }
-        if (side.y == 0 && jumpTimer == 0 && abilities.gravity == 0)
+        if ((side.y == 0 || abilities.acc.y == 0) && jumpTimer == 0 && abilities.gravity == 0)
         {
             if (abilities.dec.y > abs(velocity.y))
             {

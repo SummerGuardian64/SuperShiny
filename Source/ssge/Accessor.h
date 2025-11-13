@@ -179,6 +179,10 @@ namespace ssge {
 
         const Level::Block* getConstBlockAt(Level::Block::Coords coords) const;
 
+        Level::Block* getBlockAt(SDL_FPoint point);
+
+        const Level::Block* getConstBlockAt(SDL_FPoint point) const;
+
         SDL_Rect calculateLevelSize() const;
 
         // Query a block (with OOB policy)

@@ -347,6 +347,40 @@ SuperShiny::Sprites::Sprites(ssge::PassKey<SuperShiny> pk)
 		auto& seq = sprdefShiny.addSequence(20, 20, 0);
 		seq.imageIndexes.push_back(17);
 	}
+	{ // Bubble-ready
+		sprdefShiny.images[18] = Image(325, 102, 49, 99, 25, 92);
+		sprdefShiny.images[19] = Image(374, 102, 49, 98, 25, 91);
+		sprdefShiny.images[20] = Image(423, 102, 50, 97, 25, 90);
+		auto& seq = sprdefShiny.addSequence(12, 12, 0);
+		seq.imageIndexes.push_back(18);
+		seq.imageIndexes.push_back(19);
+		seq.imageIndexes.push_back(20);
+		seq.imageIndexes.push_back(20);
+		seq.imageIndexes.push_back(20);
+		seq.imageIndexes.push_back(19);
+		seq.imageIndexes.push_back(18);
+		seq.imageIndexes.push_back(18);
+	}
+	{ // Bubble-shooting (forward)
+		sprdefShiny.images[21] = Image(473, 102, 50, 100, 28, 92);
+		auto& seq = sprdefShiny.addSequence(20, 20, 0);
+		seq.imageIndexes.push_back(21);
+	}
+	{ // Bubble-shooting (forward-up)
+		sprdefShiny.images[22] = Image(523, 102, 53, 91, 31, 84);
+		auto& seq = sprdefShiny.addSequence(20, 20, 0);
+		seq.imageIndexes.push_back(22);
+	}
+	{ // Bubble-shooting (up)
+		sprdefShiny.images[23] = Image(576, 102, 56, 81, 27, 74);
+		auto& seq = sprdefShiny.addSequence(20, 20, 0);
+		seq.imageIndexes.push_back(23);
+	}
+	{ // Bubble-shooting (forward-down)
+		sprdefShiny.images[24] = Image(633, 102, 51, 100, 23, 92);
+		auto& seq = sprdefShiny.addSequence(20, 20, 0);
+		seq.imageIndexes.push_back(24);
+	}
 
 	sprdefOrb.spritesheetPath = "Sprites/Orb.png";
 
