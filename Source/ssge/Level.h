@@ -236,6 +236,9 @@ namespace ssge
 		//TODO: Harden
 		std::vector<Background> backgrounds;
 
+		std::string musicPath;
+		std::string getMusicPath() const;
+
 	private:
 		SdlTexture tileset;
 		TilesetMeta tilesMeta;

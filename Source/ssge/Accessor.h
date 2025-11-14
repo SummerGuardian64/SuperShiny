@@ -56,6 +56,7 @@ namespace ssge {
         void unpause();
         bool togglePause();
         bool isPaused() const;
+        uint8_t getFadeVal() const;
         void setPause(bool pause);
         bool isFadeFinished() const;
         void restart();

@@ -56,6 +56,7 @@ namespace ssge {
     public:
         EngineAccess engine;
         GameAccess game;
+        AudioAccess audio;
         ScenesAccess scenes;
         InputsAccess inputs;
         DrawingAccess drawing;
@@ -67,6 +68,7 @@ namespace ssge {
             double deltaTime,
             EngineAccess engine,
             GameAccess game,
+            AudioAccess audio,
             ScenesAccess scenes,
             InputsAccess inputs,
             DrawingAccess drawing,

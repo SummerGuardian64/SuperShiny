@@ -74,6 +74,11 @@ bool ScenesAccess::isPaused() const
 	return actual->isPaused();
 }
 
+uint8_t ScenesAccess::getFadeVal() const
+{
+	return actual->getFadeVal();
+}
+
 void ScenesAccess::setPause(bool pause)
 {
 	return actual->setPause(pause);

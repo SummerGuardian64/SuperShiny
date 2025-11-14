@@ -161,6 +161,17 @@ void SuperShiny::step(ssge::StepContext& context)
 		// Fade out on wrapping up
 		context.audio.setMasterVolume(context.audio.getMasterVolume() - 5);
 	}
+	else if (!context.scenes.isFadeFinished())
+	{
+		// Linearly interpolate between 0 and the configured volume
+		const Uint8 fadeVal = context.scenes.getFadeVal(); // 0..255
+		const int  target = config.sfxVolume;            // or master/music, 0..100
+
+		// volume = target * (255 - fadeVal) / 255
+		const int fadeVolume = (target * (255 - fadeVal) + 127) / 255; // +127 for rounding
+
+		context.audio.setMasterVolume(fadeVolume);
+	}
 	else // Avoid synchronizing settings while wrapping up
 	{
 		syncSettings(context);

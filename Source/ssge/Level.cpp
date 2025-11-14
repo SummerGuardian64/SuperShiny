@@ -20,6 +20,13 @@ namespace ssge
 	// -------------- Iterator ---------------
 	Level::Iterator::Iterator(Level& lvl) : level(lvl) {}
 
+	// Music
+
+	std::string Level::getMusicPath() const
+	{
+		return musicPath;
+	}
+
 	// --------------- Level -----------------
 	Level::Level(int cols, int rws, SDL_Rect blkSize, SdlTexture tex)
 		: columns(cols)
@@ -702,6 +709,8 @@ namespace ssge
 			logError("Failed to specify next section! Player may be stuck here!");
 			return false;
 		}
+
+		newLevel->musicPath = getValue("SSGELEV1", "Music", "");
 
 		return true;
 	}

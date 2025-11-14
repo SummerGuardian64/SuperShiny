@@ -24,6 +24,11 @@ bool ssge::GameWorld::initLevel(SceneStepContext& context)
         else
         {
             lvl->loadTextures(context.drawing.getRenderer());
+            auto musicPath = lvl->getMusicPath();
+            if (!musicPath.empty())
+            {
+                context.audio.playMusicIfNotPlaying(musicPath);
+            }
             level = std::move(lvl);
         }
     }
