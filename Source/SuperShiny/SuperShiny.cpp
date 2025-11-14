@@ -456,7 +456,7 @@ void SuperShiny::Menus::init(SuperShiny::Config& config)
 		displaySettingsMenu.newItem_IntSetting("Resolution Upscale:", &config.resolutionScaleConfig, 1, 4)->visible = false;
 		displaySettingsMenu.newItem_BoolSetting("Display Mode:", &config.fullScreen, "Borderless Fullscreen", "Windowed");
 		displaySettingsMenu.newItem_BoolSetting("Stretching:", &config.integralUpscale, "Integral", "Fractional");
-		displaySettingsMenu.newItem_SaveAndBack("Save & Back"); // TODO: Config saving
+		displaySettingsMenu.newItem_SaveAndBack("Save & Back");
 	}
 	optionsMenu.newItem_SubMenu("Input Configuration", &inputConfigMenu);
 	{
@@ -471,7 +471,7 @@ void SuperShiny::Menus::init(SuperShiny::Config& config)
 		inputConfigMenu.newItem_InputBinding("Pause Game", 7);
 		inputConfigMenu.newItem_InputBinding("Menu Accept", 8);
 		inputConfigMenu.newItem_InputBinding("Menu Back", 9);
-		inputConfigMenu.newItem_SaveAndBack("Save & Back"); // TODO: Config saving
+		inputConfigMenu.newItem_SaveAndBack("Save & Back");
 	}
 	optionsMenu.newItem_SubMenu("Volume Control", &volumeControlMenu);
 	{
@@ -479,9 +479,9 @@ void SuperShiny::Menus::init(SuperShiny::Config& config)
 		volumeControlMenu.newItem_IntSetting("Master:", &config.masterVolume, 0, 100);
 		volumeControlMenu.newItem_IntSetting("Music:", &config.musicVolume, 0, 100);
 		volumeControlMenu.newItem_IntSetting("Sounds:", &config.sfxVolume, 0, 100);
-		volumeControlMenu.newItem_SaveAndBack("Save & Back"); // TODO: Config saving
+		volumeControlMenu.newItem_SaveAndBack("Save & Back");
 	}
-	optionsMenu.newItem_SaveAndBack("Save & Back"); // TODO: Config saving
+	optionsMenu.newItem_SaveAndBack("Save & Back");
 
 	confirmRestart.newLabel("Restarting a level will discard unsaved score!");
 	confirmRestart.newLabel("Are you sure you want to restart this level?");
