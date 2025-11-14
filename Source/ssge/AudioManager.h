@@ -101,13 +101,13 @@ namespace ssge
                     return false;
                 }
                 musics[path] = m;
-                currentMusic = m;
-                currentMusicPath = path;
             }
             else
             {
                 m = it->second;
             }
+            currentMusic = m;
+            currentMusicPath = path;
             applyVolumes();
             if (Mix_PlayMusic(m, loops) < 0)
             {
