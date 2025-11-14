@@ -216,6 +216,10 @@ void Engine::handleEvents()
 		default:
 			break;
 		}
+		if (event.type == SDL_EventType::SDL_JOYDEVICEREMOVED)
+		{
+			game.joypadGotUnplugged();
+		}
 	}
 }
 

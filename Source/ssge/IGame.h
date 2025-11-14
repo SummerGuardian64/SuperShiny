@@ -46,6 +46,8 @@ namespace ssge
 
         virtual void queryQuit() = 0;
 
+        virtual void joypadGotUnplugged() = 0;
+
         // Get application title
         virtual const char* getApplicationTitle() = 0;
 

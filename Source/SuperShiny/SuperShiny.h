@@ -59,6 +59,9 @@ public: //TODO: Encapsulate
 
     void queryQuit() override;
 
+    bool _joypadGotUnplugged = false;
+    void joypadGotUnplugged() override;
+
     // Get application title
     const char* getApplicationTitle() override;
 
@@ -144,6 +147,7 @@ public: //TODO: Encapsulate
         friend class SuperShiny;
         ssge::MenuHeader mainMenu;
         ssge::MenuHeader pauseMenu;
+        ssge::MenuHeader joypadUnpluggedMenu;
         ssge::MenuHeader gameOverMenu;
         ssge::MenuHeader levelCompleteMenu;
         ssge::MenuHeader victoryMenu;

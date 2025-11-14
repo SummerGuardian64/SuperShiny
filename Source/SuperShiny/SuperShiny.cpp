@@ -120,6 +120,7 @@ void SuperShiny::step(ssge::StepContext& context)
 		{
 			context.menus.setMenu(menus.mainMenu);
 		}
+		_joypadGotUnplugged = false;
 	}
 	else if (currentScene == "GameWorld")
 	{
@@ -147,6 +148,14 @@ void SuperShiny::step(ssge::StepContext& context)
 		{
 			// Close it!!!
 			context.menus.close();
+		}
+		
+		// Pause on joypad disconnection!
+		if (_joypadGotUnplugged)
+		{
+			_joypadGotUnplugged = false;
+			context.scenes.pause(); // Pause the scene
+			context.menus.abruptMenu(menus.joypadUnpluggedMenu);
 		}
 	}
 
@@ -218,6 +227,11 @@ void SuperShiny::saveSettings()
 void SuperShiny::queryQuit()
 {
 	queriedToQuit = true;
+}
+
+void SuperShiny::joypadGotUnplugged()
+{
+	_joypadGotUnplugged = true;
 }
 
 const char* SuperShiny::getApplicationTitle()
@@ -589,7 +603,7 @@ void SuperShiny::Menus::init(SuperShiny::Config& config)
 	confirmExitGame.newItem_MainMenu("Yes");
 	confirmExitGame.newItem_GoBack("No");
 
-	confirmAbruptExit.setTitle("Exit without saving?");
+	confirmAbruptExit.setTitle("Confirm exit");
 	confirmAbruptExit.newItem_ExitProgram("Exit");
 	confirmAbruptExit.newItem_GoBack("Go back");
 
@@ -608,6 +622,9 @@ void SuperShiny::Menus::init(SuperShiny::Config& config)
 	pauseMenu.newItem_SubMenu("High Score", &highScoreMenu, (MenuFunction)&refreshHighScoreMenu)->visible = false;
 	pauseMenu.newItem_SubMenu("Options", &optionsMenu);
 	pauseMenu.newItem_SubMenu("Go To Main Menu", &confirmExitGame);
+
+	joypadUnpluggedMenu.setTitle("Joypad unplugged!");
+	joypadUnpluggedMenu.newItem_GoBack("OK");
 
 	// Compose the game over menu
 	gameOverMenu.setTitle("Game Over");
