@@ -73,6 +73,8 @@
 		<Unit filename="Resource/SuperShiny.rc">
 			<Option compilerVar="WINDRES" />
 		</Unit>
+		<Unit filename="Source/SuperShiny/Bubble.cpp" />
+		<Unit filename="Source/SuperShiny/Bubble.h" />
 		<Unit filename="Source/SuperShiny/Orb.cpp" />
 		<Unit filename="Source/SuperShiny/Orb.h" />
 		<Unit filename="Source/SuperShiny/Shiny.cpp" />
@@ -86,6 +88,7 @@
 		<Unit filename="Source/main.cpp" />
 		<Unit filename="Source/ssge/Accessor.cpp" />
 		<Unit filename="Source/ssge/Accessor.h" />
+		<Unit filename="Source/ssge/AudioManager.h" />
 		<Unit filename="Source/ssge/DrawContext.cpp" />
 		<Unit filename="Source/ssge/DrawContext.h" />
 		<Unit filename="Source/ssge/Engine.cpp" />
@@ -97,6 +100,7 @@
 		<Unit filename="Source/ssge/GameWorld.cpp" />
 		<Unit filename="Source/ssge/GameWorld.h" />
 		<Unit filename="Source/ssge/IGame.h" />
+		<Unit filename="Source/ssge/IniFile.h" />
 		<Unit filename="Source/ssge/InputBinding.h" />
 		<Unit filename="Source/ssge/InputManager.cpp" />
 		<Unit filename="Source/ssge/InputManager.h" />
