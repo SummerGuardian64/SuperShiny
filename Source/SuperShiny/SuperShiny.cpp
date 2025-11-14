@@ -489,9 +489,62 @@ void SuperShiny::Menus::init(SuperShiny::Config& config)
 	mainMenu.newItem("Super Duper Secret Menu")->visible = false;
 	mainMenu.newItem_SubMenu("High Score", &highScoreMenu, (MenuFunction)refreshHighScoreMenu)->visible = false;
 	mainMenu.newItem_SubMenu("Options", &optionsMenu);
+	mainMenu.newItem_SubMenu("Credits", &creditsMenu);
 	mainMenu.newItem_SubMenu("Exit", &confirmExitProgram);
 	mainMenu.newLabel("Created by Summer Guardian 64");
 	mainMenu.newLabel("Thank you for playing!");
+
+	creditsMenu.newLabel("Super Shiny");
+	creditsMenu.newLabel("Created by Summer Guardian 64");
+	creditsMenu.newLabel("");
+	creditsMenu.newLabel("Powerred by Super Shiny Game Engine");
+	creditsMenu.newLabel("also created by Summer Guardian 64");
+	creditsMenu.newLabel("");
+	creditsMenu.newLabel("First Alpha version 0.1");
+	creditsMenu.newLabel("");
+	creditsMenu.newItem_SetMenu("Next", &creditsMenu2);
+
+	creditsMenu2.newLabel("This game is a devotion to ");
+	creditsMenu2.newLabel("block-smashing platforming action");
+	creditsMenu2.newLabel("");
+	creditsMenu2.newLabel("Shiny the Scalefloof is my mascot ");
+	creditsMenu2.newLabel("inspired by various cartoons.");
+	creditsMenu2.newLabel("");
+	creditsMenu2.newLabel("Music is mine too, ");
+	creditsMenu2.newLabel("though contains inspirational snippets.");
+	creditsMenu2.newLabel("");
+	creditsMenu2.newItem_SetMenu("Next", &creditsMenu3);
+	creditsMenu2.newLabel("");
+
+	creditsMenu3.newLabel("I made the engine too.");
+	creditsMenu3.newLabel("For modern and retro systems.");
+	creditsMenu3.newLabel("All C++17 and SDL2 (image+mixer+ttf).");
+	creditsMenu3.newLabel("");
+	creditsMenu3.newLabel("For Windows XP, I used codeblocks-17.12-nosetup IDE");
+	creditsMenu3.newLabel("with i686-8.1.0-release-win32-dwarf-rt_v6-rev0 toolchain");
+	creditsMenu3.newLabel("Windows 11 works using CMake and Visual Studio 2022");
+	creditsMenu3.newLabel("");
+	creditsMenu3.newItem_SetMenu("Next", &creditsMenu4);
+
+	creditsMenu4.newLabel("Special thanks to my buddies:");
+	creditsMenu4.newLabel("Devee");
+	creditsMenu4.newLabel("Lilithe");
+	creditsMenu4.newLabel("Wilt");
+	creditsMenu4.newLabel("");
+	creditsMenu4.newLabel("and my mother in the other dimension.");
+	creditsMenu4.newLabel("Hvala ti za sve");
+	creditsMenu4.newLabel("");
+	creditsMenu4.newItem_SetMenu("Next", &creditsMenu5);
+
+	creditsMenu5.newLabel("Visit summerguardian64.net for more");
+	creditsMenu5.newLabel("");
+	creditsMenu5.newLabel("and join my Discord server");
+	creditsMenu5.newLabel("");
+	creditsMenu5.newLabel("discord.gg/6mWUNC99yP");
+	creditsMenu5.newLabel("");
+	creditsMenu5.newLabel("Thank you for playing!");
+	creditsMenu5.newLabel("");
+	creditsMenu5.newItem_GoBack("Finish");
 
 	optionsMenu.newItem_SubMenu("Display Settings", &displaySettingsMenu);
 	{

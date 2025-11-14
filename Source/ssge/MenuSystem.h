@@ -149,6 +149,7 @@ namespace ssge
         MenuItem* newItem_NewGame(const char* text, MenuFunction onSelect = NULL);
         MenuItem* newItem_RestartLevel(const char* text, MenuFunction onSelect = NULL);
         MenuItem* newItem_SubMenu(const char* text, MenuHeader* targetMenu, MenuFunction onSelect = NULL);
+        MenuItem* newItem_SetMenu(const char* text, MenuHeader* targetMenu, MenuFunction onSelect = NULL);
         MenuItem* newItem_GoBack(const char* text, MenuFunction onSelect = NULL);
         MenuItem* newItem_SaveAndBack(const char* text, MenuFunction onSelect = NULL);
         MenuItem* newItem_NextLevel(const char* text);

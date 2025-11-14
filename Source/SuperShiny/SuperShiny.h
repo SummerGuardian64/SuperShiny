@@ -149,6 +149,11 @@ public: //TODO: Encapsulate
         ssge::MenuHeader victoryMenu;
         ssge::MenuHeader highScoreMenu;
         ssge::MenuHeader confirmExitProgram;
+        ssge::MenuHeader creditsMenu;
+        ssge::MenuHeader creditsMenu2;
+        ssge::MenuHeader creditsMenu3;
+        ssge::MenuHeader creditsMenu4;
+        ssge::MenuHeader creditsMenu5;
         ssge::MenuHeader optionsMenu;
         ssge::MenuHeader inputConfigMenu;
         ssge::MenuHeader volumeControlMenu;

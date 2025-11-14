@@ -275,6 +275,13 @@ MenuItem* MenuHeader::newItem_SubMenu(const char* text, MenuHeader* targetMenu, 
 	return item;
 }
 
+MenuItem* MenuHeader::newItem_SetMenu(const char* text, MenuHeader* targetMenu, MenuFunction onSelect)
+{
+    auto item = new MenuItem(text, true, true, true, MenuCommand::SET_MENU, targetMenu, false, NULL, onSelect);
+    items.push_back(item);
+    return item;
+}
+
 MenuItem* MenuHeader::newItem_GoBack(const char* text, MenuFunction onSelect)
 {
 	auto item = new MenuItem(text, true, true, true, MenuCommand::GO_BACK, NULL, false, NULL, onSelect);
