@@ -172,7 +172,7 @@ bool ssge::InputManager::handleBindings(SDL_Event e, InputBinding* chosenBinding
             else if (e.type == SDL_JOYHATMOTION)
             {
                 // We must check hat direction
-                if (e.jhat.value == binding.getJoystickHatDirection())
+                if (binding.isJoystickHatDirectionEquivalent(e.jhat.value))
                 {
                     directInputs |= 1 << index;
                     eventSwallowed = true;

@@ -243,6 +243,16 @@ namespace ssge
 			else return boundTo.joystickHat.direction;
 		}
 
+		bool isJoystickHatDirectionEquivalent(Uint8 directionToTest) const
+		{
+			if (deviceType != DeviceType::JoystickHat)
+				return false;
+			
+			// Bitwise AND the wanted and the actual
+			auto mashup = boundTo.joystickHat.direction & directionToTest;
+			return mashup != 0;
+		}
+
 		std::string getJoystickHatString() const
 		{
 			if (deviceType != DeviceType::JoystickHat)
