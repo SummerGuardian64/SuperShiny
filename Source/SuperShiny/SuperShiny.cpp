@@ -482,12 +482,12 @@ void SuperShiny::Menus::init(SuperShiny::Config& config)
 	highScoreMenu.setTitle("High Score");
 
 	// Compose the main menu
-	mainMenu.setTitle("Super Shiny");
+	mainMenu.setTitle("Super Shiny v0.1");
 	mainMenu.newItem_NewGame("Start Game");
 	mainMenu.newItem("Load Game")->visible = false;
 	mainMenu.newItem_SubMenu("Level Select", &levelSelect)->visible = false;
 	mainMenu.newItem("Super Duper Secret Menu")->visible = false;
-	mainMenu.newItem_SubMenu("High Score", &highScoreMenu, (MenuFunction)refreshHighScoreMenu);
+	mainMenu.newItem_SubMenu("High Score", &highScoreMenu, (MenuFunction)refreshHighScoreMenu)->visible = false;
 	mainMenu.newItem_SubMenu("Options", &optionsMenu);
 	mainMenu.newItem_SubMenu("Exit", &confirmExitProgram);
 	mainMenu.newLabel("Created by Summer Guardian 64");
@@ -526,12 +526,12 @@ void SuperShiny::Menus::init(SuperShiny::Config& config)
 	}
 	optionsMenu.newItem_SaveAndBack("Save & Back");
 
-	confirmRestart.newLabel("Restarting a level will discard unsaved score!");
+	//confirmRestart.newLabel("Restarting a level will discard unsaved score!");
 	confirmRestart.newLabel("Are you sure you want to restart this level?");
 	confirmRestart.newItem_RestartLevel("Yes");
 	confirmRestart.newItem_GoBack("No");
 
-	confirmExitGame.newLabel("Exiting the game will discard unsaved score!");
+	//confirmExitGame.newLabel("Exiting the game will discard unsaved score!");
 	confirmExitGame.newLabel("Are you sure you want to return to the main menu?");
 	confirmExitGame.newItem_MainMenu("Yes");
 	confirmExitGame.newItem_GoBack("No");
