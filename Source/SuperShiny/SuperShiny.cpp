@@ -16,6 +16,7 @@
 // GAMEDEV: Please include headers of your entities
 #include "Shiny.h"
 #include "Orb.h"
+#include "Bubble.h"
 
 using namespace ssge;
 
@@ -64,6 +65,7 @@ void SuperShiny::init(ssge::StepContext& context)
 	SDL_Renderer* renderer = context.drawing.getRenderer();
 	sprites.load("Shiny", renderer);
 	sprites.load("Orb", renderer);
+	sprites.load("Bubble", renderer);
 	context.scenes.changeScene("SplashScreen");
 
 	auto& inputs = context.inputs;
@@ -173,6 +175,7 @@ void SuperShiny::cleanUp(ssge::PassKey<ssge::Engine> pk)
 {
 	sprites.unload("Shiny");
 	sprites.unload("Orb");
+	sprites.unload("Bubble");
 }
 
 bool SuperShiny::saveSettings(ssge::StepContext& context)
@@ -293,6 +296,11 @@ std::shared_ptr<Orb> SuperShiny::Entities::orb()
 	return std::make_shared<Orb>();
 }
 
+std::shared_ptr<Bubble> SuperShiny::Entities::bubble()
+{
+	return std::make_shared<Bubble>();
+}
+
 SuperShiny::Entities::Entities(ssge::PassKey<SuperShiny> pk) {}
 
 std::shared_ptr<ssge::Entity> SuperShiny::Entities::createEntity(ssge::PassKey<ssge::EntitiesAccess> pk, std::string entityId)
@@ -302,6 +310,9 @@ std::shared_ptr<ssge::Entity> SuperShiny::Entities::createEntity(ssge::PassKey<s
 
 	else if (entityId == "Orb")
 		return orb();
+
+	else if (entityId == "Bubble")
+		return bubble();
 
 	return nullptr;
 }
@@ -389,6 +400,24 @@ SuperShiny::Sprites::Sprites(ssge::PassKey<SuperShiny> pk)
 		auto& seq = sprdefOrb.addSequence(20, 20, 0);
 		seq.imageIndexes.push_back(0);
 	}
+
+	sprdefBubble.spritesheetPath = "Sprites/Bubble.png";
+
+	{ // Bubble flying
+		auto& seq = sprdefBubble.addSequence(1, 1, 0);
+		sprdefBubble.images.push_back(Image(0, 0, 16, 16, 8, 8));
+		seq.imageIndexes.push_back(0);
+	}
+	{ // Bubble popping
+		auto& seq = sprdefBubble.addSequence(20, 20, 0);
+		sprdefBubble.images.push_back(Image(16, 0, 16, 16, 8, 8));
+		sprdefBubble.images.push_back(Image(0, 16, 16, 16, 8, 8));
+		sprdefBubble.images.push_back(Image(16, 16, 16, 16, 8, 8));
+		seq.imageIndexes.push_back(1);
+		seq.imageIndexes.push_back(2);
+		seq.imageIndexes.push_back(3);
+	}
+
 }
 
 bool SuperShiny::Sprites::load(std::string sprdefId, SDL_Renderer* renderer)
@@ -418,6 +447,9 @@ ssge::Sprite::Definition* SuperShiny::Sprites::fetchDefinitionNonConst(std::stri
 
 	if (sprdefId == "Orb")
 		return &sprdefOrb;
+
+	if (sprdefId == "Bubble")
+		return &sprdefBubble;
 
 	return nullptr;
 }
@@ -466,8 +498,8 @@ void SuperShiny::Menus::init(SuperShiny::Config& config)
 		inputConfigMenu.newItem_InputBinding("Left", 2);
 		inputConfigMenu.newItem_InputBinding("Right", 3);
 		inputConfigMenu.newItem_InputBinding("Jump", 4);
-		inputConfigMenu.newItem_InputBinding("Run/Shoot/Grab", 5);
-		inputConfigMenu.newItem_InputBinding("Dash/Pounce", 6);
+		inputConfigMenu.newItem_InputBinding("Shoot", 5);
+		//inputConfigMenu.newItem_InputBinding("Pounce", 6);
 		inputConfigMenu.newItem_InputBinding("Pause Game", 7);
 		inputConfigMenu.newItem_InputBinding("Menu Accept", 8);
 		inputConfigMenu.newItem_InputBinding("Menu Back", 9);

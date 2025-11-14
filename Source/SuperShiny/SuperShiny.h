@@ -19,6 +19,7 @@ class TitleScreen;
 
 class Shiny;
 class Orb;
+class Bubble;
 
 // GAMEDEV: Your game class here. It must implement ssge::IGame
 
@@ -97,6 +98,7 @@ public: //TODO: Encapsulate
 
         std::shared_ptr<Shiny> shiny();
         std::shared_ptr<Orb> orb();
+        std::shared_ptr<Bubble> bubble();
 
     public: //TODO: Encapsulate
         Entities(ssge::PassKey<SuperShiny> pk);
@@ -117,6 +119,7 @@ public: //TODO: Encapsulate
     {
         ssge::Sprite::Definition sprdefShiny;
         ssge::Sprite::Definition sprdefOrb;
+        ssge::Sprite::Definition sprdefBubble;
 
     public: //TODO: Encapsulate
         Sprites(ssge::PassKey<SuperShiny> pk);

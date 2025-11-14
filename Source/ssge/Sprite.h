@@ -99,7 +99,7 @@ namespace ssge
 		int getSeqIdx() const;                // Calls animation.GetSeqIdx()
 		int getCurrentAnimationFrame() const; // Calls animation.GetAnimFrame()
 		int getAnimationSpeed() const;        // Calls animation.GetSpeed()
-		//todo: bool IsFinished() const;
+		bool isFinished() const;
 
 		// These will stay public
 		Uint8 alpha;

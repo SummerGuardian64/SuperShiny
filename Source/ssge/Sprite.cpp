@@ -87,6 +87,11 @@ int Sprite::getCurrentAnimationFrame() const
 int Sprite::getAnimationSpeed() const
 { return animation.calculateEffectiveSpeed(); }
 
+bool ssge::Sprite::isFinished() const
+{
+	return animation.finished;
+}
+
 //==========================
 // Animation Control Methods
 //==========================

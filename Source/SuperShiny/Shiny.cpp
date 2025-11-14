@@ -251,7 +251,7 @@ void Shiny::preStep(ssge::EntityStepContext& context)
     {
         ssge::InputPad pad = ctrl->getPad();
 
-        if (pad.isJustPressed(5))
+        /*if (pad.isJustPressed(6))
         {
             if (auto orbRef = context.entities.addEntity("Orb"))
             {
@@ -262,12 +262,12 @@ void Shiny::preStep(ssge::EntityStepContext& context)
                 if(sprite->xscale<0)
                     orb.getPhysics()->velocity.x *= -1;
             }
-        }
+        }*/
 
-        if (pad.isPressed(6))
+        if (pad.isPressed(5))
         {
             // Bubbleshooting
-            if (physics->grounded && physics->side.x == 0)
+            if (physics->grounded)
             {
                 startBubbling();
             }
@@ -322,7 +322,7 @@ void Shiny::preStep(ssge::EntityStepContext& context)
 
                 if (bubbleX * bubbleY != 0)
                 { // Diagonal
-                    bubbleSpeed = sqrtf(10);
+                    bubbleSpeed *= sqrtf(2)/2.f;
                 }
 
                 // Bubbling animation
@@ -346,7 +346,7 @@ void Shiny::preStep(ssge::EntityStepContext& context)
                     bubbleAnim = (int)Sequences::BubblingForwardDown;
                 }
 
-                if (bubbleX + bubbleY != 0)
+                if (bubbleX != 0 || bubbleY != 0)
                 {
                     SDL_FPoint bubbleVector{
                         (float)bubbleX * bubbleSpeed,
@@ -360,8 +360,11 @@ void Shiny::preStep(ssge::EntityStepContext& context)
                     else
                     {
                         bubbleTimer = bubbleDelay;
-                        // TODO: BUBBLE!
-
+                        auto bubble = context.entities.addEntity("Bubble");
+                        bubble->position.x = position.x + (7 * sign(sprite->xscale));
+                        bubble->position.y = position.y - 60;
+                        auto bubblePhysics = bubble->getPhysics();
+                        bubblePhysics->velocity = bubbleVector;
                     }
                 }
             }
