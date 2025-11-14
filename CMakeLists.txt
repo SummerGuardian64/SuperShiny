@@ -25,6 +25,10 @@ file(GLOB_RECURSE SRC_FILES CONFIGURE_DEPENDS
 # If you use SRC_FILES, make sure your target uses it:
 add_executable(${PROJECT_NAME} ${SRC_FILES})
 
+if (WIN32)
+  set_target_properties(SuperShiny PROPERTIES WIN32_EXECUTABLE TRUE)
+endif()
+
 # Resource file
 set(APP_ICON_RC "${CMAKE_SOURCE_DIR}/Resource/SuperShiny.rc")
 if (WIN32)
