@@ -28,6 +28,7 @@
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
+					<Add option="-Wl,-subsystem,windows" />
 				</Linker>
 			</Target>
 		</Build>
