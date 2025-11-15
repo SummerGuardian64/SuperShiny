@@ -2,8 +2,8 @@
 
 This repository contains two main parts:
 
-1. **SSGE (Summer Shiny Game Engine)** – the engine code (reusable).
-2. **Super Shiny the game** – game logic, art, music, assets, and content.
+1. **SSGE (Super Shiny Game Engine)** – the engine code (reusable).
+2. **Super Shiny Game game** – game logic, art, music, assets, and content.
 
 They are licensed differently.
 
@@ -47,10 +47,9 @@ freely, subject to the following restrictions:
 All **game code and content**, including but not limited to:
 
 - `Source/SuperShiny/`
-- Any `Assets/`, `Music/`, `Backgrounds/`, `Tilesets/`, sprites, 3D models,
-  sounds, graphics, logo, story, characters (including “Shiny”), level data,
-
-are **NOT** open-source and are **not** covered by the zlib license above.
+- All `WithEXE/` files, 3D models, music, sounds, graphics, logo, story,
+  characters (including “Shiny”), level data, are **NOT** open-source
+  and are **not** covered by the zlib license above.
 
 ### You ARE allowed to:
 
