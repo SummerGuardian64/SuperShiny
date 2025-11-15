@@ -149,7 +149,7 @@ void SuperShiny::step(ssge::StepContext& context)
 			// Close it!!!
 			context.menus.close();
 		}
-		
+
 		// Pause on joypad disconnection!
 		if (_joypadGotUnplugged)
 		{
@@ -496,7 +496,7 @@ void SuperShiny::Menus::init(SuperShiny::Config& config)
 	highScoreMenu.setTitle("High Score");
 
 	// Compose the main menu
-	mainMenu.setTitle("Super Shiny v0.1");
+	mainMenu.setTitle("Super Shiny v0.1.0.1");
 	mainMenu.newItem_NewGame("Start Game");
 	mainMenu.newItem("Load Game")->visible = false;
 	mainMenu.newItem_SubMenu("Level Select", &levelSelect)->visible = false;

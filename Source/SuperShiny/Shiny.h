@@ -3,6 +3,8 @@
 
 class Shiny : public ssge::Entity
 {
+    bool bubbleAux = false;
+    float bubbleAuxOffset = -6;
 	bool dying = false;
 	bool bubbling = false;
 	int bubbleTimer = 0;
@@ -17,7 +19,7 @@ class Shiny : public ssge::Entity
 	void animate(ssge::EntityStepContext& context);
 
 public:
-	
+
 	enum class Sequences : int
 	{
 		Stopped = 0,

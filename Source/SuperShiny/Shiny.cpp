@@ -362,7 +362,16 @@ void Shiny::preStep(ssge::EntityStepContext& context)
                         bubbleTimer = bubbleDelay;
                         auto bubble = context.entities.addEntity("Bubble");
                         bubble->position.x = position.x + (7 * sign(sprite->xscale));
-                        bubble->position.y = position.y - 60;
+                        if(bubbleAux)
+                        {
+                            bubble->position.y = position.y - 60 - bubbleAuxOffset;
+                            bubbleAux=false;
+                        }
+                        else{
+                                bubble->position.y = position.y - 60;
+                            bubbleAux=true;
+                        }
+
                         auto bubblePhysics = bubble->getPhysics();
                         bubblePhysics->velocity = bubbleVector;
                     }
