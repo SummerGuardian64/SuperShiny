@@ -33,6 +33,7 @@ namespace ssge
 				DeathIfFullyOutside,
 				WrapAround,
 				NextSection,
+				Victory,
 				TOTAL
 			};
 

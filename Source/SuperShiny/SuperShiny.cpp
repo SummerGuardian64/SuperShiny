@@ -12,6 +12,7 @@
 // GAMEDEV: Please include headers of your scenes
 #include "SplashScreen.h"
 #include "TitleScreen.h"
+#include "VictoryScreen.h"
 
 // GAMEDEV: Please include headers of your entities
 #include "Shiny.h"
@@ -129,8 +130,12 @@ void SuperShiny::step(ssge::StepContext& context)
 		bool gameplayRunning = !isPaused && !fading;
 		bool menuOpen = context.menus.isOpen();
 
-		// If gameplay is running
-		if (gameplayRunning)
+		if(processingGameVictory) // If victory is being processed
+        {
+            // SKIP ALL OF THIS!
+            context.menus.close(); // And don't show any menus!
+        }
+		else if (gameplayRunning) // If gameplay is running
 		{
 			// Offer pause button
 			if (context.inputs.isJustPressed(7))
@@ -158,6 +163,26 @@ void SuperShiny::step(ssge::StepContext& context)
 			context.menus.abruptMenu(menus.joypadUnpluggedMenu);
 		}
 	}
+	else if (currentScene=="VictoryScreen")
+    {
+        if(processingGameVictory)
+        {
+            context.menus.setMenu(menus.victoryMenu);
+            context.menus.abruptMenu(menus.creditsMenu);
+        }
+        processingGameVictory=false;
+    }
+
+	if (gameWasWon)
+    {
+        gameWasWon=false;
+        if(!processingGameVictory)
+        {
+            context.scenes.pause();
+            context.scenes.changeScene("VictoryScreen");
+            processingGameVictory=true;
+        }
+    }
 
 	if (wannaSaveSettings)
 	{
@@ -224,6 +249,11 @@ void SuperShiny::saveSettings()
 	wannaSaveSettings = true;
 }
 
+void SuperShiny::declareVictory()
+{
+    gameWasWon = true;
+}
+
 void SuperShiny::queryQuit()
 {
 	queriedToQuit = true;
@@ -260,6 +290,11 @@ ssge::MenuCommandEx SuperShiny::onHavingBackedOutOfMenus(ssge::PassKey<ssge::Gam
 		cmdEx.smallCmd = ssge::MenuCommand::SUB_MENU;
 		cmdEx.targetMenu = &menus.confirmExitProgram;
 	}
+	else if(currentScene=="VictoryScreen")
+    {
+        // IGNORE!!!
+        cmdEx.smallCmd = ssge::MenuCommand::NOTHING;
+    }
 	else
 	{ // Otherwise just close the menu
 		cmdEx.smallCmd = ssge::MenuCommand::CLOSE_MENU;
@@ -291,6 +326,9 @@ std::unique_ptr<ssge::Scene> SuperShiny::Scenes::createScene(ssge::PassKey<ssge:
 	else if (id == "TitleScreen")
 		return titleScreen();
 
+    else if (id == "VictoryScreen")
+        return victoryScreen();
+
 	else return nullptr;
 }
 
@@ -309,6 +347,11 @@ std::unique_ptr<SplashScreen> SuperShiny::Scenes::splashScreen()
 std::unique_ptr<TitleScreen> SuperShiny::Scenes::titleScreen()
 {
 	return std::make_unique<TitleScreen>();
+}
+
+std::unique_ptr<VictoryScreen> SuperShiny::Scenes::victoryScreen()
+{
+    return std::make_unique<VictoryScreen>();
 }
 
 std::shared_ptr<Shiny> SuperShiny::Entities::shiny()
@@ -496,7 +539,7 @@ void SuperShiny::Menus::init(SuperShiny::Config& config)
 	highScoreMenu.setTitle("High Score");
 
 	// Compose the main menu
-	mainMenu.setTitle("Super Shiny v0.1.0.1");
+	mainMenu.setTitle("Super Shiny v0.1.1");
 	mainMenu.newItem_NewGame("Start Game");
 	mainMenu.newItem("Load Game")->visible = false;
 	mainMenu.newItem_SubMenu("Level Select", &levelSelect)->visible = false;
@@ -643,12 +686,13 @@ void SuperShiny::Menus::init(SuperShiny::Config& config)
 
 	// Compose the victory menu
 	victoryMenu.setTitle("Congratulations!");
-	victoryMenu.newLabel("You have completed the last level of this demo!");
+	victoryMenu.newLabel("You have completed the demo level!");
 	victoryMenu.newLabel("Thank you for playing!");
-	victoryMenu.newLabel("Don't forget to enter your high score!");
-	victoryMenu.newItem_SubMenu("Enter High Score", &highScoreMenu, (MenuFunction)&refreshHighScoreMenu);
-	victoryMenu.newItem_SubMenu("Start Over", &friendlyReminderReset);
-	victoryMenu.newItem_SubMenu("Go To Main Menu", &friendlyReminderExit);
+	victoryMenu.newItem_SubMenu("Credits",&creditsMenu);
+	//victoryMenu.newLabel("Don't forget to enter your high score!");
+	//victoryMenu.newItem_SubMenu("Enter High Score", &highScoreMenu, (MenuFunction)&refreshHighScoreMenu);
+	//victoryMenu.newItem_SubMenu("Start Over", &friendlyReminderReset);
+	victoryMenu.newItem_MainMenu("Go To Main Menu");
 
 	friendlyReminderReset.newLabel("You should save your high score before restarting");
 	friendlyReminderReset.newItem_NewGame("It's alright. I wanna start over");

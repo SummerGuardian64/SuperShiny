@@ -41,6 +41,7 @@ public:
 
 	bool isDying() const;
 	void die();
+	int makeBoxNumber(std::string callback) const;
 
 	// Inherited via Entity
 	std::string getEntityClassID() const override;

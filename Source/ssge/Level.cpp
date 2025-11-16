@@ -829,6 +829,7 @@ namespace ssge
 			"DeathIfFullyOutside",
 			"WrapAround",
 			"NextSection",
+			"Victory",
 			nullptr
 		};
 
@@ -909,7 +910,7 @@ namespace ssge
 	}
 	Level::Background::Background(std::string path, float parallaxX, float parallaxY, int offsetX, int offsetY)
 		: path(path), parallaxX(parallaxX), parallaxY(parallaxY), offsetX(offsetX), offsetY(offsetY) {}
-	
+
 	const SdlTexture& Level::Background::getTexture() const
 	{
 		return texture;
@@ -923,7 +924,7 @@ namespace ssge
 		setTexture(SdlTexture(path.c_str(), renderer));
 		return texture.isValid();
 	}
-	
+
 	std::string Level::Background::getPath() const { return path; }
 	void Level::Background::setPath(std::string path)
 		{ this->path = path; }

@@ -206,6 +206,10 @@ void GameWorld::step(SceneStepContext& context)
                 context.scenes.goToLevel(level->nextSection);
             }
         }
+        if (warpQuery.coll == Level::Block::Collision::Victory)
+        {
+            context.game.declareVictory();
+        }
     }
 
 

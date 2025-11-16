@@ -86,6 +86,8 @@
 		<Unit filename="Source/SuperShiny/SuperShiny.h" />
 		<Unit filename="Source/SuperShiny/TitleScreen.cpp" />
 		<Unit filename="Source/SuperShiny/TitleScreen.h" />
+		<Unit filename="Source/SuperShiny/VictoryScreen.cpp" />
+		<Unit filename="Source/SuperShiny/VictoryScreen.h" />
 		<Unit filename="Source/main.cpp" />
 		<Unit filename="Source/ssge/Accessor.cpp" />
 		<Unit filename="Source/ssge/Accessor.h" />

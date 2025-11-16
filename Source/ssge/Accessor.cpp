@@ -469,7 +469,7 @@ void ssge::MenusAccess::abruptMenu(MenuHeader& menuHeader)
 void ssge::MenusAccess::abruptMenu(MenuHeader* menuHeader)
 {
 	if (!actual) return;
-	
+
 	auto currentMenu = actual->currentMenu;
 
 	// Is our abrupt menu currently displaying
@@ -515,4 +515,9 @@ MenuCommandEx ssge::GameAccess::onHavingBackedOutOfMenus(PassKey<MenuManager> pk
 void GameAccess::saveSettings()
 {
 	actual.saveSettings();
+}
+
+void GameAccess::declareVictory()
+{
+    actual.declareVictory();
 }

@@ -44,6 +44,8 @@ namespace ssge
 
         virtual void saveSettings() = 0;
 
+        virtual void declareVictory() = 0;
+
         virtual void queryQuit() = 0;
 
         virtual void joypadGotUnplugged() = 0;

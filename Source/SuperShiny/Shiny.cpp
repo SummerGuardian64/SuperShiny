@@ -15,7 +15,7 @@ void Shiny::startBubbling()
     if (!bubbling)
     {
         bubbling = true;
-        bubbleTimer = bubbleDelay;
+        bubbleTimer = 0;
         physics->abilities = makeBubblingAbilities();
         bubbleX = sign(sprite->xscale);
         bubbleY = 0;
@@ -417,6 +417,8 @@ void Shiny::postStep(ssge::EntityStepContext& context)
                 for (auto& collision : allCollisions)
                 {
                     auto* block = context.level.getBlockAt(collision.coords);
+                    std::string callback = collision.callback;
+
                     if (collision.coll == Level::Block::Collision::Hazard
                         || collision.coll == Level::Block::Collision::DeathOnTouch
                         || collision.coll == Level::Block::Collision::DeathIfFullyOutside)
@@ -450,9 +452,93 @@ void Shiny::postStep(ssge::EntityStepContext& context)
                             amIDeadYet = true;
                         }
                     }
-                    if (collision.callback == "Collectable")
+                    if (callback == "Collectable")
                     {
                         block->type = 0;
+                    }
+                    // Callback: DestroyBlock>x,y<replaceCurrent
+                    if (callback.substr(0, 12) == "DestroyBlock")
+                    {
+                        auto rightArrowIndex = callback.find('>');
+                        auto commaIndex = callback.find(',');
+                        auto leftArrowIndex = callback.find('<');
+
+                        int destroyBlockX = -1;
+                        int destroyBlockY = -1;
+                        int replaceCurrentBlock = -1;
+
+                        if (rightArrowIndex != std::string::npos)
+                        {
+                            std::size_t start = rightArrowIndex + 1;
+                            std::size_t end = callback.size();
+
+                            // If there's also a ',' after '>', stop before it
+                            if (commaIndex != std::string::npos && commaIndex > rightArrowIndex)
+                            {
+                                end = commaIndex;
+                            }
+
+                            try
+                            {
+                                std::string numberSubstring = callback.substr(start, end - start);
+                                destroyBlockX = std::stoi(numberSubstring);
+                            }
+                            catch (...)
+                            {
+                                // Ignore malformed number, do nothing
+                            }
+                        }
+
+                        if (commaIndex != std::string::npos)
+                        {
+                            std::size_t start = commaIndex + 1;
+                            std::size_t end = callback.size();
+
+                            // If there's also a '<' after ',', stop before it
+                            if (leftArrowIndex != std::string::npos && leftArrowIndex > commaIndex)
+                            {
+                                end = leftArrowIndex;
+                            }
+
+                            try
+                            {
+                                std::string numberSubstring = callback.substr(start, end - start);
+                                destroyBlockY = std::stoi(numberSubstring);
+                            }
+                            catch (...)
+                            {
+                                // Ignore malformed number, do nothing
+                            }
+                        }
+
+                        if (leftArrowIndex != std::string::npos)
+                        {
+                            std::size_t start = leftArrowIndex + 1;
+                            std::size_t end = callback.size();
+
+                            try
+                            {
+                                std::string numberSubstring = callback.substr(start, end - start);
+                                replaceCurrentBlock = std::stoi(numberSubstring);
+                            }
+                            catch (...)
+                            {
+                                // Ignore malformed number, do nothing
+                            }
+                        }
+
+                        ssge::Level::Block::Coords destroyBlockCoords{destroyBlockX,destroyBlockY};
+                        ssge::Level::Block* destroyBlockPtr = context.level.getBlockAt(destroyBlockCoords);
+
+                        if(destroyBlockPtr)
+                        {
+                            destroyBlockPtr->type = 0;
+                        }
+
+                        if(replaceCurrentBlock>=0)
+                        {
+                            block->type = replaceCurrentBlock;
+                        }
                     }
                 }
             }
@@ -475,7 +561,7 @@ void Shiny::postStep(ssge::EntityStepContext& context)
                         {
                             physics->velocity.y = -physics->abilities.jumpSpeed;
                             physics->jumpTimer = physics->abilities.jumpStrength;
-                            block->type = 0;
+                            block->type = makeBoxNumber(collision.callback);
                         }
                     }
                     if (callback.substr(0, 9) == "Terraform")
@@ -567,7 +653,7 @@ void Shiny::postStep(ssge::EntityStepContext& context)
                         if (physics->oldVelocity.y < 0)
                         {
                             physics->velocity.y = -physics->oldVelocity.y;
-                            block->type = 0;
+                            block->type = makeBoxNumber(collision.callback);
                         }
                     }
                 }
@@ -579,6 +665,23 @@ void Shiny::postStep(ssge::EntityStepContext& context)
         die();
 
     animate(context);
+}
+
+int Shiny::makeBoxNumber(std::string callback) const
+{
+    auto rightArrowIndex=callback.find('>');
+
+    try
+    {
+        std::string numberString = callback.substr(rightArrowIndex + 1);
+        auto boxNumber = std::stoi(numberString);
+        return boxNumber;
+    }
+    catch(...)
+    {// Bad index
+        // Default
+        return 0;
+    }
 }
 
 void Shiny::preDraw(ssge::DrawContext& context) const

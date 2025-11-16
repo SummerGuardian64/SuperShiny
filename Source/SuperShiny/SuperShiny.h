@@ -14,6 +14,7 @@ class MenuHeader;
 
 class SplashScreen;
 class TitleScreen;
+class VictoryScreen;
 
 // GAMEDEV: Please forward-declare your entities here
 
@@ -36,6 +37,8 @@ private:
     void syncSettings(ssge::StepContext& context) const;
     bool wannaSaveSettings = false;
     bool queriedToQuit = false;
+    bool gameWasWon = false;
+    bool processingGameVictory = false;
 
     void _queryQuit(ssge::StepContext& context);
 
@@ -58,6 +61,8 @@ public: //TODO: Encapsulate
     void saveSettings() override;
 
     void queryQuit() override;
+
+    void declareVictory() override;
 
     bool _joypadGotUnplugged = false;
     void joypadGotUnplugged() override;
@@ -85,6 +90,7 @@ public: //TODO: Encapsulate
 
         static std::unique_ptr<SplashScreen> splashScreen();
         static std::unique_ptr<TitleScreen> titleScreen();
+        static std::unique_ptr<VictoryScreen> victoryScreen();
 
         std::unique_ptr<ssge::Scene> createScene(ssge::PassKey<ssge::ScenesAccess> pk, std::string id) override;
         std::string getMainMenuSceneClassID() const override;

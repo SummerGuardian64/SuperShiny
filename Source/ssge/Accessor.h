@@ -39,6 +39,7 @@ namespace ssge {
         explicit GameAccess(IGame& actual) : actual(actual) {}
         IGame& get() { return actual; }
         MenuCommandEx onHavingBackedOutOfMenus(PassKey<MenuManager> pk, MenuContext& context);
+        void declareVictory();
         void saveSettings();
     };
 
@@ -172,7 +173,7 @@ namespace ssge {
 
         bool valid() const;
         bool rectOverlapsSolid(const SDL_FRect& r) const;  // implemented to forward to Level
-        
+
         // Return tile indices overlapped by a rect (clamped to level bounds).
         void rectToBlockSpan(const SDL_FRect& r, int& col0, int& col1, int& row0, int& row1) const;
 
@@ -204,7 +205,7 @@ namespace ssge {
         // Is any overlapped tile "water"?
         bool rectInWater(const SDL_FRect& r) const;
     };
-    
+
     class EntitiesAccess {
         EntityManager* actual;
         IGameEntities& gameEntities;
@@ -222,7 +223,7 @@ namespace ssge {
         explicit EntitiesAccessWCurrent(EntityManager* actual, GameAccess& game, Entity* current)
             : EntitiesAccess(actual, game), current(*current) {}
     };
-    
+
     class SpritesAccess {
         IGameSprites& actual;
     public:
