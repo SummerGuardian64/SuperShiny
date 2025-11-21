@@ -539,7 +539,7 @@ void SuperShiny::Menus::init(SuperShiny::Config& config)
 	highScoreMenu.setTitle("High Score");
 
 	// Compose the main menu
-	mainMenu.setTitle("Super Shiny v0.1.1");
+	mainMenu.setTitle("Super Shiny v0.1.2");
 	mainMenu.newItem_NewGame("Start Game");
 	mainMenu.newItem("Load Game")->visible = false;
 	mainMenu.newItem_SubMenu("Level Select", &levelSelect)->visible = false;
@@ -557,7 +557,7 @@ void SuperShiny::Menus::init(SuperShiny::Config& config)
 	creditsMenu.newLabel("Powerred by Super Shiny Game Engine");
 	creditsMenu.newLabel("also created by Summer Guardian 64");
 	creditsMenu.newLabel("");
-	creditsMenu.newLabel("First Alpha version 0.1");
+	creditsMenu.newLabel("Post-con Alpha version 0.1.2");
 	creditsMenu.newLabel("");
 	creditsMenu.newItem_SetMenu("Next", &creditsMenu2);
 
