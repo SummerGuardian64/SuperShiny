@@ -206,11 +206,11 @@ void Engine::handleEvents()
 		case SDL_EventType::SDL_JOYDEVICEADDED:
 		case SDL_EventType::SDL_JOYDEVICEREMOVED:
 		// GameController events
-		/*case SDL_EventType::SDL_CONTROLLERDEVICEADDED:
+		case SDL_EventType::SDL_CONTROLLERDEVICEADDED:
 		case SDL_EventType::SDL_CONTROLLERDEVICEREMOVED:
 		case SDL_EventType::SDL_CONTROLLERBUTTONDOWN:
 		case SDL_EventType::SDL_CONTROLLERBUTTONUP:
-		case SDL_EventType::SDL_CONTROLLERAXISMOTION:*/
+		case SDL_EventType::SDL_CONTROLLERAXISMOTION:
 			inputs->handle(event);
 			break;
 		default:

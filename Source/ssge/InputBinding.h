@@ -149,7 +149,19 @@ namespace ssge
 
 		std::string getMouseButtonString() const
 		{
-			return std::to_string(getMouseButton());
+			switch (getMouseButton())
+			{
+			case 1:
+				return "Left mouse button";
+			case 2:
+				return "Middle mouse button";
+			case 3:
+				return "Right mouse button";
+			case -1:
+				return "Unknown mouse button!";
+			default:
+				return "Mouse button " + std::to_string(getMouseButton());
+			}
 		}
 
 		int getMouseWheelDirection() const
@@ -171,7 +183,7 @@ namespace ssge
 			else return "in an unknown direction!";
 		}
 
-		Uint8 getJoystickID() const
+		Uint8 getJoypadID() const
 		{
 			if (deviceType == DeviceType::JoystickAxis
 				|| deviceType == DeviceType::JoystickButton
@@ -209,24 +221,29 @@ namespace ssge
 			return axisString;
 		}
 		
-		Uint8 getJoystickButton() const
+		Uint8 getJoypadButton() const
 		{
-			if (deviceType != DeviceType::JoystickButton)
+			if (deviceType != DeviceType::JoystickButton
+				&& deviceType != DeviceType::GameControllerButton)
 				return -1;
 			else return boundTo.joypadButton;
 		}
 
 		std::string getJoypadButtonString() const
 		{
-			// TODO: More user-friendly printing for Gamepad
-
-			if (deviceType != DeviceType::JoystickButton
-				&& deviceType != DeviceType::GameControllerButton)
+			if (deviceType == DeviceType::JoystickButton)
+			{
+				return std::to_string(boundTo.joypadButton);
+			}
+			else if (deviceType == DeviceType::GameControllerButton)
+			{
+				auto sdlGameControllerButton = (SDL_GameControllerButton)boundTo.joypadButton;
+				return SDL_GameControllerGetStringForButton(sdlGameControllerButton);
+			}
+			else
+			{
 				return "of an unknown kind!";
-
-			std::string buttonString = std::to_string(boundTo.joypadButton);
-
-			return buttonString;
+			}
 		}
 
 		Uint8 getJoystickHatIndex() const
@@ -297,9 +314,15 @@ namespace ssge
 			return hatString;
 		}
 
-		std::string getJoystickName() const
+		std::string getJoypadName() const
 		{
-			return std::to_string(getJoystickID());
+			if (deviceType == DeviceType::GameControllerButton
+				|| deviceType == DeviceType::GameControllerAxis)
+			{
+				auto sdlGameController = SDL_GameControllerFromInstanceID(deviceInstanceID);
+				return SDL_GameControllerName(sdlGameController);
+			}
+			else return std::to_string(getJoypadID());
 		}
 
 		std::string makeBindingString() const
@@ -311,19 +334,19 @@ namespace ssge
 			case ssge::InputBinding::DeviceType::Keyboard:
 				return getScancodeString() + " key";
 			case ssge::InputBinding::DeviceType::MouseButton:
-				return std::string("Mouse button ") + getMouseButtonString();
+				return getMouseButtonString();
 			case ssge::InputBinding::DeviceType::MouseWheel:
 				return std::string("Mouse wheel ") + getMouseWheelString();
 			case ssge::InputBinding::DeviceType::JoystickButton:
-				return std::string("Joystick ") + getJoystickName() + " button " + std::to_string(getJoystickButton());
+				return std::string("Joystick ") + getJoypadName() + " button " + getJoypadButtonString();
 			case ssge::InputBinding::DeviceType::GameControllerButton:
-				return std::string("Game controller ") + getJoystickName() + " button " + std::to_string(getJoystickButton());
+				return getJoypadName() + ":" + getJoypadButtonString();
 			case ssge::InputBinding::DeviceType::JoystickAxis:
-				return std::string("Joystick ") + getJoystickName() + " axis " + getJoypadAxisString();
+				return std::string("Joystick ") + getJoypadName() + " axis " + getJoypadAxisString();
 			case ssge::InputBinding::DeviceType::GameControllerAxis:
-				return std::string("Game controller ") + getJoystickName() + " axis " + getJoypadAxisString();
+				return getJoypadName() + ":" + getJoypadAxisString();
 			case ssge::InputBinding::DeviceType::JoystickHat:
-				return std::string("Joystick ") + getJoystickName() + " hat " + getJoystickHatString();
+				return std::string("Joystick ") + getJoypadName() + " hat " + getJoystickHatString();
 			case ssge::InputBinding::DeviceType::TouchFinger:
 				return "FINGER UNIMPLEMENTED!";
 			default:
@@ -352,15 +375,15 @@ namespace ssge
 				        e.button.button == boundTo.mouseButton;
 			case DeviceType::MouseWheel:
 				return (e.type == SDL_MOUSEWHEEL
-					&& e.wheel.direction == boundTo.mouseWheel.direction);
+					&& e.wheel.y == boundTo.mouseWheel.direction);
 			case DeviceType::JoystickButton:
 				return (e.type == SDL_JOYBUTTONDOWN
 					|| e.type == SDL_JOYBUTTONUP) &&
-				        /*e.jbutton.which == deviceInstanceID &&*/
+				        /*e.jbutton.which == deviceInstanceID &&*/ //FIXME: Implement autorebind!
 				        e.jbutton.button == boundTo.joypadButton;
 			case DeviceType::JoystickAxis:
 				if (e.type == SDL_JOYAXISMOTION
-					/* && e.jaxis.which == deviceInstanceID*/) // for the con
+					/* && e.jaxis.which == deviceInstanceID*/) // for the con //FIXME: Implement autorebind!
 				{
 					if (e.jaxis.axis == boundTo.joypadAxis.axis)
 					{
@@ -370,7 +393,7 @@ namespace ssge
 				return false;
 			case DeviceType::JoystickHat:
 				if (e.type == SDL_JOYHATMOTION
-					/* && e.jhat.which == deviceInstanceID*/) // for the con
+					/* && e.jhat.which == deviceInstanceID*/) // for the con //FIXME: Implement autorebind!
 				{
 					if (e.jhat.hat == boundTo.joystickHat.index)
 					{
@@ -381,11 +404,12 @@ namespace ssge
 			case DeviceType::GameControllerButton:
 				return (e.type == SDL_CONTROLLERBUTTONDOWN // If pressed
 					|| e.type == SDL_CONTROLLERBUTTONUP) && // or released
-					e.cbutton.which == deviceInstanceID && // this device
+					//e.cbutton.which == deviceInstanceID && // this device //FIXME: Implement autorebind!
 					e.cbutton.button == boundTo.joypadButton; // this button
 			case DeviceType::GameControllerAxis:
 				if (e.type == SDL_JOYAXISMOTION
-					&& e.caxis.which == deviceInstanceID)
+					/*&& e.caxis.which == deviceInstanceID*/ //FIXME: Implement autorebind!
+					)
 				{
 					if (e.caxis.axis == boundTo.joypadAxis.axis)
 					{
@@ -404,7 +428,7 @@ namespace ssge
 
 			if (a.deviceType != b.deviceType) return false;
 
-			// For the con
+			// For the con //FIXME: Implement autorebind!
 			//if (a.deviceInstanceID != b.deviceInstanceID) return false;
 
 			switch (a.deviceType)

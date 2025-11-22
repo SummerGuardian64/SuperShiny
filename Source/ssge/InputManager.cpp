@@ -7,7 +7,6 @@ InputManager::InputManager(PassKey<Engine> pk) {}
 
 void InputManager::init(PassKey<Engine> pk)
 {
-
     // Enable joystick and game controller events
     SDL_JoystickEventState(SDL_ENABLE);
     SDL_GameControllerEventState(SDL_ENABLE);
@@ -21,12 +20,12 @@ bool ssge::InputManager::handleHardwareChange(SDL_Event e)
     // Joypad hardware change
     switch (e.type)
     {
-        /*case SDL_CONTROLLERDEVICEADDED:
-            onControllerAdded(e.cdevice.which); // device index
-            return true;
-        case SDL_CONTROLLERDEVICEREMOVED:
-            onControllerRemoved(e.cdevice.which); // instance id
-            return true;*/
+    case SDL_CONTROLLERDEVICEADDED:
+        onControllerAdded(e.cdevice.which); // device index
+        return true;
+    case SDL_CONTROLLERDEVICEREMOVED:
+        onControllerRemoved(e.cdevice.which); // instance id
+        return true;
     case SDL_JOYDEVICEADDED:
         onJoystickAdded(e.jdevice.which); // device index
         return true;
@@ -57,7 +56,7 @@ bool ssge::InputManager::handleListeningForBinding(SDL_Event e)
             lastBinding.bindToMouseButton(e.button.button);
             break;
         case SDL_MOUSEWHEEL:
-            lastBinding.bindToMouseWheel(e.wheel.direction);
+            lastBinding.bindToMouseWheel(e.wheel.y);
             break;
 
             // GameController (XInput-style, preferred on Windows)
@@ -133,18 +132,6 @@ bool ssge::InputManager::handleListeningForBinding(SDL_Event e)
 bool ssge::InputManager::handleBindings(SDL_Event e, InputBinding* chosenBindings)
 {
     bool eventSwallowed = false;
-
-    // Clear all SDL_MOUSEWHEEL-bound inputs
-    // because we don't have a MouseWheelRelease event.
-    // Without this, the mousewheel inputs get jammed!
-    for (int index = 0; index < 32; index++)
-    {
-        if (chosenBindings[index].getDeviceType()
-            == InputBinding::DeviceType::MouseWheel)
-        { // Clear no matter what
-            directInputs &= ~(1 << index);
-        }
-    }
 
     // See if incoming event matches a binding
     for (int index = 0; index < 32; index++)
@@ -244,6 +231,21 @@ bool ssge::InputManager::handleBindings(SDL_Event e, InputBinding* chosenBinding
     return eventSwallowed;
 }
 
+void InputManager::mouseWheelFix(InputBinding* chosenBindings)
+{
+    // Clear all SDL_MOUSEWHEEL-bound inputs
+    // because we don't have a MouseWheelRelease event.
+    // Without this, the mousewheel inputs get jammed!
+    for (int index = 0; index < 32; index++)
+    {
+        if (chosenBindings[index].getDeviceType()
+            == InputBinding::DeviceType::MouseWheel)
+        { // Clear no matter what
+            directInputs &= ~(1 << index);
+        }
+    }
+}
+
 void InputManager::handle(SDL_Event e)
 {
     if (handleHardwareChange(e)) return;
@@ -255,6 +257,8 @@ void InputManager::handle(SDL_Event e)
 void InputManager::latch()
 {
     pad.latchButtons(directInputs);
+    mouseWheelFix(bindings);
+    mouseWheelFix(fallbackBindings);
 }
 
 // Joypad stuff
@@ -305,8 +309,8 @@ void InputManager::onControllerRemoved(SDL_JoystickID id)
 void InputManager::onJoystickAdded(int deviceIndex)
 {
     // Only if NOT a GameController
-    //if (SDL_IsGameController(deviceIndex))
-    //    return;
+    if (SDL_IsGameController(deviceIndex))
+        return;
 
     int slot = getFreeJoypadSlot();
     if (slot < 0)
@@ -609,7 +613,7 @@ bool ssge::InputManager::saveToIniFile(IniFile& iniFile)
             iniFile.setInt(
                 INI_SECTION,
                 "Button" + bindingIdxStr,
-                binding->getJoystickButton()
+                binding->getJoypadButton()
             );
             break;
         case ssge::InputBinding::DeviceType::JoystickAxis:

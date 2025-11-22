@@ -21,6 +21,7 @@ namespace ssge
 		bool handleHardwareChange(SDL_Event e);
 		bool handleListeningForBinding(SDL_Event e);
 		bool handleBindings(SDL_Event e, InputBinding* chosenBindings);
+		void mouseWheelFix(InputBinding* chosenBindings);
 	public:
 		void handle(SDL_Event e);
 		void latch();
