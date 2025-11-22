@@ -22,7 +22,6 @@ namespace ssge
 			TOTAL
 		};
 
-		//TODO: Proper mouse wheel support
 		//TODO: Proper axis threshold support
 		//TODO: Proper touch support
 
@@ -195,14 +194,16 @@ namespace ssge
 
 		Uint8 getJoystickAxis() const
 		{
-			if (deviceType != DeviceType::JoystickAxis)
+			if (deviceType != DeviceType::JoystickAxis
+				&& deviceType != DeviceType::GameControllerAxis)
 				return -1;
 			else return boundTo.joypadAxis.axis;
 		}
 
 		int getJoystickAxisDirection() const
 		{
-			if (deviceType != DeviceType::JoystickAxis)
+			if (deviceType != DeviceType::JoystickAxis
+				&& deviceType != DeviceType::GameControllerAxis)
 				return -1;
 			else return boundTo.joypadAxis.direction;
 		}

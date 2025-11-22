@@ -170,11 +170,12 @@ bool ssge::InputManager::handleBindings(SDL_Event e, InputBinding* chosenBinding
                     eventSwallowed = true;
                 }
             }
-            else if (e.type == SDL_JOYAXISMOTION)
+            else if (e.type == SDL_CONTROLLERAXISMOTION
+                || e.type == SDL_JOYAXISMOTION)
             {
                 // We must check the axis direction
                 int wantedDirection = binding.getJoystickAxisDirection();
-                Sint16 axisValue = e.jaxis.value;
+                Sint16 axisValue = (e.type == SDL_JOYAXISMOTION) ? e.jaxis.value : e.caxis.value;
                 if (std::abs(axisValue) > 8000)
                 {
                     // If the signs are the same,
@@ -198,31 +199,6 @@ bool ssge::InputManager::handleBindings(SDL_Event e, InputBinding* chosenBinding
                 { // If it's below the threshold, then it's surely released
                     directInputs &= ~(1 << index);
                     eventSwallowed = true;
-                }
-            }
-            else if (e.type == SDL_CONTROLLERAXISMOTION)
-            {
-                // We must check the axis direction
-                int wantedDirection = binding.getJoystickAxisDirection();
-                Sint16 axisValue = e.caxis.value;
-                if (std::abs(axisValue) > 8000)
-                {
-                    // If the signs are the same,
-                    // then this is what we want
-                    if (wantedDirection * axisValue > 0)
-                    { // Count it as pressed
-                        directInputs |= 1 << index;
-                        eventSwallowed = true;
-                    }
-                    else if (wantedDirection * axisValue < 0)
-                    { // Count it as released
-                        directInputs &= ~(1 << index);
-                        eventSwallowed = true;
-                    }
-                    else
-                    {
-                        // WHAT!? This is impossible!
-                    }
                 }
             }
         }
