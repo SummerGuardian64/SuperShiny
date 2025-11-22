@@ -127,10 +127,11 @@ void SuperShiny::step(ssge::StepContext& context)
 	{
 		bool isPaused = context.scenes.isPaused();
 		bool fading = !context.scenes.isFadeFinished();
+		bool isWrappingUp = context.engine.isWrappingUp();
 		bool gameplayRunning = !isPaused && !fading;
 		bool menuOpen = context.menus.isOpen();
 
-		if(processingGameVictory) // If victory is being processed
+		if (processingGameVictory) // If victory is being processed
         {
             // SKIP ALL OF THIS!
             context.menus.close(); // And don't show any menus!
@@ -149,10 +150,16 @@ void SuperShiny::step(ssge::StepContext& context)
 			// Unpause!
 			context.scenes.unpause();
 		}
-		else if (fading) // If menu is somehow open during fading
+
+		if (fading) // If menu is somehow open during fading
 		{
 			// Close it!!!
 			context.menus.close();
+		}
+
+		if (isWrappingUp) // If we're wrapping up, FORCE PAUSE!
+		{
+			context.scenes.pause();
 		}
 
 		// Pause on joypad disconnection!
