@@ -15,6 +15,12 @@ That means you can put it on a USB stick and play on any machine without install
 
 **DO NOT** try running only the EXE file from the ZIP file! All files that are inside of the ZIP file need to be extracted to run the game!
 
+If you see missing DLL errors or non-existent graphics, you haven't extracted the archives properly or there may be issues with USB communication (if you're using a USB stick).
+
+It is recommended that you don't oversaturate the USB hub with too many devices. If there are USB connectivity issues, try copying the game folder onto the local computer and running from there.
+
+Please enjoy the scalefloof~
+
 ## For developers, modders, code reviewers and whoever wants to compile the code
 
 Super Shiny game and engine currently have only two targets:
@@ -24,7 +30,7 @@ Super Shiny game and engine currently have only two targets:
 
 The project uses these dependencies:
 
-- SDL2-2.32.8
+- SDL2-2.32.10
 - SDL2_image-2.8.8
 - SDL2_ttf-2.24.0
 - SDL2_mixer-2.8.1
@@ -256,7 +262,11 @@ You need to set up the environment variables first, then restart Visual Studio s
 5. Press *OK*
 
 For example:
-> `D:\Shared\Development\SDL2-2.32.8;D:\Shared\Development\SDL2_image-2.8.8;D:\Shared\Development\SDL2_ttf-2.24.0;D:\Shared\Development\SDL2_mixer-2.8.1`
+> `D:\Shared\Development\SDL2-2.32.10;D:\Shared\Development\SDL2_image-2.8.8;D:\Shared\Development\SDL2_ttf-2.24.0;D:\Shared\Development\SDL2_mixer-2.8.1`
+
+**NOTE:**
+
+Different programs for archive extraction may extract differently. Some add an additional folder, but some don't. You need to make sure that the folder being pointed to has a direct subfolder called `cmake`.
 
 #### Having set up the dependencies
 
@@ -265,7 +275,6 @@ Now relaunch Visual Studio.
 1. In the *Standard* toolbar, near the green arrow button, make sure it says `Super Shiny`. If it doesn't, press the small arrow pointing down on it and select `Super Shiny`
 2. Press the green arrow button
 3. Wait for the project to build
-
 
 If all goes well, a window will open with a splash screen of Shiny.
 
@@ -277,7 +286,13 @@ If you can see the background and the menu, and if you can hear the background m
 
 #### Troubleshooting the build process
 
-...
+Have you restarted Visual Studio after setting up the environment variables? If not, restart and try again.
+
+If you see missing DLL errors, that means that there is an issue with how paths are configured or you haven't extracted the archives properly.
+
+Make sure your paths match the *Folder structure* specified in this document.
+
+If you see build errors revolving around compiler version, make sure you've installed all the necessary Visual Studio components via Visual Studio Installer.
 
 ---
 
