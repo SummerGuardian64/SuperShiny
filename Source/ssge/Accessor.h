@@ -172,7 +172,6 @@ namespace ssge {
         explicit LevelAccess(Level* actual) : actual(actual) {}
 
         bool valid() const;
-        bool rectOverlapsSolid(const SDL_FRect& r) const;  // implemented to forward to Level
 
         // Return tile indices overlapped by a rect (clamped to level bounds).
         void rectToBlockSpan(const SDL_FRect& r, int& col0, int& col1, int& row0, int& row1) const;
@@ -242,8 +241,6 @@ namespace ssge {
         void setMenu(MenuHeader* menuHeader);
         void abruptMenu(MenuHeader& menuHeader);
         void abruptMenu(MenuHeader* menuHeader);
-        void openMainMenu();
-        void openPauseMenu();
         void close();
     };
 

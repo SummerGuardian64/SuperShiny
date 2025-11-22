@@ -14,45 +14,42 @@ using namespace ssge;
 
 void EngineAccess::finish()
 {
-	if (!actual) return;
-
-	actual->finish();
+	if (actual) actual->finish();
 }
 
 void EngineAccess::wrapUp()
 {
-	if (!actual) return;
-
-	actual->wrapUp();
+	if (actual) actual->wrapUp();
 }
 
-bool ssge::EngineAccess::isWrappingUp() const
+bool EngineAccess::isWrappingUp() const
 {
 	if (!actual)return false;
 
 	return actual->isWrappingUp();
 }
 
-void ssge::ScenesAccess::changeScene(std::string newSceneId)
+void ScenesAccess::changeScene(std::string newSceneId)
 {
-	if (!actual)return; // Null-safety
-
-	actual->changeScene(gameScenes.createScene(PassKey<ScenesAccess>(), newSceneId));
+	if (actual)
+		actual->changeScene(
+			gameScenes.createScene(PassKey<ScenesAccess>(), newSceneId)
+		);
 }
 
-std::string ssge::ScenesAccess::getCurrentSceneClassID() const
+std::string ScenesAccess::getCurrentSceneClassID() const
 {
 	if (!actual)return "";
 
 	return actual->getCurrentSceneClassID();
 }
 
-void ssge::ScenesAccess::goToLevel(int wantedLevel)
+void ScenesAccess::goToLevel(int wantedLevel)
 {
-	actual->changeScene(std::make_unique<GameWorld>(wantedLevel));
+	if (actual) actual->changeScene(std::make_unique<GameWorld>(wantedLevel));
 }
 
-void ssge::ScenesAccess::goToMainMenu()
+void ScenesAccess::goToMainMenu()
 {
 	std::string mainMenuSceneClassID = gameScenes.getMainMenuSceneClassID();
 	if(!mainMenuSceneClassID.empty())
@@ -61,40 +58,52 @@ void ssge::ScenesAccess::goToMainMenu()
 
 void ScenesAccess::pause()
 {
-	actual->pause();
+	if (actual) actual->pause();
 }
 
 void ScenesAccess::unpause()
 {
-	actual->unpause();
+	if (actual) actual->unpause();
 }
 
 bool ScenesAccess::isPaused() const
 {
+	if (!actual)return false;
+
 	return actual->isPaused();
 }
 
 uint8_t ScenesAccess::getFadeVal() const
 {
+	if (!actual) return 0;
+
 	return actual->getFadeVal();
 }
 
 void ScenesAccess::setPause(bool pause)
 {
-	return actual->setPause(pause);
+	if (actual) return actual->setPause(pause);
 }
 
-bool ssge::ScenesAccess::isFadeFinished() const
+bool ScenesAccess::isFadeFinished() const
 {
+	if (!actual)return false;
+
 	return actual->isFadeFinished();
 }
 
-void ssge::ScenesAccess::restart()
+void ScenesAccess::restart()
 {
+	if (!actual) return;
+
 	auto currentSceneClassID = actual->getCurrentSceneClassID();
 	if (currentSceneClassID == "GameWorld")
 	{
-		GameWorld* gameWorldScene = dynamic_cast<GameWorld*>(actual->getCurrentScene());
+		// We need to get the wanted level if we want to restart the level
+
+		GameWorld* gameWorldScene =
+			dynamic_cast<GameWorld*>(actual->getCurrentScene());
+
 		goToLevel(gameWorldScene->getWantedLevel());
 	}
 	else
@@ -149,12 +158,14 @@ bool WindowAccess::isUpscaleIntegral() const
 
 void WindowAccess::setIntegralUpscale(bool integralUpscale)
 {
-	if (actual) actual->setIntegralUpscale(integralUpscale);
+	if (actual)
+		actual->setIntegralUpscale(integralUpscale);
 }
 
 void WindowAccess::setBorderedFullScreen(bool borderedFullScreen)
 {
-	if (actual) actual->setBorderedFullScreen(borderedFullScreen);
+	if (actual)
+		actual->setBorderedFullScreen(borderedFullScreen);
 }
 
 SDL_Rect WindowAccess::makeBestFitScale() const
@@ -168,91 +179,100 @@ SDL_Rect WindowAccess::makeBestFitScale() const
 
 void AudioAccess::setMasterVolume(int v)
 {
-	if (!actual)return;
-	actual->setMasterVolume(v);
+	if (actual)
+		actual->setMasterVolume(v);
 }
 
 void AudioAccess::setMusicVolume(int v)
 {
-	if (!actual)return;
-	actual->setMusicVolume(v);
+	if (actual)
+		actual->setMusicVolume(v);
 }
 
 void AudioAccess::setSfxVolume(int v)
 {
-	if (!actual)return;
-	actual->setSfxVolume(v);
+	if (actual)
+		actual->setSfxVolume(v);
 }
 
-int  AudioAccess::getMasterVolume() const
+int AudioAccess::getMasterVolume() const
 {
 	if (!actual)return 0;
+
 	return actual->getMasterVolume();
 }
 
-int  AudioAccess::getMusicVolume() const
+int AudioAccess::getMusicVolume() const
 {
 	if (!actual)return 0;
+
 	return actual->getMusicVolume();
 }
 
-int  AudioAccess::getSfxVolume() const
+int AudioAccess::getSfxVolume() const
 {
 	if (!actual)return 0;
+
 	return actual->getSfxVolume();
 }
 
 bool AudioAccess::playMusic(const std::string& path, int loops)
 {
 	if (!actual)return false;
+
 	return actual->playMusic(path, loops);
 }
 
 void AudioAccess::stopMusic()
 {
-	if (!actual)return;
-	actual->stopMusic();
+	if (actual)
+		actual->stopMusic();
 }
 
 void AudioAccess::pauseMusic()
 {
-	if (!actual)return;
-	actual->pauseMusic();
+	if (actual)
+		actual->pauseMusic();
 }
 
 void AudioAccess::resumeMusic()
 {
-	if (!actual)return;
-	actual->resumeMusic();
+	if (actual)
+		actual->resumeMusic();
 }
 
 bool AudioAccess::loadSfx(const std::string& path)
 {
 	if (!actual)return false;
+
 	return actual->loadSfx(path);
 }
 
-int  AudioAccess::playSfx(const std::string& path, int loops)
+int AudioAccess::playSfx(const std::string& path, int loops)
 {
 	if (!actual)return 0;
+
 	return actual->playSfx(path, loops);
 }
 
 bool AudioAccess::isMusicPlaying() const
 {
 	if (!actual)return false;
+
 	return actual->isMusicPlaying();
 }
 
 bool AudioAccess::isMusicPlaying(const std::string& path) const
 {
 	if (!actual)return false;
+
 	return actual->isMusicPlaying(path);
 }
 
 bool AudioAccess::playMusicIfNotPlaying(const std::string& path, int loops)
 {
 	if (!actual)return false;
+
 	return actual->playMusicIfNotPlaying(path, loops);
 }
 
@@ -260,21 +280,29 @@ bool AudioAccess::playMusicIfNotPlaying(const std::string& path, int loops)
 
 bool InputsAccess::isPressed(int buttonIndex)
 {
+	if (!actual) return false;
+
 	return actual->getPad().isPressed(buttonIndex);
 }
 
 bool InputsAccess::isJustPressed(int buttonIndex)
 {
+	if (!actual) return false;
+
 	return actual->getPad().isJustPressed(buttonIndex);
 }
 
 bool InputsAccess::isJustReleased(int buttonIndex)
 {
+	if (!actual) return false;
+
 	return actual->getPad().isJustReleased(buttonIndex);
 }
 
 uint32_t InputsAccess::getCurrentButtonsForPlayer(int playerId)
 {
+	if (!actual) return 0;
+
 	if (playerId == 0)
 	{
 		return actual->getPad().getPressedButtons();
@@ -286,187 +314,238 @@ uint32_t InputsAccess::getCurrentButtonsForPlayer(int playerId)
 bool InputsAccessConfigurable::isListeningForBinding() const
 {
 	if (!actual)return false;
+
 	return actual->isListeningForBinding();
 }
 
-InputsAccess ssge::InputsAccessConfigurable::accessDowngrade()
+InputsAccess InputsAccessConfigurable::accessDowngrade()
 {
 	return InputsAccess(actual);
 }
 
 void InputsAccessConfigurable::listenForBinding(int bindingIndex)
 {
-	if (!actual)return;
-	else actual->listenForBinding(bindingIndex);
+	if (actual)
+		actual->listenForBinding(bindingIndex);
 }
 
 void InputsAccessConfigurable::stopListeningForBinding()
 {
-	if (!actual)return;
-	else actual->stopListeningForBinding();
+	if (actual)
+		actual->stopListeningForBinding();
 }
 
 InputBinding InputsAccess::getBinding(int bindingIndex) const
 {
 	if (!actual) return InputBinding();
-	else return actual->getBinding(bindingIndex);
+
+	return actual->getBinding(bindingIndex);
 }
 
-std::string ssge::InputsAccess::getBindingString(int bindingIndex) const
+std::string InputsAccess::getBindingString(int bindingIndex) const
 {
 	if (!actual)return "(err: InputsAccess->actual==nullptr)";
-	else return actual->getBindingString(bindingIndex);
+
+	return actual->getBindingString(bindingIndex);
 }
 
 int InputsAccess::getMaxBindings() const
 {
 	if (!actual)return 0;
-	else return actual->getMaxBindings();
+
+	return actual->getMaxBindings();
 }
 
 InputBinding* InputsAccessConfigurable::fetchBinding(int bindingIndex)
 {
 	if (!actual)return nullptr;
-	else return actual->fetchBinding(bindingIndex);
+
+	return actual->fetchBinding(bindingIndex);
 }
 
 InputBinding* InputsAccessConfigurable::fetchFallbackBinding(int bindingIndex)
 {
 	if (!actual)return nullptr;
-	else return actual->fetchFallbackBinding(bindingIndex);
+
+	return actual->fetchFallbackBinding(bindingIndex);
 }
 
 bool InputsAccessConfigurable::loadFromIniFile(IniFile& iniFile)
 {
 	if (!actual)return false;
-	else return actual->loadFromIniFile(iniFile);
+
+	return actual->loadFromIniFile(iniFile);
 }
 
 bool InputsAccessConfigurable::saveToIniFile(IniFile& iniFile)
 {
 	if (!actual)return false;
-	else return actual->saveToIniFile(iniFile);
+
+	return actual->saveToIniFile(iniFile);
 }
+
+// CurrentSceneAccess
 
 std::string CurrentSceneAccess::getSceneClassID() const
 {
+	if (!currentScene)return "";
+
 	return currentScene->getSceneClassID();
 }
 
+// LevelAccess
+
 bool LevelAccess::valid() const
 {
+	if (!actual)return false;
+
 	return actual->getTilesetMeta().isValid();
 }
 
-bool LevelAccess::rectOverlapsSolid(const SDL_FRect& r) const
+void LevelAccess::rectToBlockSpan(
+	const SDL_FRect& r,
+	int& col0, int& col1,
+	int& row0, int& row1) const
 {
-	//FIXME: UNIMPLEMENTED!
-	return false;
+	if(actual)
+		actual->rectToBlockSpan(r, col0, col1, row0, row1);
 }
 
-void LevelAccess::rectToBlockSpan(const SDL_FRect& r, int& col0, int& col1, int& row0, int& row1) const
+Level::Block* LevelAccess::getBlockAt(Level::Block::Coords coords)
 {
-	return actual->rectToBlockSpan(r, col0, col1, row0, row1);
-}
+	if (!actual)return nullptr;
 
-Level::Block* ssge::LevelAccess::getBlockAt(Level::Block::Coords coords)
-{
 	return actual->getBlockAt(coords);
 }
 
-const Level::Block* ssge::LevelAccess::getConstBlockAt(Level::Block::Coords coords) const
+const Level::Block* LevelAccess::getConstBlockAt(
+	Level::Block::Coords coords) const
 {
+	if (!actual)return nullptr;
+
 	return actual->getBlockAt(coords);
 }
 
-Level::Block* ssge::LevelAccess::getBlockAt(SDL_FPoint point)
+Level::Block* LevelAccess::getBlockAt(SDL_FPoint point)
 {
+	if (!actual)return nullptr;
+
 	return actual->getBlockAt(point);
 }
 
-const Level::Block* ssge::LevelAccess::getConstBlockAt(SDL_FPoint point) const
+const Level::Block* LevelAccess::getConstBlockAt(SDL_FPoint point) const
 {
+	if (!actual)return nullptr;
+
 	return actual->getConstBlockAt(point);
 }
 
-SDL_Rect ssge::LevelAccess::calculateLevelSize() const
+SDL_Rect LevelAccess::calculateLevelSize() const
 {
+	if (!actual)return SDL_Rect{ 0,0,0,0 };
+
 	return actual->calculateLevelSize();
 }
 
 Level::BlockQuery LevelAccess::queryBlock(int col, int row) const
 {
+	if (!actual)return Level::BlockQuery();
+
 	return actual->queryBlock(col, row);
 }
 
 Level::BlockQuery LevelAccess::queryBlock(SDL_FPoint positionInLevel) const
 {
+	if (!actual)return Level::BlockQuery();
+
 	return actual->queryBlock(positionInLevel);
 }
 
-std::vector<Level::BlockQuery> ssge::LevelAccess::queryBlocksUnderCollider(SDL_FRect collider) const
+std::vector<Level::BlockQuery> LevelAccess::queryBlocksUnderCollider(
+	SDL_FRect collider) const
 {
+	if (!actual)return std::vector<Level::BlockQuery>();
+
 	return actual->queryBlocksUnderCollider(collider);
 }
 
-Level::SweepHit LevelAccess::sweepHorizontal(const SDL_FRect& rect, float dx) const
+Level::SweepHit LevelAccess::sweepHorizontal(
+	const SDL_FRect& rect,
+	float dx) const
 {
+	if (!actual)return Level::SweepHit();
+
 	return actual->sweepHorizontal(rect, dx);
 }
 
-Level::SweepHit LevelAccess::sweepVertical(const SDL_FRect& rect, float dy) const
+Level::SweepHit LevelAccess::sweepVertical(
+	const SDL_FRect& rect,
+	float dy) const
 {
+	if (!actual)return Level::SweepHit();
+
 	return actual->sweepVertical(rect, dy);
 }
 
 bool LevelAccess::rectInWater(const SDL_FRect& r) const
 {
+	if (!actual)return false;
+
 	return actual->rectInWater(r);
 }
 
-EntityReference ssge::EntitiesAccess::addEntity(std::string entityID)
+// EntitiesAccess
+
+EntityReference EntitiesAccess::addEntity(std::string entityID)
 {
-	return actual->addEntity(gameEntities.createEntity(PassKey<EntitiesAccess>(), entityID));
+	if (!actual) return EntityReference();
+
+	return actual->addEntity(
+		gameEntities.createEntity(PassKey<EntitiesAccess>(), entityID)
+	);
 }
 
-const ssge::Sprite::Definition* ssge::SpritesAccess::fetchDefinition(std::string sprdefId)
+// SpritesAccess
+
+const Sprite::Definition* SpritesAccess::fetchDefinition(std::string sprdefId)
 {
 	return actual.fetchDefinition(sprdefId);
 }
 
-std::unique_ptr<ssge::Sprite> ssge::SpritesAccess::create(std::string sprdefId)
+std::unique_ptr<Sprite> SpritesAccess::create(std::string sprdefId)
 {
 	auto sprdef = fetchDefinition(sprdefId);
 	if (sprdef)
-		return std::make_unique<ssge::Sprite>(*sprdef);
+		return std::make_unique<Sprite>(*sprdef);
 	else return nullptr;
 }
 
-bool ssge::MenusAccess::isOpen() const
+// MenusAccess
+
+bool MenusAccess::isOpen() const
 {
 	if (!actual)return false;
 
 	return actual->isOpen();
 }
 
-void ssge::MenusAccess::setMenu(MenuHeader& menuHeader)
+void MenusAccess::setMenu(MenuHeader& menuHeader)
 {
 	setMenu(&menuHeader);
 }
 
-void ssge::MenusAccess::setMenu(MenuHeader* menuHeader)
+void MenusAccess::setMenu(MenuHeader* menuHeader)
 {
-	if (!actual) return;
-
-	actual->setMenu(menuHeader);
+	if (actual)
+		actual->setMenu(menuHeader);
 }
 
-void ssge::MenusAccess::abruptMenu(MenuHeader& menuHeader)
+void MenusAccess::abruptMenu(MenuHeader& menuHeader)
 {
 	abruptMenu(&menuHeader);
 }
 
-void ssge::MenusAccess::abruptMenu(MenuHeader* menuHeader)
+void MenusAccess::abruptMenu(MenuHeader* menuHeader)
 {
 	if (!actual) return;
 
@@ -487,27 +566,20 @@ void ssge::MenusAccess::abruptMenu(MenuHeader* menuHeader)
 	}
 }
 
-void ssge::MenusAccess::openMainMenu()
-{
-	//TODO: Wire up IGameMenus
-}
-
-void ssge::MenusAccess::openPauseMenu()
-{
-	//actual->pushMenu(2);
-}
-
-void ssge::MenusAccess::close()
+void MenusAccess::close()
 {
 	actual->close();
 }
 
-void ssge::GameWorldAccess::reportHeroDeadth()
+// GameWorldAccess
+
+void GameWorldAccess::reportHeroDeadth()
 {
-	if(currentGameWorld) currentGameWorld->reportHeroDeadth();
+	if (currentGameWorld)
+		currentGameWorld->reportHeroDeadth();
 }
 
-MenuCommandEx ssge::GameAccess::onHavingBackedOutOfMenus(PassKey<MenuManager> pk, MenuContext& context)
+MenuCommandEx GameAccess::onHavingBackedOutOfMenus(PassKey<MenuManager> pk, MenuContext& context)
 {
 	return actual.onHavingBackedOutOfMenus(PassKey<GameAccess>(), context);
 }
