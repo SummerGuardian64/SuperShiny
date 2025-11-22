@@ -33,13 +33,13 @@
 			</Target>
 		</Build>
 		<Compiler>
-			<Add option="-Wall" />
 			<Add option="-m32" />
 			<Add option="-std=gnu++17 -DWINVER=0x0501 -DWIN32_WINNT=0x0501 -DNOMINMAX" />
-			<Add directory="E:/Dev/SDL2-devel-2.32.10-mingw/SDL2-2.32.10/i686-w64-mingw32/include/SDL2" />
-			<Add directory="E:/Dev/SDL2_image-devel-2.8.8-mingw/SDL2_image-2.8.8/i686-w64-mingw32/include/SDL2" />
-			<Add directory="E:/Dev/SDL2_ttf-devel-2.24.0-mingw/SDL2_ttf-2.24.0/i686-w64-mingw32/include/SDL2" />
-			<Add directory="E:/Dev/SDL2_mixer-devel-2.8.1-mingw/SDL2_mixer-2.8.1/i686-w64-mingw32/include/SDL2" />
+			<Add option="-Wall -Wextra -Wno-unused-value -Wno-reorder -Wno-missing-field-initializers -Wno-unknown-pragmas -Wno-unused-variable -Wno-unused-parameter -Wno-switch -Wuninitialized -Wduplicated-cond -Wduplicated-branches" />
+			<Add directory="$(#sdl2)/include/SDL2" />
+			<Add directory="$(#sdl2_image)/include/SDL2" />
+			<Add directory="$(#sdl2_ttf)/include/SDL2" />
+			<Add directory="$(#sdl2_mixer)/include/SDL2" />
 		</Compiler>
 		<ResourceCompiler>
 			<Add directory="Resource" />
