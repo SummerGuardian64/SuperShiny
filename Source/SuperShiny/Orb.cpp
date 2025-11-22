@@ -12,7 +12,7 @@ Orb::Orb()
     physics = std::make_unique<ssge::Entity::Physics>(*this);
     control = std::make_unique<ssge::Entity::Control>(*this);
 
-    control->mode = ssge::Entity::Control::Mode::NPC;
+    control->setMode(Entity::Control::Mode::NPC);
 
     position.x = 400;
     position.y = 100;

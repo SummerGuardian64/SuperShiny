@@ -42,7 +42,7 @@ Bubble::Bubble()
 {
 	physics = std::make_unique<ssge::Entity::Physics>(*this);
 	control = std::make_unique<ssge::Entity::Control>(*this);
-	control->mode = ssge::Entity::Control::Mode::NPC;
+    control->setMode(ssge::Entity::Control::Mode::NPC);
 	auto& abilities = physics->abilities;
 	using Ability = ssge::Entity::Physics::Abilities::Flag;
     abilities.set(Ability::EnablePhysics);

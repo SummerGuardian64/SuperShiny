@@ -31,33 +31,39 @@ namespace ssge
 				TOTAL
 			};
 
-		//private: //TODO: Harden later
-		public:
-			Mode mode;
-			bool ignore;
-			bool playable;
-			int playerId;
+		private:
+			Mode mode = Mode::None;
+			bool _ignore = false;
+			bool playable = false;
+			int playerId = -1;
 			//TBA: ControlAI
 
 		private:
 			InputPad pad;
 		public:
-			//TODO: Harden later. Make work now.
-			/*Mode getMode() const { return mode; };
+			Mode getMode() const { return mode; };
 			void setMode(Mode mode) {
 				if ((int)mode >= 0 || mode < Mode::TOTAL) this->mode = mode;
 			};
-			bool isIgnored() const { return ignore; };
-			bool setIgnore(bool ignore) { this->ignore = ignore; };
-			void setIgnored(bool ignored) { ignore = ignored; }
-			void ignore() { ignore = true; };
-			void restore() { ignore = false; };
+			bool isIgnored() const { return _ignore; };
+			bool ignored() const { return _ignore; };
+			bool setIgnore(bool ignore) { _ignore = ignore; };
+			void setIgnored(bool ignored) { _ignore = ignored; }
+			void ignore(bool ignore) { _ignore = ignore; };
+			void restore() { _ignore = false; };
 			bool isPlayable() const { return playable; };
 			void setPlayable(bool playable) { this->playable = playable; };
 			void makePlayable() { playable = true; };
 			void makeUnplayable() { playable = false; };
 			int getPlayerId() const { return playerId; };
-			void setPlayerId(int playerId) { this->playerId = playerId; };*/
+			void setPlayerId(int playerId) { this->playerId = playerId; };
+			void makePlayableBy(int playerId)
+			{
+				setMode(Mode::Player);
+				ignore(false);
+				makePlayable();
+				setPlayerId(playerId);
+			}
 
 			//The reason for decoupling is because maybe a player is controlling?
 			//Maybe NPC/AI logic? Maybe it's a replay or a cutscene?
@@ -87,7 +93,7 @@ namespace ssge
 			// Limits of physical movement
 			struct Abilities
 			{
-				// ---- bit flags ----
+				// Ability flags
 				enum class Flag : uint32_t {
 					None = 0u,
 					EnablePhysics = 1u << 0,
@@ -136,7 +142,7 @@ namespace ssge
 
 				// sugar getters (read nicely at callsites)
 
-				bool physicsEnabled()               const noexcept { return has(Flag::EnablePhysics); }
+				bool physicsEnabled()        const noexcept { return has(Flag::EnablePhysics); }
 				bool horzMove()              const noexcept { return has(Flag::EnableHorizontalMove); }
 				bool vertMove()              const noexcept { return has(Flag::EnableVerticalMove); }
 				bool canJump()               const noexcept { return has(Flag::EnableJump); }
@@ -144,7 +150,7 @@ namespace ssge
 				bool canSwim()               const noexcept { return has(Flag::EnableSwim); }
 				bool horzCollision()         const noexcept { return has(Flag::EnableHorizontalCollision); }
 				bool vertCollision()         const noexcept { return has(Flag::EnableVerticalCollision); }
-				bool collisionIgnored()       const noexcept { return has(Flag::IgnoreCollision); }
+				bool collisionIgnored()      const noexcept { return has(Flag::IgnoreCollision); }
 				bool horzBounce()            const noexcept { return has(Flag::EnableHorizontalBounce); }
 				bool vertBounce()            const noexcept { return has(Flag::EnableVerticalBounce); }
 				bool gmBounce()              const noexcept { return has(Flag::EnableGMBounce); }
@@ -188,7 +194,6 @@ namespace ssge
 			float getVerticalCenter() const { return hitbox.y + hitbox.h / 2.0f; }
 			SDL_FRect getBounds() const { return hitbox; }
 			SDL_FPoint getSize() const { return SDL_FPoint{ hitbox.w, hitbox.h }; }
-			float getDistance(const Entity& other) const; //TODO: Refactor with EntityReference!
 			//std::shared_ptr<Collision> collideWith(Entity& other); //TODO: May be not needed
 
 			// Current abilities

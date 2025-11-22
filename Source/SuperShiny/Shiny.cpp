@@ -156,9 +156,7 @@ Shiny::Shiny()
 	physics = std::make_unique<ssge::Entity::Physics>(*this);
     control = std::make_unique<ssge::Entity::Control>(*this);
 
-    control->mode = ssge::Entity::Control::Mode::Player;
-    control->playable = true;
-    control->playerId = 0;
+    control->makePlayableBy(0);
 
     position.x = 400;
     position.y = 100;
@@ -229,7 +227,7 @@ void Shiny::die()
     physics->velocity.y = -20;
     physics->abilities.maxSpeedUp = 20;
     physics->abilities.enable(ssge::Entity::Physics::Abilities::Flag::IgnoreCollision);
-    control->ignore = true;
+    control->ignore(false);
 }
 
 std::string Shiny::getEntityClassID() const

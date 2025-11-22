@@ -16,12 +16,6 @@ SDL_FPoint Entity::Physics::setVelocityMagnitude(const SDL_FPoint& v, float spee
 	return SDL_FPoint();
 }
 
-float Entity::Physics::getDistance(const Entity& other) const
-{
-	//FIXME: UNIMPLEMENTED!
-	return 0.0f;
-}
-
 Entity::Physics::Physics(Entity& entity)
 	: entity(entity),
 	  position(entity.position),
@@ -453,10 +447,7 @@ void Entity::step(EntityStepContext& context)
 	}
 
 	// Increment lifespan
-	//FIXME: THIS NEEDS REFINEMENT!
 	lifespan++;
-
-	//std::cout << "Entity " << (void*)this << " has been there for " << lifespan << std::endl;
 }
 
 void Entity::draw(DrawContext context) const
@@ -477,12 +468,7 @@ void Entity::destroy()
 }
 
 Entity::Control::Control(Entity& entity) : entity(entity)
-{
-	mode = Mode::None;
-	ignore = false;
-	playable = false;
-	playerId = -1;
-}
+{}
 
 ssge::Entity::Control* ssge::Entity::getControl()
 {
@@ -507,7 +493,7 @@ void ssge::Entity::Control::latch(EntityStepContext& context)
 {
     uint32_t directButtons = 0;
 
-    if (!ignore)
+    if (!ignored())
     {
         switch (mode)
         {
