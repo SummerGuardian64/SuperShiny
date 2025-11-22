@@ -147,7 +147,7 @@ std::string MenuItem::getText() const
 	return text;
 }
 
-int MenuItem::execute(int direction)
+int MenuItem::execute(MenuContext& context, int direction)
 {
 	// The item has to be selectable, enabled and visible in order to be executed
 	if ((selectable && enabled && visible) == false)
@@ -164,7 +164,7 @@ int MenuItem::execute(int direction)
 	// If onSelect function is set, run it
 	if (onSelect)
 	{
-		(*onSelect)(direction);
+		onSelect(context, direction);
 	}
 
     // Change a setting if any exists
@@ -250,28 +250,28 @@ MenuItem* MenuHeader::newLabel(const char* text)
 MenuItem* MenuHeader::newItem(const char* text, MenuFunction onSelect)
 {
 	auto item = new MenuItem(text, true, true, true, MenuCommand::NOTHING, NULL, false, NULL, onSelect);
-	items.push_back(item);
+    items.push_back(item);
 	return item;
 }
 
 MenuItem* MenuHeader::newItem_NewGame(const char* text, MenuFunction onSelect)
 {
 	auto item = new MenuItem(text, true, true, true, MenuCommand::NEW_GAME);
-	items.push_back(item);
+    items.push_back(item);
 	return item;
 }
 
 MenuItem* MenuHeader::newItem_RestartLevel(const char* text, MenuFunction onSelect)
 {
 	auto item = new MenuItem(text, true, true, true, MenuCommand::RESTART_LEVEL);
-	items.push_back(item);
+    items.push_back(item);
 	return item;
 }
 
 MenuItem* MenuHeader::newItem_SubMenu(const char* text, MenuHeader* targetMenu, MenuFunction onSelect)
 {
 	auto item = new MenuItem(text, true, true, true, MenuCommand::SUB_MENU, targetMenu, false, NULL, onSelect);
-	items.push_back(item);
+    items.push_back(item);
 	return item;
 }
 
@@ -285,7 +285,7 @@ MenuItem* MenuHeader::newItem_SetMenu(const char* text, MenuHeader* targetMenu, 
 MenuItem* MenuHeader::newItem_GoBack(const char* text, MenuFunction onSelect)
 {
 	auto item = new MenuItem(text, true, true, true, MenuCommand::GO_BACK, NULL, false, NULL, onSelect);
-	items.push_back(item);
+    items.push_back(item);
 	return item;
 }
 
@@ -299,21 +299,21 @@ MenuItem* MenuHeader::newItem_SaveAndBack(const char* text, MenuFunction onSelec
 MenuItem* MenuHeader::newItem_NextLevel(const char* text)
 {
 	auto item = new MenuItem(text, true, true, true, MenuCommand::NEXT_LEVEL);
-	items.push_back(item);
+    items.push_back(item);
 	return item;
 }
 
 MenuItem* MenuHeader::newItem_MainMenu(const char* text, MenuFunction onSelect)
 {
 	auto item = new MenuItem(text, true, true, true, MenuCommand::MAIN_MENU, NULL, false, NULL, onSelect);
-	items.push_back(item);
+    items.push_back(item);
 	return item;
 }
 
 MenuItem* MenuHeader::newItem_IntSetting(const char* text, int* setting, int min, int max, MenuCommand command, MenuFunction onSelect)
 {
 	auto item = new MenuItem(text, true, true, true, command, NULL, true, new MenuSettingInt(setting, min, max), onSelect);
-	items.push_back(item);
+    items.push_back(item);
 	return item;
 }
 
@@ -341,14 +341,14 @@ MenuItem* ssge::MenuHeader::newItem_InputBinding(const char* bindingName, int bi
 MenuItem* MenuHeader::newItem_CloseMenu(const char* text, MenuFunction onSelect)
 {
 	auto item = new MenuItem(text, true, true, true, MenuCommand::CLOSE_MENU);
-	items.push_back(item);
+    items.push_back(item);
 	return item;
 }
 
 MenuItem* MenuHeader::newItem_ExitProgram(const char* text, MenuFunction onSelect)
 {
 	auto item = new MenuItem(text, true, true, true, MenuCommand::EXIT_PROGRAM);
-	items.push_back(item);
+    items.push_back(item);
 	return item;
 }
 
@@ -358,7 +358,14 @@ MenuHeader::MenuHeader(const char* title)
 	:title(title)
 {}
 
-MenuHeader::~MenuHeader() {}
+MenuHeader::~MenuHeader()
+{
+    for (auto& item : items)
+    {
+        delete item;
+    }
+    items.clear();
+}
 
 // Draw a UTF-8 string centered at xCenter,y with an optional shadow.
 // Returns the drawn text width/height via outW/outH (nullable).
@@ -578,7 +585,7 @@ void MenuManager::step(MenuContext& context)
         {
             if (currentMenuItem->isRightLeftable())
             { // If the item supports left/right controls, execute its function.
-                returnedCommand = currentMenuItem->execute(-1);
+                returnedCommand = currentMenuItem->execute(context, -1);
             }
         }
     }
@@ -589,7 +596,7 @@ void MenuManager::step(MenuContext& context)
         {
             if (currentMenuItem->isRightLeftable())
             { // If the item supports left/right controls, execute its function.
-                returnedCommand = currentMenuItem->execute(1);
+                returnedCommand = currentMenuItem->execute(context, 1);
             }
         }
     }
@@ -599,7 +606,7 @@ void MenuManager::step(MenuContext& context)
         {
             if (currentMenuItem->isEnabled())
             { // If the item is enabled, execute its function.
-                returnedCommand = currentMenuItem->execute(0);
+                returnedCommand = currentMenuItem->execute(context, 0);
             }
         }
     }

@@ -179,7 +179,7 @@ public: //TODO: Encapsulate
 
     public:
         void init(SuperShiny::Config& config);
-        static void refreshHighScoreMenu(int direction);
+        void refreshHighScoreMenu(ssge::MenuContext& context, int direction);
     };
 
     Menus menus;

@@ -532,6 +532,12 @@ void SuperShiny::Menus::init(SuperShiny::Config& config)
 	friendlyReminderReset.setTitle("Friendly reminder");
 	friendlyReminderExit.setTitle("Friendly reminder");
 
+	// This lambda serves to call refreshHighScoreMenu non-statically
+	auto highScoreLambda = [this](ssge::MenuContext& context, int direction)
+		{
+			refreshHighScoreMenu(context, direction);
+		};
+
 	// Create the exit menu header
 	confirmExitProgram.setTitle("Exit?");
 
@@ -544,7 +550,7 @@ void SuperShiny::Menus::init(SuperShiny::Config& config)
 	mainMenu.newItem("Load Game")->visible = false;
 	mainMenu.newItem_SubMenu("Level Select", &levelSelect)->visible = false;
 	mainMenu.newItem("Super Duper Secret Menu")->visible = false;
-	mainMenu.newItem_SubMenu("High Score", &highScoreMenu, (MenuFunction)refreshHighScoreMenu)->visible = false;
+	mainMenu.newItem_SubMenu("High Score", &highScoreMenu, highScoreLambda)->visible = false;
 	mainMenu.newItem_SubMenu("Options", &optionsMenu);
 	mainMenu.newItem_SubMenu("Credits", &creditsMenu);
 	mainMenu.newItem_SubMenu("Exit", &confirmExitProgram);
@@ -636,12 +642,10 @@ void SuperShiny::Menus::init(SuperShiny::Config& config)
 	}
 	optionsMenu.newItem_SaveAndBack("Save & Back");
 
-	//confirmRestart.newLabel("Restarting a level will discard unsaved score!");
 	confirmRestart.newLabel("Are you sure you want to restart this level?");
 	confirmRestart.newItem_RestartLevel("Yes");
 	confirmRestart.newItem_GoBack("No");
 
-	//confirmExitGame.newLabel("Exiting the game will discard unsaved score!");
 	confirmExitGame.newLabel("Are you sure you want to return to the main menu?");
 	confirmExitGame.newItem_MainMenu("Yes");
 	confirmExitGame.newItem_GoBack("No");
@@ -662,7 +666,7 @@ void SuperShiny::Menus::init(SuperShiny::Config& config)
 	pauseMenu.setTitle("Pause");
 	pauseMenu.newItem_CloseMenu("Resume");
 	pauseMenu.newItem_SubMenu("Restart Level", &confirmRestart);
-	pauseMenu.newItem_SubMenu("High Score", &highScoreMenu, (MenuFunction)&refreshHighScoreMenu)->visible = false;
+	pauseMenu.newItem_SubMenu("High Score", &highScoreMenu, highScoreLambda)->visible = false;
 	pauseMenu.newItem_SubMenu("Options", &optionsMenu);
 	pauseMenu.newItem_SubMenu("Go To Main Menu", &confirmExitGame);
 
@@ -671,7 +675,7 @@ void SuperShiny::Menus::init(SuperShiny::Config& config)
 
 	// Compose the game over menu
 	gameOverMenu.setTitle("Game Over");
-	gameOverMenu.newItem_SubMenu("High Score", &highScoreMenu, (MenuFunction)&refreshHighScoreMenu);
+	gameOverMenu.newItem_SubMenu("High Score", &highScoreMenu, highScoreLambda);
 	gameOverMenu.newItem_RestartLevel("Try Again");
 	gameOverMenu.newItem_NewGame("Start Over");
 	gameOverMenu.newItem_SubMenu("Options", &optionsMenu);
@@ -680,7 +684,7 @@ void SuperShiny::Menus::init(SuperShiny::Config& config)
 	// Compose the level completion menu
 	levelCompleteMenu.setTitle("Level Complete!");
 	levelCompleteMenu.newItem_NextLevel("Next Level");
-	levelCompleteMenu.newItem_SubMenu("High Score", &highScoreMenu, (MenuFunction)&refreshHighScoreMenu);
+	levelCompleteMenu.newItem_SubMenu("High Score", &highScoreMenu, highScoreLambda);
 	levelCompleteMenu.newItem_SubMenu("Options", &optionsMenu);
 	levelCompleteMenu.newItem_SubMenu("Go To Main Menu", &confirmExitGame);
 
@@ -703,8 +707,29 @@ void SuperShiny::Menus::init(SuperShiny::Config& config)
 	friendlyReminderExit.newItem_GoBack("Uh oh, you're right. Go back!");
 }
 
-void SuperShiny::Menus::refreshHighScoreMenu(int direction)
-{
+void SuperShiny::Menus::refreshHighScoreMenu(ssge::MenuContext& context, int direction)
+{ // Refreshes the high score menu with the latest score results (Breakenzi port)
+	highScoreMenu.items.clear(); // Reset the menu
+
+	// TODO: Actual scoreboard
+	for (int i = 0; i < 10; i++)
+	{ // Each contestant's line shall consist of 23 characters
+		char fullstr_contestant[24] = { 0 };
+		// Format: " 1. 4294967295 MAXIMUS1"
+		auto contestant_number = i + 1;
+		auto contestant_name = "SUMMER";
+		auto contestant_score = (10 - i) * 1000;
+		sprintf_s(fullstr_contestant, "%2d. %10d %-8s", contestant_number, contestant_score, contestant_name);
+		// Append this line
+		highScoreMenu.newLabel(fullstr_contestant);
+	}
+
+	// TODO: Implement
+
+	// Enable the player to enter their score if they've qualified
+	highScoreMenu.newItem("Register My Score!"/*, (MenuFunction)activateScoreInput*/)->visible = false;
+	// Add a menu item to navigate back
+	highScoreMenu.newItem_GoBack("Back");
 }
 
 bool SuperShiny::Config::load(ssge::IniFile& iniFile)

@@ -4,6 +4,7 @@
 #include <stack>
 #include "SDL.h"
 #include "PassKey.h"
+#include <functional>
 
 namespace ssge
 {
@@ -15,7 +16,7 @@ namespace ssge
     class MenuHeader;
     class MenuItem;
     class MenuCommand;
-    typedef void (*MenuFunction)(int direction);
+    using MenuFunction = std::function<void(MenuContext&, int)>;
     class MenuSetting;
 
     class MenuCommand
@@ -109,7 +110,7 @@ namespace ssge
         MenuFunction onSelect;
         MenuHeader* targetMenu;
         MenuSetting* setting;
-        int execute(int direction);
+        int execute(MenuContext& context, int direction);
         bool isSelectable() const;
         bool isEnabled() const;
         bool isRightLeftable() const;
@@ -126,6 +127,8 @@ namespace ssge
             MenuSetting* setting = NULL,
             MenuFunction on_select = NULL
         );
+        MenuItem(const MenuItem& toCopy) = default;
+        MenuItem(MenuItem&& toMove) = default;
         ~MenuItem();
     };
 
