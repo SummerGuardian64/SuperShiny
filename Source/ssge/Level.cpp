@@ -869,7 +869,7 @@ namespace ssge
 			auto colonIndex = blockItemValue.find(':');
 			auto endOfNumber = blockItemValue.find('@');
 			std::string numberSubstring;
-			if (endOfNumber == -1)
+			if (endOfNumber == std::string::npos)
 			{
 				numberSubstring = blockItemValue.substr(colonIndex + 1);
 			}
@@ -891,7 +891,7 @@ namespace ssge
 		try
 		{
 			auto monkeyIndex = blockItemValue.find('@');
-			if (monkeyIndex == -1)
+			if (monkeyIndex == std::string::npos)
 			{
 				// No callback here
 				return "";
