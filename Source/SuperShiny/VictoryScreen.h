@@ -3,14 +3,16 @@
 #include "SDL.h"
 #include "../ssge/SdlTexture.h"
 
-class VictoryScreen : public ssge::Scene
+using namespace ssge;
+
+class VictoryScreen : public Scene
 {
 	SdlTexture background;
 	// Inherited via Scene
 	std::string getSceneClassID() const override;
-	void init(ssge::SceneStepContext& context) override;
-	void step(ssge::SceneStepContext& context) override;
-	void draw(ssge::DrawContext& context) override;
+	void init(SceneStepContext& context) override;
+	void step(SceneStepContext& context) override;
+	void draw(DrawContext& context) override;
 public:
 	VictoryScreen();
 	~VictoryScreen();

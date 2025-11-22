@@ -19,13 +19,13 @@ VictoryScreen::~VictoryScreen()
 {
 }
 
-void VictoryScreen::init(ssge::SceneStepContext& context)
+void VictoryScreen::init(SceneStepContext& context)
 {
 	background = SdlTexture("Backgrounds/Victory.png", context.drawing.getRenderer());
 	context.audio.playMusicIfNotPlaying("Music/Victory.ogg",1);
 }
 
-void VictoryScreen::step(ssge::SceneStepContext& context)
+void VictoryScreen::step(SceneStepContext& context)
 {
 	if(!context.audio.isMusicPlaying("Music/Victory.ogg"))
     {
@@ -33,7 +33,7 @@ void VictoryScreen::step(ssge::SceneStepContext& context)
     }
 }
 
-void VictoryScreen::draw(ssge::DrawContext& context)
+void VictoryScreen::draw(DrawContext& context)
 {
 	SDL_Renderer* renderer = context.getRenderer();
 	SDL_Rect screenRect = context.getBounds();

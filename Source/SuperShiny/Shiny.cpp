@@ -7,9 +7,6 @@
 #include "../ssge/Utilities.h"
 #include "SDL.h"
 
-using ssge::sign;
-using ssge::Level;
-
 void Shiny::startBubbling()
 {
     if (!bubbling)
@@ -31,7 +28,7 @@ void Shiny::quitBubbling()
     }
 }
 
-void Shiny::animate(ssge::EntityStepContext& context)
+void Shiny::animate(EntityStepContext& context)
 {
     if (sprite && physics)
     {
@@ -98,9 +95,9 @@ void Shiny::animate(ssge::EntityStepContext& context)
     }
 }
 
-ssge::Entity::Physics::Abilities Shiny::makeRegularAbilities() const
+Entity::Physics::Abilities Shiny::makeRegularAbilities() const
 {
-    using Abilities = ssge::Entity::Physics::Abilities;
+    using Abilities = Entity::Physics::Abilities;
     using Ability = Abilities::Flag;
     Abilities abilities;
     abilities.set(Ability::EnablePhysics);
@@ -124,9 +121,9 @@ ssge::Entity::Physics::Abilities Shiny::makeRegularAbilities() const
     return abilities;
 }
 
-ssge::Entity::Physics::Abilities Shiny::makeBubblingAbilities() const
+Entity::Physics::Abilities Shiny::makeBubblingAbilities() const
 {
-    using Abilities = ssge::Entity::Physics::Abilities;
+    using Abilities = Entity::Physics::Abilities;
     using Ability = Abilities::Flag;
     Abilities abilities;
     abilities.set(Ability::EnablePhysics);
@@ -153,8 +150,8 @@ ssge::Entity::Physics::Abilities Shiny::makeBubblingAbilities() const
 Shiny::Shiny()
 {
 	//sprite = std::make_unique<Sprite>(Game::Sprites::shiny());
-	physics = std::make_unique<ssge::Entity::Physics>(*this);
-    control = std::make_unique<ssge::Entity::Control>(*this);
+	physics = std::make_unique<Entity::Physics>(*this);
+    control = std::make_unique<Entity::Control>(*this);
 
     control->makePlayableBy(0);
 
@@ -226,8 +223,8 @@ void Shiny::die()
     physics->velocity.x = 0;
     physics->velocity.y = -20;
     physics->abilities.maxSpeedUp = 20;
-    physics->abilities.enable(ssge::Entity::Physics::Abilities::Flag::IgnoreCollision);
-    control->ignore(false);
+    physics->abilities.enable(Entity::Physics::Abilities::Flag::IgnoreCollision);
+    control->ignore();
 }
 
 std::string Shiny::getEntityClassID() const
@@ -235,19 +232,19 @@ std::string Shiny::getEntityClassID() const
 	return "Shiny";
 }
 
-void Shiny::firstStep(ssge::EntityStepContext& context)
+void Shiny::firstStep(EntityStepContext& context)
 {
     sprite = context.sprites.create("Shiny");
 	//std::cout << "Helloy!" << std::endl;
 }
 
-void Shiny::preStep(ssge::EntityStepContext& context)
+void Shiny::preStep(EntityStepContext& context)
 {
 	//std::cout << "scale.. ";
 
     if (auto ctrl = control.get())
     {
-        ssge::InputPad pad = ctrl->getPad();
+        InputPad pad = ctrl->getPad();
 
         /*if (pad.isJustPressed(6))
         {
@@ -389,7 +386,7 @@ void Shiny::preStep(ssge::EntityStepContext& context)
     }
 }
 
-void Shiny::postStep(ssge::EntityStepContext& context)
+void Shiny::postStep(EntityStepContext& context)
 {
     bool amIDeadYet = false;
     float tipOfTheHead = position.y + hitbox.y;
@@ -525,8 +522,8 @@ void Shiny::postStep(ssge::EntityStepContext& context)
                             }
                         }
 
-                        ssge::Level::Block::Coords destroyBlockCoords{destroyBlockX,destroyBlockY};
-                        ssge::Level::Block* destroyBlockPtr = context.level.getBlockAt(destroyBlockCoords);
+                        Level::Block::Coords destroyBlockCoords{destroyBlockX,destroyBlockY};
+                        Level::Block* destroyBlockPtr = context.level.getBlockAt(destroyBlockCoords);
 
                         if(destroyBlockPtr)
                         {
@@ -682,15 +679,15 @@ int Shiny::makeBoxNumber(std::string callback) const
     }
 }
 
-void Shiny::preDraw(ssge::DrawContext& context) const
+void Shiny::preDraw(DrawContext& context) const
 {
 }
 
-void Shiny::postDraw(ssge::DrawContext& context) const
+void Shiny::postDraw(DrawContext& context) const
 {
 }
 
-void Shiny::onDestroy(ssge::EntityStepContext& context)
+void Shiny::onDestroy(EntityStepContext& context)
 {
 	//std::cout << "Scalefloof go poof!" << std::endl;
 }

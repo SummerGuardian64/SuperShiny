@@ -40,11 +40,11 @@ void Bubble::animate()
 
 Bubble::Bubble()
 {
-	physics = std::make_unique<ssge::Entity::Physics>(*this);
-	control = std::make_unique<ssge::Entity::Control>(*this);
-    control->setMode(ssge::Entity::Control::Mode::NPC);
+	physics = std::make_unique<Entity::Physics>(*this);
+	control = std::make_unique<Entity::Control>(*this);
+    control->setMode(Entity::Control::Mode::NPC);
 	auto& abilities = physics->abilities;
-	using Ability = ssge::Entity::Physics::Abilities::Flag;
+	using Ability = Entity::Physics::Abilities::Flag;
     abilities.set(Ability::EnablePhysics);
 	abilities.set(Ability::EnableHorizontalCollision);
 	abilities.set(Ability::EnableVerticalCollision);
@@ -62,16 +62,16 @@ std::string Bubble::getEntityClassID() const
 	return "Bubble";
 }
 
-void Bubble::firstStep(ssge::EntityStepContext& context)
+void Bubble::firstStep(EntityStepContext& context)
 {
 	sprite = context.sprites.create("Bubble");
 }
 
-void Bubble::preStep(ssge::EntityStepContext& context)
+void Bubble::preStep(EntityStepContext& context)
 {
 }
 
-void Bubble::postStep(ssge::EntityStepContext& context)
+void Bubble::postStep(EntityStepContext& context)
 {
     if (physics)
     {
@@ -120,7 +120,7 @@ void Bubble::postStep(ssge::EntityStepContext& context)
                     {
                         auto* block = context.level.getBlockAt(collision.coords);
 
-                        using Collision = ssge::Level::Block::Collision;
+                        using Collision = Level::Block::Collision;
 
                         switch (collision.coll)
                         {
@@ -186,14 +186,14 @@ void Bubble::postStep(ssge::EntityStepContext& context)
     animate();
 }
 
-void Bubble::preDraw(ssge::DrawContext& context) const
+void Bubble::preDraw(DrawContext& context) const
 {
 }
 
-void Bubble::postDraw(ssge::DrawContext& context) const
+void Bubble::postDraw(DrawContext& context) const
 {
 }
 
-void Bubble::onDestroy(ssge::EntityStepContext& context)
+void Bubble::onDestroy(EntityStepContext& context)
 {
 }

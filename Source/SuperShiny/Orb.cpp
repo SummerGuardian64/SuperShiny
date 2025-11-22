@@ -4,13 +4,11 @@
 #include <iostream>
 #include <memory>
 
-using namespace ssge;
-
 Orb::Orb()
 {
     //sprite = std::make_unique<Sprite>(Game::Sprites::orb());
-    physics = std::make_unique<ssge::Entity::Physics>(*this);
-    control = std::make_unique<ssge::Entity::Control>(*this);
+    physics = std::make_unique<Entity::Physics>(*this);
+    control = std::make_unique<Entity::Control>(*this);
 
     control->setMode(Entity::Control::Mode::NPC);
 
@@ -19,7 +17,7 @@ Orb::Orb()
 
     physics->velocity.x = 4;
 
-    using Ability = ssge::Entity::Physics::Abilities::Flag;
+    using Ability = Entity::Physics::Abilities::Flag;
     auto& abilities = physics->abilities;
     abilities.set(Ability::EnablePhysics);
     abilities.set(Ability::EnableHorizontalBounce);
@@ -90,17 +88,17 @@ std::string Orb::getEntityClassID() const
     return "Orb";
 }
 
-void Orb::firstStep(ssge::EntityStepContext& context)
+void Orb::firstStep(EntityStepContext& context)
 {
     sprite = context.sprites.create("Orb");
     //std::cout << "BORB!" << std::endl;
 }
 
-void Orb::preStep(ssge::EntityStepContext& context)
+void Orb::preStep(EntityStepContext& context)
 {
 }
 
-void Orb::postStep(ssge::EntityStepContext& context)
+void Orb::postStep(EntityStepContext& context)
 {
     bool shouldWeBounce = false;
 
@@ -120,7 +118,7 @@ void Orb::postStep(ssge::EntityStepContext& context)
                 for (auto& collision : allCollisions)
                 {
                     auto* block = context.level.getBlockAt(collision.coords);
-                    if(collision.coll == ssge::Level::Block::Collision::Hazard)
+                    if(collision.coll == Level::Block::Collision::Hazard)
                     {
                         shouldWeBounce = true;
                         block->type = 0;
@@ -137,14 +135,14 @@ void Orb::postStep(ssge::EntityStepContext& context)
     }
 }
 
-void Orb::preDraw(ssge::DrawContext& context) const
+void Orb::preDraw(DrawContext& context) const
 {
 }
 
-void Orb::postDraw(ssge::DrawContext& context) const
+void Orb::postDraw(DrawContext& context) const
 {
 }
 
-void Orb::onDestroy(ssge::EntityStepContext& context)
+void Orb::onDestroy(EntityStepContext& context)
 {
 }

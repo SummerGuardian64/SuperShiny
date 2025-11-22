@@ -2,15 +2,17 @@
 #include "../ssge/Scene.h"
 #include "../ssge/SdlTexture.h"
 
-class TitleScreen : public ssge::Scene
+using namespace ssge;
+
+class TitleScreen : public Scene
 {
 	SdlTexture background;
 
 	// Inherited via Scene
 	std::string getSceneClassID() const override;
-	void init(ssge::SceneStepContext& context) override;
-	void step(ssge::SceneStepContext& context) override;
-	void draw(ssge::DrawContext& context) override;
+	void init(SceneStepContext& context) override;
+	void step(SceneStepContext& context) override;
+	void draw(DrawContext& context) override;
 public:
 	TitleScreen();
 	~TitleScreen();

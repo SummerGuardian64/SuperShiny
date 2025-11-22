@@ -4,11 +4,13 @@
 #include "../ssge/MenuSystem.h"
 #include "../ssge/IniFile.h"
 
-class Scene;
-class ScenesAccess;
-class Entity;
-class EntitiesAccess;
-class MenuHeader;
+using namespace ssge;
+
+class ssge::Scene;
+class ssge::ScenesAccess;
+class ssge::Entity;
+class ssge::EntitiesAccess;
+class ssge::MenuHeader;
 
 // GAMEDEV: Please forward-declare your scenes here
 
@@ -22,9 +24,9 @@ class Shiny;
 class Orb;
 class Bubble;
 
-// GAMEDEV: Your game class here. It must implement ssge::IGame
+// GAMEDEV: Your game class here. It must implement IGame
 
-class SuperShiny : public ssge::IGame
+class SuperShiny : public IGame
 {
 public:
     static SuperShiny makeGame();
@@ -34,28 +36,28 @@ public:
     ~SuperShiny() = default;
 
 private:
-    void syncSettings(ssge::StepContext& context) const;
+    void syncSettings(StepContext& context) const;
     bool wannaSaveSettings = false;
     bool queriedToQuit = false;
     bool gameWasWon = false;
     bool processingGameVictory = false;
 
-    void _queryQuit(ssge::StepContext& context);
+    void _queryQuit(StepContext& context);
 
 public: //TODO: Encapsulate
     // Called once after SDL + engine subsystems are up.
-    void init(ssge::StepContext& context) override;
+    void init(StepContext& context) override;
 
     // Called every frame before SceneManager step
-    void step(ssge::StepContext& context) override;
+    void step(StepContext& context) override;
 
     // Called after everything is drawn
-    void draw(ssge::DrawContext& context) override;
+    void draw(DrawContext& context) override;
 
     // Called when it's time to clean up before SDL quits
-    void cleanUp(ssge::PassKey<ssge::Engine> pk) override;
+    void cleanUp(PassKey<Engine> pk) override;
 
-    bool saveSettings(ssge::StepContext& context) override;
+    bool saveSettings(StepContext& context) override;
 
     // The game will save the settings later, don't worry
     void saveSettings() override;
@@ -74,13 +76,13 @@ public: //TODO: Encapsulate
 
     int getVirtualHeight() override;
 
-    ssge::MenuCommandEx onHavingBackedOutOfMenus(ssge::PassKey<ssge::GameAccess> pk, ssge::MenuContext& context) override;
+    MenuCommandEx onHavingBackedOutOfMenus(PassKey<GameAccess> pk, MenuContext& context) override;
 
     // Scenes
-    class Scenes : public ssge::IGameScenes
+    class Scenes : public IGameScenes
     {
     public: //TODO: Encapsulate
-        Scenes(ssge::PassKey<SuperShiny> pk);
+        Scenes(PassKey<SuperShiny> pk);
         Scenes(const Scenes& toCopy) = delete;
         Scenes(Scenes&& toMove) = delete;
         ~Scenes() = default;
@@ -92,15 +94,15 @@ public: //TODO: Encapsulate
         static std::unique_ptr<TitleScreen> titleScreen();
         static std::unique_ptr<VictoryScreen> victoryScreen();
 
-        std::unique_ptr<ssge::Scene> createScene(ssge::PassKey<ssge::ScenesAccess> pk, std::string id) override;
+        std::unique_ptr<Scene> createScene(PassKey<ScenesAccess> pk, std::string id) override;
         std::string getMainMenuSceneClassID() const override;
     };
 
     Scenes scenes;
-    ssge::IGameScenes& getScenes(ssge::PassKey<ssge::ScenesAccess> pk) override;
+    IGameScenes& getScenes(PassKey<ScenesAccess> pk) override;
 
     // Entities
-    class Entities : public ssge::IGameEntities
+    class Entities : public IGameEntities
     {
         // GAMEDEV: Create methods that create your Entities
         // Example: static std::shared_ptr<YourEntityClass> yourEntityClass();
@@ -110,76 +112,76 @@ public: //TODO: Encapsulate
         std::shared_ptr<Bubble> bubble();
 
     public: //TODO: Encapsulate
-        Entities(ssge::PassKey<SuperShiny> pk);
+        Entities(PassKey<SuperShiny> pk);
         Entities(const Entities& toCopy) = delete;
         Entities(Entities&& toMove) = delete;
         ~Entities() = default;
 
 
     public:
-        std::shared_ptr<ssge::Entity> createEntity(ssge::PassKey<ssge::EntitiesAccess> pk, std::string id) override;
+        std::shared_ptr<Entity> createEntity(PassKey<EntitiesAccess> pk, std::string id) override;
     };
 
     Entities entities;
-    ssge::IGameEntities& getEntities(ssge::PassKey<ssge::EntitiesAccess> pk) override;
+    IGameEntities& getEntities(PassKey<EntitiesAccess> pk) override;
 
     // Sprites
-    class Sprites : public ssge::IGameSprites
+    class Sprites : public IGameSprites
     {
-        ssge::Sprite::Definition sprdefShiny;
-        ssge::Sprite::Definition sprdefOrb;
-        ssge::Sprite::Definition sprdefBubble;
+        Sprite::Definition sprdefShiny;
+        Sprite::Definition sprdefOrb;
+        Sprite::Definition sprdefBubble;
 
     public: //TODO: Encapsulate
-        Sprites(ssge::PassKey<SuperShiny> pk);
+        Sprites(PassKey<SuperShiny> pk);
         Sprites(const Sprites& toCopy) = delete;
         Sprites(Sprites&& toMove) = delete;
         ~Sprites() = default;
 
         bool load(std::string sprdefId, SDL_Renderer* renderer) override;
         void unload(std::string sprdefId) override;
-        const ssge::Sprite::Definition* fetchDefinition(const std::string& sprdefId) override;
+        const Sprite::Definition* fetchDefinition(const std::string& sprdefId) override;
     private:
-        ssge::Sprite::Definition* fetchDefinitionNonConst(std::string sprdefId);
+        Sprite::Definition* fetchDefinitionNonConst(std::string sprdefId);
     };
 
     Sprites sprites;
-    ssge::IGameSprites& getSprites() override;
+    IGameSprites& getSprites() override;
 
     class Config;
 
     class Menus
     {
         friend class SuperShiny;
-        ssge::MenuHeader mainMenu;
-        ssge::MenuHeader pauseMenu;
-        ssge::MenuHeader joypadUnpluggedMenu;
-        ssge::MenuHeader gameOverMenu;
-        ssge::MenuHeader levelCompleteMenu;
-        ssge::MenuHeader victoryMenu;
-        ssge::MenuHeader highScoreMenu;
-        ssge::MenuHeader confirmExitProgram;
-        ssge::MenuHeader creditsMenu;
-        ssge::MenuHeader creditsMenu2;
-        ssge::MenuHeader creditsMenu3;
-        ssge::MenuHeader creditsMenu4;
-        ssge::MenuHeader creditsMenu5;
-        ssge::MenuHeader optionsMenu;
-        ssge::MenuHeader inputConfigMenu;
-        ssge::MenuHeader volumeControlMenu;
-        ssge::MenuHeader displaySettingsMenu;
-        ssge::MenuHeader confirmRestart;
-        ssge::MenuHeader confirmExitGame;
-        ssge::MenuHeader confirmAbruptExit;
-        ssge::MenuHeader levelSelect;
-        ssge::MenuHeader friendlyReminderReset;
-        ssge::MenuHeader friendlyReminderExit;
+        MenuHeader mainMenu;
+        MenuHeader pauseMenu;
+        MenuHeader joypadUnpluggedMenu;
+        MenuHeader gameOverMenu;
+        MenuHeader levelCompleteMenu;
+        MenuHeader victoryMenu;
+        MenuHeader highScoreMenu;
+        MenuHeader confirmExitProgram;
+        MenuHeader creditsMenu;
+        MenuHeader creditsMenu2;
+        MenuHeader creditsMenu3;
+        MenuHeader creditsMenu4;
+        MenuHeader creditsMenu5;
+        MenuHeader optionsMenu;
+        MenuHeader inputConfigMenu;
+        MenuHeader volumeControlMenu;
+        MenuHeader displaySettingsMenu;
+        MenuHeader confirmRestart;
+        MenuHeader confirmExitGame;
+        MenuHeader confirmAbruptExit;
+        MenuHeader levelSelect;
+        MenuHeader friendlyReminderReset;
+        MenuHeader friendlyReminderExit;
 
         int levelSelectorInt = 1;
 
     public:
         void init(SuperShiny::Config& config);
-        void refreshHighScoreMenu(ssge::MenuContext& context, int direction);
+        void refreshHighScoreMenu(MenuContext& context, int direction);
     };
 
     Menus menus;
@@ -194,8 +196,8 @@ public: //TODO: Encapsulate
         bool fullScreen = false;
         bool integralUpscale = false;
 
-        bool load(ssge::IniFile& iniFile);
-        bool save(ssge::IniFile& iniFile) const;
+        bool load(IniFile& iniFile);
+        bool save(IniFile& iniFile) const;
     };
 
     Config config;

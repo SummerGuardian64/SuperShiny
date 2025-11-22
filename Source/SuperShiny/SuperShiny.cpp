@@ -30,13 +30,13 @@ SuperShiny SuperShiny::makeGame()
 }
 
 SuperShiny::SuperShiny() :
-	scenes(ssge::PassKey<SuperShiny>()),
-	entities(ssge::PassKey<SuperShiny>()),
-	sprites(ssge::PassKey<SuperShiny>())
+	scenes(PassKey<SuperShiny>()),
+	entities(PassKey<SuperShiny>()),
+	sprites(PassKey<SuperShiny>())
 {
 }
 
-void SuperShiny::syncSettings(ssge::StepContext& context) const
+void SuperShiny::syncSettings(StepContext& context) const
 {
 	context.window.setIntegralUpscale(config.integralUpscale);
 	context.window.setBorderedFullScreen(config.fullScreen);
@@ -45,7 +45,7 @@ void SuperShiny::syncSettings(ssge::StepContext& context) const
 	context.audio.setSfxVolume(config.musicVolume);
 }
 
-void SuperShiny::_queryQuit(ssge::StepContext& context)
+void SuperShiny::_queryQuit(StepContext& context)
 {
 	std::string currentScene = context.scenes.getCurrentSceneClassID();
 
@@ -61,7 +61,7 @@ void SuperShiny::_queryQuit(ssge::StepContext& context)
 	}
 }
 
-void SuperShiny::init(ssge::StepContext& context)
+void SuperShiny::init(StepContext& context)
 {
 	SDL_Renderer* renderer = context.drawing.getRenderer();
 	sprites.load("Shiny", renderer);
@@ -101,7 +101,7 @@ void SuperShiny::init(ssge::StepContext& context)
 	menus.init(config);
 }
 
-void SuperShiny::step(ssge::StepContext& context)
+void SuperShiny::step(StepContext& context)
 {
 	if (queriedToQuit)
 	{
@@ -219,18 +219,18 @@ void SuperShiny::step(ssge::StepContext& context)
 	}
 }
 
-void SuperShiny::draw(ssge::DrawContext& context)
+void SuperShiny::draw(DrawContext& context)
 {
 }
 
-void SuperShiny::cleanUp(ssge::PassKey<ssge::Engine> pk)
+void SuperShiny::cleanUp(PassKey<Engine> pk)
 {
 	sprites.unload("Shiny");
 	sprites.unload("Orb");
 	sprites.unload("Bubble");
 }
 
-bool SuperShiny::saveSettings(ssge::StepContext& context)
+bool SuperShiny::saveSettings(StepContext& context)
 {
 	// Save settings
 
@@ -286,46 +286,46 @@ int SuperShiny::getVirtualHeight()
 	return 768;
 }
 
-ssge::MenuCommandEx SuperShiny::onHavingBackedOutOfMenus(ssge::PassKey<ssge::GameAccess> pk, ssge::MenuContext& context)
+MenuCommandEx SuperShiny::onHavingBackedOutOfMenus(PassKey<GameAccess> pk, MenuContext& context)
 {
-	ssge::MenuCommandEx cmdEx;
+	MenuCommandEx cmdEx;
 
 	std::string currentScene = context.currentScene.getSceneClassID();
 
 	if (currentScene==scenes.getMainMenuSceneClassID())
 	{ // If this is the main menu, ask the player do they wanna exit program
-		cmdEx.smallCmd = ssge::MenuCommand::SUB_MENU;
+		cmdEx.smallCmd = MenuCommand::SUB_MENU;
 		cmdEx.targetMenu = &menus.confirmExitProgram;
 	}
 	else if(currentScene=="VictoryScreen")
     {
         // IGNORE!!!
-        cmdEx.smallCmd = ssge::MenuCommand::NOTHING;
+        cmdEx.smallCmd = MenuCommand::NOTHING;
     }
 	else
 	{ // Otherwise just close the menu
-		cmdEx.smallCmd = ssge::MenuCommand::CLOSE_MENU;
+		cmdEx.smallCmd = MenuCommand::CLOSE_MENU;
 	}
 
 	return cmdEx;
 }
 
-ssge::IGameScenes& SuperShiny::getScenes(ssge::PassKey<ssge::ScenesAccess> pk)
+IGameScenes& SuperShiny::getScenes(PassKey<ScenesAccess> pk)
 {
 	return scenes;
 }
 
-ssge::IGameEntities& SuperShiny::getEntities(ssge::PassKey<ssge::EntitiesAccess> pk)
+IGameEntities& SuperShiny::getEntities(PassKey<EntitiesAccess> pk)
 {
 	return entities;
 }
 
-ssge::IGameSprites& SuperShiny::getSprites()
+IGameSprites& SuperShiny::getSprites()
 {
 	return sprites;
 }
 
-std::unique_ptr<ssge::Scene> SuperShiny::Scenes::createScene(ssge::PassKey<ssge::ScenesAccess> pk, std::string id)
+std::unique_ptr<Scene> SuperShiny::Scenes::createScene(PassKey<ScenesAccess> pk, std::string id)
 {
 	if (id == "SplashScreen")
 		return splashScreen();
@@ -344,7 +344,7 @@ std::string SuperShiny::Scenes::getMainMenuSceneClassID() const
 	return "TitleScreen";
 }
 
-SuperShiny::Scenes::Scenes(ssge::PassKey<SuperShiny> pk) {}
+SuperShiny::Scenes::Scenes(PassKey<SuperShiny> pk) {}
 
 std::unique_ptr<SplashScreen> SuperShiny::Scenes::splashScreen()
 {
@@ -376,9 +376,9 @@ std::shared_ptr<Bubble> SuperShiny::Entities::bubble()
 	return std::make_shared<Bubble>();
 }
 
-SuperShiny::Entities::Entities(ssge::PassKey<SuperShiny> pk) {}
+SuperShiny::Entities::Entities(PassKey<SuperShiny> pk) {}
 
-std::shared_ptr<ssge::Entity> SuperShiny::Entities::createEntity(ssge::PassKey<ssge::EntitiesAccess> pk, std::string entityId)
+std::shared_ptr<Entity> SuperShiny::Entities::createEntity(PassKey<EntitiesAccess> pk, std::string entityId)
 {
 	if (entityId == "Shiny")
 		return shiny();
@@ -392,10 +392,10 @@ std::shared_ptr<ssge::Entity> SuperShiny::Entities::createEntity(ssge::PassKey<s
 	return nullptr;
 }
 
-SuperShiny::Sprites::Sprites(ssge::PassKey<SuperShiny> pk)
+SuperShiny::Sprites::Sprites(PassKey<SuperShiny> pk)
 {
-	using Image = ssge::Sprite::Image;
-	using Sequence = ssge::Sprite::Animation::Sequence;
+	using Image = Sprite::Image;
+	using Sequence = Sprite::Animation::Sequence;
 
 	sprdefShiny.spritesheetPath = "Sprites/Shiny.png";
 
@@ -497,7 +497,7 @@ SuperShiny::Sprites::Sprites(ssge::PassKey<SuperShiny> pk)
 
 bool SuperShiny::Sprites::load(std::string sprdefId, SDL_Renderer* renderer)
 {
-	ssge::Sprite::Definition* sprdef = fetchDefinitionNonConst(sprdefId);
+	Sprite::Definition* sprdef = fetchDefinitionNonConst(sprdefId);
 	if (sprdef)
 		return sprdef->load(renderer);
 	else return false;
@@ -505,17 +505,17 @@ bool SuperShiny::Sprites::load(std::string sprdefId, SDL_Renderer* renderer)
 
 void SuperShiny::Sprites::unload(std::string sprdefId)
 {
-	ssge::Sprite::Definition* sprdef = fetchDefinitionNonConst(sprdefId);
+	Sprite::Definition* sprdef = fetchDefinitionNonConst(sprdefId);
 	if (sprdef)
 		sprdef->unload();
 }
 
-const ssge::Sprite::Definition* SuperShiny::Sprites::fetchDefinition(const std::string& sprdefId)
+const Sprite::Definition* SuperShiny::Sprites::fetchDefinition(const std::string& sprdefId)
 {
 	return fetchDefinitionNonConst(sprdefId);
 }
 
-ssge::Sprite::Definition* SuperShiny::Sprites::fetchDefinitionNonConst(std::string sprdefId)
+Sprite::Definition* SuperShiny::Sprites::fetchDefinitionNonConst(std::string sprdefId)
 {
 	if (sprdefId == "Shiny")
 		return &sprdefShiny;
@@ -540,7 +540,7 @@ void SuperShiny::Menus::init(SuperShiny::Config& config)
 	friendlyReminderExit.setTitle("Friendly reminder");
 
 	// This lambda serves to call refreshHighScoreMenu non-statically
-	auto highScoreLambda = [this](ssge::MenuContext& context, int direction)
+	auto highScoreLambda = [this](MenuContext& context, int direction)
 		{
 			refreshHighScoreMenu(context, direction);
 		};
@@ -714,7 +714,7 @@ void SuperShiny::Menus::init(SuperShiny::Config& config)
 	friendlyReminderExit.newItem_GoBack("Uh oh, you're right. Go back!");
 }
 
-void SuperShiny::Menus::refreshHighScoreMenu(ssge::MenuContext& context, int direction)
+void SuperShiny::Menus::refreshHighScoreMenu(MenuContext& context, int direction)
 { // Refreshes the high score menu with the latest score results (Breakenzi port)
 	highScoreMenu.items.clear(); // Reset the menu
 
@@ -739,7 +739,7 @@ void SuperShiny::Menus::refreshHighScoreMenu(ssge::MenuContext& context, int dir
 	highScoreMenu.newItem_GoBack("Back");
 }
 
-bool SuperShiny::Config::load(ssge::IniFile& iniFile)
+bool SuperShiny::Config::load(IniFile& iniFile)
 {
 	masterVolume = iniFile.getInt("Config", "MasterVolume", 100);
 	sfxVolume = iniFile.getInt("Config", "SfxVolume", 100);
@@ -750,7 +750,7 @@ bool SuperShiny::Config::load(ssge::IniFile& iniFile)
 	return true;
 }
 
-bool SuperShiny::Config::save(ssge::IniFile& iniFile) const
+bool SuperShiny::Config::save(IniFile& iniFile) const
 {
 	iniFile.setInt("Config", "MasterVolume", masterVolume);
 	iniFile.setInt("Config", "SfxVolume", sfxVolume);

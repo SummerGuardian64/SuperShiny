@@ -1,7 +1,9 @@
 #pragma once
 #include "../ssge/Entity.h"
 
-class Shiny : public ssge::Entity
+using namespace ssge;
+
+class Shiny : public Entity
 {
     bool bubbleAux = false;
     float bubbleAuxOffset = -6;
@@ -16,7 +18,7 @@ class Shiny : public ssge::Entity
 
 	void startBubbling();
 	void quitBubbling();
-	void animate(ssge::EntityStepContext& context);
+	void animate(EntityStepContext& context);
 
 public:
 
@@ -34,8 +36,8 @@ public:
 		BubblingForwardDown = 9
 	};
 
-	ssge::Entity::Physics::Abilities makeRegularAbilities() const;
-	ssge::Entity::Physics::Abilities makeBubblingAbilities() const;
+	Entity::Physics::Abilities makeRegularAbilities() const;
+	Entity::Physics::Abilities makeBubblingAbilities() const;
 
 	Shiny();
 
@@ -45,10 +47,10 @@ public:
 
 	// Inherited via Entity
 	std::string getEntityClassID() const override;
-	void firstStep(ssge::EntityStepContext& context) override;
-	void preStep(ssge::EntityStepContext& context) override;
-	void postStep(ssge::EntityStepContext& context) override;
-	void preDraw(ssge::DrawContext& context) const override;
-	void postDraw(ssge::DrawContext& context) const override;
-	void onDestroy(ssge::EntityStepContext& context) override;
+	void firstStep(EntityStepContext& context) override;
+	void preStep(EntityStepContext& context) override;
+	void postStep(EntityStepContext& context) override;
+	void preDraw(DrawContext& context) const override;
+	void postDraw(DrawContext& context) const override;
+	void onDestroy(EntityStepContext& context) override;
 };

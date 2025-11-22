@@ -19,16 +19,16 @@ TitleScreen::~TitleScreen()
 {
 }
 
-void TitleScreen::init(ssge::SceneStepContext& context)
+void TitleScreen::init(SceneStepContext& context)
 {
 	background = SdlTexture("Backgrounds/ShinyRuns_XGA.png", context.drawing.getRenderer());
 }
 
-void TitleScreen::step(ssge::SceneStepContext& context)
+void TitleScreen::step(SceneStepContext& context)
 {
 }
 
-void TitleScreen::draw(ssge::DrawContext& context)
+void TitleScreen::draw(DrawContext& context)
 {
 	SDL_Renderer* renderer = context.getRenderer();
 	SDL_Rect screenRect = context.getBounds();

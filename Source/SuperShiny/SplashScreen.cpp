@@ -19,12 +19,12 @@ SplashScreen::~SplashScreen()
 {
 }
 
-void SplashScreen::init(ssge::SceneStepContext& context)
+void SplashScreen::init(SceneStepContext& context)
 {
 	background = SdlTexture("Backgrounds/Splash.png", context.drawing.getRenderer());
 }
 
-void SplashScreen::step(ssge::SceneStepContext& context)
+void SplashScreen::step(SceneStepContext& context)
 {
 	if (context.inputs.getCurrentButtonsForPlayer(0) != 0)
 	{
@@ -32,7 +32,7 @@ void SplashScreen::step(ssge::SceneStepContext& context)
 	}
 }
 
-void SplashScreen::draw(ssge::DrawContext& context)
+void SplashScreen::draw(DrawContext& context)
 {
 	SDL_Renderer* renderer = context.getRenderer();
 	SDL_Rect screenRect = context.getBounds();
