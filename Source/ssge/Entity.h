@@ -47,9 +47,9 @@ namespace ssge
 			};
 			bool isIgnored() const { return _ignore; };
 			bool ignored() const { return _ignore; };
-			bool setIgnore(bool ignore) { _ignore = ignore; };
-			void setIgnored(bool ignored) { _ignore = ignored; }
-			void ignore(bool ignore) { _ignore = ignore; };
+			bool setIgnore(bool ignore) { _ignore = ignore; return _ignore; };
+			bool setIgnored(bool ignored) { _ignore = ignored; return _ignore; }
+			void ignore(bool ignored = true) { _ignore = ignored; };
 			void restore() { _ignore = false; };
 			bool isPlayable() const { return playable; };
 			void setPlayable(bool playable) { this->playable = playable; };
