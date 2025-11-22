@@ -33,7 +33,7 @@ namespace ssge
 			SDL_Scancode key;
 			Uint8 mouseButton; // SDL_BUTTON_LEFT, etc.
 			struct { int direction; } mouseWheel;
-			struct { int axis; int direction; } joypadAxis;
+			struct { Uint8 axis; int direction; } joypadAxis;
 			Uint8 joypadButton;
 			struct { Uint8 index; Uint8 direction; } joystickHat;
 			SDL_FingerID finger; // touchscreen finger
@@ -99,7 +99,8 @@ namespace ssge
 		{
 			deviceType = DeviceType::GameControllerAxis;
 			deviceInstanceID = which;
-			boundTo.joypadAxis;
+			boundTo.joypadAxis.axis = axis;
+			boundTo.joypadAxis.direction = direction; // -1 or 1
 		}
 
 		DeviceType getDeviceType() const
@@ -143,7 +144,7 @@ namespace ssge
 		Uint8 getMouseButton() const
 		{
 			if (deviceType != DeviceType::MouseButton)
-				return -1;
+				return 0;
 			else return boundTo.mouseButton;
 		}
 
@@ -157,7 +158,7 @@ namespace ssge
 				return "Middle mouse button";
 			case 3:
 				return "Right mouse button";
-			case -1:
+			case 0:
 				return "Unknown mouse button!";
 			default:
 				return "Mouse button " + std::to_string(getMouseButton());
@@ -320,7 +321,11 @@ namespace ssge
 				|| deviceType == DeviceType::GameControllerAxis)
 			{
 				auto sdlGameController = SDL_GameControllerFromInstanceID(deviceInstanceID);
-				return SDL_GameControllerName(sdlGameController);
+				auto sdlGameControllerName = SDL_GameControllerName(sdlGameController);
+				if (sdlGameControllerName == nullptr)
+					return "Unknown controller";
+				else
+					return SDL_GameControllerName(sdlGameController);
 			}
 			else return std::to_string(getJoypadID());
 		}
