@@ -6,6 +6,11 @@
 
 using namespace ssge;
 
+inline ssge::EntityReference::EntityReference(const EntityAllocator& alloc)
+    : ref(alloc.getShared())
+{
+}
+
 void EntityManager::step(GameWorldStepContext& context)
 {
     // Step all entities
@@ -58,14 +63,15 @@ EntityCollection::iterator EntityManager::getEntitiesEnd()
 
 EntityReference EntityManager::addEntity(std::shared_ptr<Entity> entity)
 {
-	if (!entity)
-		return EntityReference(nullptr); // invalid ID
+    if (!entity)
+        return EntityReference(nullptr);
 
-	entities.add(EntityAllocator(entity));
-	return EntityReference(entity);
+    EntityAllocator alloc(std::move(entity)); // consumes the caller's shared_ptr
+    entities.add(alloc);
+    return EntityReference(alloc); // from allocator
 }
 
-bool EntityManager::deleteEntity(EntityReference entity)
+bool EntityManager::scheduleDestroy(EntityReference entity)
 {
     auto it = std::find(entities.begin(), entities.end(), entity);
 
@@ -81,7 +87,7 @@ bool EntityManager::deleteEntity(EntityReference entity)
     }
 }
 
-Entity* EntityManager::findEntity(std::string entityClassID)
+Entity* EntityManager::findEntity(const std::string& entityClassID)
 {
     for (auto& entity : entities)
     {
@@ -97,7 +103,7 @@ Entity* EntityManager::findEntity(std::string entityClassID)
     return nullptr;
 }
 
-const Entity* EntityManager::findConstEntity(std::string entityClassID) const
+const Entity* EntityManager::findConstEntity(const std::string& entityClassID) const
 {
     for (auto& entity : entities)
     {
@@ -113,7 +119,7 @@ const Entity* EntityManager::findConstEntity(std::string entityClassID) const
     return nullptr;
 }
 
-EntityQueryResult EntityManager::findAllEntities(std::string entityClassID)
+EntityQueryResult EntityManager::findAllEntities(const std::string& entityClassID)
 {
     EntityQueryResult foundEntities;
 
@@ -146,7 +152,7 @@ int EntityManager::countAllEntities() const
     return count;
 }
 
-int EntityManager::countAllEntities(std::string entityClassID) const
+int EntityManager::countAllEntities(const std::string& entityClassID) const
 {
     int count = 0;
 
@@ -193,4 +199,3 @@ void EntityManager::destroyScheduledEntities(GameWorldStepContext& context)
         }
     }
 }
-

@@ -38,7 +38,9 @@ bool ssge::GameWorld::initLevel(SceneStepContext& context)
     return (level != nullptr);
 }
 
-GameWorld::GameWorld() : levelLoader(PassKey<GameWorld>())
+GameWorld::GameWorld() :
+    levelLoader(PassKey<GameWorld>()),
+    entities(PassKey<GameWorld>())
 {
     backgroundColor = SDL_Color{ 0,0,255,255 };
     setConfines(SDL_FRect{ 0,0,1280,720 });
@@ -46,7 +48,9 @@ GameWorld::GameWorld() : levelLoader(PassKey<GameWorld>())
     wantedLevel = 0;
 }
 
-GameWorld::GameWorld(int wantedLevel) : levelLoader(PassKey<GameWorld>())
+GameWorld::GameWorld(int wantedLevel) :
+    levelLoader(PassKey<GameWorld>()),
+    entities(PassKey<GameWorld>())
 {
     backgroundColor = SDL_Color{ 0,0,255,255 };
     setConfines(SDL_FRect{ 0,0,1280,720 });

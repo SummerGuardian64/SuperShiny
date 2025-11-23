@@ -1,4 +1,5 @@
 #pragma once
+#include "PassKey.h"
 #include "Entity.h"
 #include <list>
 #include <memory>
@@ -25,6 +26,7 @@ namespace ssge
         EntityReference(const std::weak_ptr<Entity>& r) : ref(r) {}
         EntityReference(const std::shared_ptr<Entity>& r) : ref(r) {}
         EntityReference(std::nullptr_t) noexcept : ref() {}
+        EntityReference(const EntityAllocator& alloc);
 
         explicit operator bool() const noexcept { return !ref.expired(); }
 
@@ -49,8 +51,10 @@ namespace ssge
         }
         Entity* get() const {
             auto sp = ref.lock();
-            //if (!sp) throw std::runtime_error("Dereferencing expired EntityReference");
-            return &*sp;
+#ifndef NDEBUG
+            if (!sp) throw std::runtime_error("Dereferencing expired EntityReference");
+#endif
+            return sp ? sp.get() : nullptr;
         }
 
         //std::shared_ptr<Entity> lock() const { return ref.lock(); }
@@ -88,6 +92,8 @@ namespace ssge
         
         // implicit conversion to EntityReference
         operator EntityReference() const { return EntityReference(ptr); }
+
+        std::shared_ptr<Entity> getShared() const { return ptr; }
 
         // <-- NEW: make it usable in if(entity) checks
         explicit operator bool() const noexcept { return static_cast<bool>(ptr); }
@@ -137,7 +143,7 @@ namespace ssge
 
         // Add from an EntityAllocator (convert to weak_ptr)
         void push_back(const EntityAllocator& alloc) {
-            refs.push_back(alloc);
+            refs.push_back(EntityReference(alloc));
         }
 
         // Optional: alias for "add" if you want consistency
@@ -154,9 +160,15 @@ namespace ssge
         EntityReference operator[](size_t i) const { return refs[i]; }
     };
 
+    // Forward declare GameWorld in order to allow only it to create EntityManager
+
+    class GameWorld;
+
 	class EntityManager
 	{
-    public:
+    public: // Okay to make public. EntityManager is NEVER exposed to GAMEDEV
+        EntityManager(PassKey<GameWorld> pk) {}; // Only GameWorld may create EntityManager
+
         void step(GameWorldStepContext& context);
         void draw(DrawContext& context);
 
@@ -164,12 +176,12 @@ namespace ssge
         EntityCollection::iterator getEntitiesBegin();
         EntityCollection::iterator getEntitiesEnd();
         EntityReference addEntity(std::shared_ptr<Entity> entity);
-        bool deleteEntity(EntityReference entity);
-        Entity* findEntity(std::string entityClassID);
-        const Entity* findConstEntity(std::string entityClassID) const;
-        EntityQueryResult findAllEntities(std::string entityClassID);
+        bool scheduleDestroy(EntityReference entity);
+        Entity* findEntity(const std::string& entityClassID);
+        const Entity* findConstEntity(const std::string& entityClassID) const;
+        EntityQueryResult findAllEntities(const std::string& entityClassID);
         int countAllEntities() const;
-        int countAllEntities(std::string entityClassID) const;
+        int countAllEntities(const std::string& entityClassID) const;
         void destroyScheduledEntities(GameWorldStepContext& context);
 	};
 }
