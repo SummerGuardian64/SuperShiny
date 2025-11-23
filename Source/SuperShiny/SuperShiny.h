@@ -142,7 +142,7 @@ public: //TODO: Encapsulate
         void unload(std::string sprdefId) override;
         const Sprite::Definition* fetchDefinition(const std::string& sprdefId) override;
     private:
-        Sprite::Definition* fetchDefinitionNonConst(std::string sprdefId);
+        Sprite::Definition* fetchDefinitionNonConst(const std::string& sprdefId);
     };
 
     Sprites sprites;
@@ -196,8 +196,8 @@ public: //TODO: Encapsulate
         bool fullScreen = false;
         bool integralUpscale = false;
 
-        bool load(IniFile& iniFile);
-        bool save(IniFile& iniFile) const;
+        void load(IniFile& iniFile);
+        void save(IniFile& iniFile) const;
     };
 
     Config config;

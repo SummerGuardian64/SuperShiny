@@ -6,7 +6,6 @@
 #include "../ssge/MenuContext.h"
 #include <memory>
 #include <vector>
-#include <string_view>
 #include "SDL.h"
 #include "../ssge/InputSet.h"
 
@@ -25,7 +24,7 @@ using namespace ssge;
 SuperShiny SuperShiny::makeGame()
 {
 	static bool alreadyCreated = false;
-	if (alreadyCreated) throw;
+	if (alreadyCreated) throw std::runtime_error("Game already created!");
 	alreadyCreated = true;
 	return SuperShiny();
 }
@@ -43,7 +42,7 @@ void SuperShiny::syncSettings(StepContext& context) const
 	context.window.setBorderedFullScreen(config.fullScreen);
 	context.audio.setMasterVolume(config.masterVolume);
 	context.audio.setMusicVolume(config.musicVolume);
-	context.audio.setSfxVolume(config.musicVolume);
+	context.audio.setSfxVolume(config.sfxVolume);
 }
 
 void SuperShiny::_queryQuit(StepContext& context)
@@ -207,7 +206,7 @@ void SuperShiny::step(StepContext& context)
 	{
 		// Linearly interpolate between 0 and the configured volume
 		const Uint8 fadeVal = context.scenes.getFadeVal(); // 0..255
-		const int  target = config.sfxVolume;            // or master/music, 0..100
+		const int  target = config.masterVolume;           // or master/music, 0..100
 
 		// volume = target * (255 - fadeVal) / 255
 		const int fadeVolume = (target * (255 - fadeVal) + 127) / 255; // +127 for rounding
@@ -516,7 +515,7 @@ const Sprite::Definition* SuperShiny::Sprites::fetchDefinition(const std::string
 	return fetchDefinitionNonConst(sprdefId);
 }
 
-Sprite::Definition* SuperShiny::Sprites::fetchDefinitionNonConst(std::string sprdefId)
+Sprite::Definition* SuperShiny::Sprites::fetchDefinitionNonConst(const std::string& sprdefId)
 {
 	if (sprdefId == "Shiny")
 		return &sprdefShiny;
@@ -717,7 +716,7 @@ void SuperShiny::Menus::init(SuperShiny::Config& config)
 
 void SuperShiny::Menus::refreshHighScoreMenu(MenuContext& context, int direction)
 { // Refreshes the high score menu with the latest score results (Breakenzi port)
-	highScoreMenu.items.clear(); // Reset the menu
+	highScoreMenu.clearItems(); // Reset the menu
 
 	// TODO: Actual scoreboard
 	for (int i = 0; i < 10; i++)
@@ -740,7 +739,7 @@ void SuperShiny::Menus::refreshHighScoreMenu(MenuContext& context, int direction
 	highScoreMenu.newItem_GoBack("Back");
 }
 
-bool SuperShiny::Config::load(IniFile& iniFile)
+void SuperShiny::Config::load(IniFile& iniFile)
 {
 	masterVolume = iniFile.getInt("Config", "MasterVolume", 100);
 	sfxVolume = iniFile.getInt("Config", "SfxVolume", 100);
@@ -748,10 +747,9 @@ bool SuperShiny::Config::load(IniFile& iniFile)
 	resolutionScaleConfig = iniFile.getInt("Config", "ResolutionScaleConfig", 1);
 	fullScreen = iniFile.getBool("Config", "FullScreen", false);
 	integralUpscale = iniFile.getBool("Config", "IntegralUpscale", false);
-	return true;
 }
 
-bool SuperShiny::Config::save(IniFile& iniFile) const
+void SuperShiny::Config::save(IniFile& iniFile) const
 {
 	iniFile.setInt("Config", "MasterVolume", masterVolume);
 	iniFile.setInt("Config", "SfxVolume", sfxVolume);
@@ -759,5 +757,4 @@ bool SuperShiny::Config::save(IniFile& iniFile) const
 	iniFile.setInt("Config", "ResolutionScaleConfig", resolutionScaleConfig);
 	iniFile.setBool("Config", "FullScreen", fullScreen);
 	iniFile.setBool("Config", "IntegralUpscale", integralUpscale);
-	return false;
 }

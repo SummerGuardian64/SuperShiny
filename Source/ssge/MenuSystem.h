@@ -146,6 +146,7 @@ namespace ssge
     public:
         std::string getTitle() const;
         void setTitle(const char* text);
+        // TODO: Harden!
         std::vector<MenuItem*> items;
         MenuItem* newLabel(const char* text);
         MenuItem* newItem(const char* text, MenuFunction onSelect = NULL);
@@ -163,6 +164,7 @@ namespace ssge
         MenuItem* newItem_InputBinding(const char* bindingName, int bindingIndex);
         MenuItem* newItem_CloseMenu(const char* text, MenuFunction onSelect = NULL);
         MenuItem* newItem_ExitProgram(const char* text, MenuFunction onSelect = NULL);
+        void clearItems();
         MenuHeader();
         MenuHeader(const char* title);
         ~MenuHeader();

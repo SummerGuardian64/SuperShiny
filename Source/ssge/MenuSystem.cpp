@@ -353,6 +353,15 @@ MenuItem* MenuHeader::newItem_ExitProgram(const char* text, MenuFunction onSelec
 	return item;
 }
 
+void ssge::MenuHeader::clearItems()
+{
+    for (auto& item : items)
+    {
+        delete item;
+    }
+    items.clear();
+}
+
 MenuHeader::MenuHeader() {}
 
 MenuHeader::MenuHeader(const char* title)
@@ -361,11 +370,7 @@ MenuHeader::MenuHeader(const char* title)
 
 MenuHeader::~MenuHeader()
 {
-    for (auto& item : items)
-    {
-        delete item;
-    }
-    items.clear();
+    clearItems();
 }
 
 // Draw a UTF-8 string centered at xCenter,y with an optional shadow.
