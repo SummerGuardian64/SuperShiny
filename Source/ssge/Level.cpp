@@ -518,6 +518,8 @@ namespace ssge
 		SDL_Renderer* renderer = context.getRenderer();
 		if (!renderer || !array) return;
 
+		SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+
 		// Mitigate division by zero
 		if (!tilesMeta.isValid())
 			return;
@@ -604,7 +606,6 @@ namespace ssge
 						blockSize.h
 					};
 
-					SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 					SDL_RenderCopy(renderer, tileset, &src, &dst);
 				}
 			}

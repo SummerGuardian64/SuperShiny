@@ -1,6 +1,8 @@
 #pragma once
 #include <type_traits>
 #include <cmath>
+#include <string>
+#include <cctype>
 
 namespace ssge
 {
