@@ -219,6 +219,9 @@ void Shiny::die()
 
     dying = true;
 
+    // Restore regular abilities first
+    physics->abilities = makeRegularAbilities();
+
     // Boing up into the air and have no control over it
     physics->velocity.x = 0;
     physics->velocity.y = -20;
