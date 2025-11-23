@@ -32,6 +32,11 @@ namespace ssge
 		std::string errorLog;
 
 		// ---------- small helpers ----------
+		// TODO: Create a utility class
+		// or maybe even a common sense library to have functions
+		// like all other normal languages, smh -.-'
+		// (except they're not normal because they have GC and I don't like GC)
+
 		static inline void ltrim(std::string& s)
 		{
 			size_t i = 0u;
