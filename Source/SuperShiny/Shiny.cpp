@@ -34,7 +34,7 @@ void Shiny::animate(EntityStepContext& context)
     {
         // Flip the sprite according to entity's facing direction (side)
         auto direction = physics->side.x;
-        if (direction == 0) { sign(physics->velocity.x); }
+        if (direction == 0) { direction = sign(physics->velocity.x); }
         if (direction > 0) sprite->xscale = 1;
         else if (direction < 0) sprite->xscale = -1;
 
@@ -216,7 +216,7 @@ void Shiny::die()
     // Cannot die twice
     if (dying)
         return;
-
+    
     dying = true;
 
     // Restore regular abilities first
@@ -227,7 +227,7 @@ void Shiny::die()
     physics->velocity.y = -20;
     physics->abilities.maxSpeedUp = 20;
     physics->abilities.enable(Entity::Physics::Abilities::Flag::IgnoreCollision);
-    control->ignore();
+    if (control)control->ignore();
 }
 
 std::string Shiny::getEntityClassID() const
