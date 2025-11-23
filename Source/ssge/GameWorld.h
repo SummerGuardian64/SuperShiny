@@ -8,11 +8,6 @@
 #include <list>
 #include "Level.h"
 #include "IGame.h"
-//#include "LevelLoader.h"
-//#include "PowerupType.h"
-//#include "HintManager.h"
-static_assert(sizeof(ssge::Scene) > 0, "Scene must be defined");
-static_assert(sizeof(ssge::EntityManager) > 0, "EntityManager must be defined");
 
 namespace ssge
 {
@@ -31,9 +26,8 @@ namespace ssge
         Scene& getAsScene();
         EntityManager entities;
         std::unique_ptr<Level> level;
-        EntityReference entityToScrollTo;
+        EntityReference heroEntity;
         SDL_FPoint scrollTarget;
-        //HintManager hints;
         void reportHeroDeadth();
         bool isGameplayOver() const;
         void finishGameplay();
@@ -41,8 +35,6 @@ namespace ssge
         SDL_FRect getConstConfines() const;
         SDL_FRect getConfines() const;
         void setConfines(SDL_FRect confines);
-        //sf::Vector2i getMousePosition();
-        //std::weak_ptr<Ball> spawnNewBall();
         std::string getSceneClassID() const override;
         void init(SceneStepContext& context) override;
         void step(SceneStepContext& context) override;

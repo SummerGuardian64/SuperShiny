@@ -7,7 +7,7 @@
 
 using namespace ssge;
 
-bool ssge::GameWorld::initLevel(SceneStepContext& context)
+bool GameWorld::initLevel(SceneStepContext& context)
 {
     if (!level)
     {
@@ -59,14 +59,14 @@ GameWorld::GameWorld(int wantedLevel) :
     this->wantedLevel = wantedLevel;
 }
 
-GameWorld* ssge::GameWorld::tryCast(Scene* scene)
+GameWorld* GameWorld::tryCast(Scene* scene)
 {
     if (scene->getSceneClassID() != "GameWorld")
         return dynamic_cast<GameWorld*>(scene);
     else return nullptr;
 }
 
-Scene& ssge::GameWorld::getAsScene()
+Scene& GameWorld::getAsScene()
 {
     return *this;
 }
@@ -118,7 +118,8 @@ void GameWorld::init(SceneStepContext& context)
     if (!levelSuccessful)
     {
         // ERROR! Get out of there!
-        // TODO! Report the error
+        std::cout << levelLoader.getErrorLog() << std::endl;
+        // TODO: Better error handling!
         context.scenes.pause();
         context.scenes.goToMainMenu();
     }
@@ -139,42 +140,19 @@ void GameWorld::init(SceneStepContext& context)
 
             if (levelLoader.getHeroIndex() == currentEntityIndex)
             {
-                entityToScrollTo = entity;
+                heroEntity = entity;
             }
 
             currentEntityIndex++;
         }
     }
-
-    //std::string error;
-    //level = LevelLoader::loadLevel(game.progress.getLevel(), error);
-    //if (level == NULL)
-    //{
-    //    //TODO: Error handling
-    //    // Go to some error scene and pass it the error string
-    //    std::cerr << error;
-    //    game.gotoTitleScreen();
-    //    return;
-    //}
-    //level->initPowerupTypes(powerupTypes);
-    //level->loadResources();
-    //game.backgroundMusic.loadSong(level->backgroundMusicPath, true, true);
-
-    //// Spawn the paddle
-    //addEntity(std::make_shared<Paddle>(*this));
-
-    //// Spawn a new ball
-    //spawnNewBall();
-
-    //// Give the player a hint
-    //hints.playerEnteredNewLevel();
 }
 
 void GameWorld::step(SceneStepContext& context)
 {
     //// Step all entities
     GameWorldStepContext gameWorldStepContext(
-        ssge::PassKey<GameWorld>(),
+        PassKey<GameWorld>(),
         context.deltaTime,
         context.engine,
         context.game,
@@ -186,6 +164,9 @@ void GameWorld::step(SceneStepContext& context)
         LevelAccess(level.get())
     );
 
+    // TODO: Better deadth handling
+    // See if heroEntity doesn't exist, then tell IGame about it
+    // But that requires a fully fledged super duper ultra hyper mega event system that I don't have time for
     if (heroDied)
     {
         context.scenes.restart();
@@ -193,14 +174,15 @@ void GameWorld::step(SceneStepContext& context)
 
     entities.step(gameWorldStepContext);
 
-    if (auto e = entityToScrollTo.get())
+    // TODO: Decouple heroEntity from entityToScrollTo
+    if (auto e = heroEntity.get())
     {
         scrollTarget = e->position;
     }
 
     // Warp check
 
-    if (auto hero = entityToScrollTo.get())
+    if (auto hero = heroEntity.get())
     {
         auto warpQuery = level->queryBlock(hero->position);
         if (warpQuery.coll == Level::Block::Collision::NextSection)
@@ -215,42 +197,6 @@ void GameWorld::step(SceneStepContext& context)
             context.game.declareVictory();
         }
     }
-
-
-    //// TODO: game victory/loss criteria check
-
-    //// If the gameplay isn't over yet, process the game
-    //if (!isGameplayOver())
-    //{
-    //    // If all balls have been destroyed
-    //    if (countAllEntities(EntityClassID::Ball) == 0)
-    //    {
-    //        // That means that player lost a life
-    //        if (!game.progress.loseLife())
-    //        { // If there's remaining lives
-    //            // Give the player another ball
-    //            spawnNewBall();
-
-    //            // Update the hint
-    //            hints.playerLostALife();
-    //        }
-    //        else
-    //        { // If there's no more lives
-    //            // Tell the player they lost
-    //            hints.playerLostAllLives();
-
-    //            // Halt the gameplaay
-    //            finishGameplay();
-
-    //            // Play game over
-    //            game.backgroundMusic.loadGameOverSong(true, false);
-
-    //            // Open the game over screen
-    //            game.menus.openGameOver();
-    //        }
-    //    }
-    //}
-    // Here would be the hints
 }
 
 void GameWorld::draw(DrawContext& context)
@@ -330,10 +276,4 @@ void GameWorld::draw(DrawContext& context)
 
 void GameWorld::drawHUD(DrawContext& context) const
 {
-    /*sf::Font& font = game.getFont();
-    Text::fastDraw(renderTarget, font, sf::String("LIVES: ") + std::to_string(game.progress.getLives()), 50, 50, 24, TextAlign::Left);
-    Text::fastDraw(renderTarget, font, sf::String("SCORE: ") + std::to_string(game.progress.getScore()), 1280.f / 2 - 50.f / 2, 50, 24, TextAlign::Center);
-    Text::fastDraw(renderTarget, font, sf::String("LEVEL: ") + std::to_string(game.progress.getLevel()), 1280 - 50, 50, 24, TextAlign::Right);
-
-    Text::fastDraw(renderTarget, font, sf::String(hints.makeHintString()), 1280.f / 2, 720.f / 3 * 2, 24, TextAlign::Center);*/
 }
