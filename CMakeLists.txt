@@ -94,31 +94,37 @@ if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET ${GAME_NAME} PROPERTY CXX_STANDARD_REQUIRED ON)
 endif()
 
-# --- Mirror WithEXE into the target dir (Windows only) ---
-if (WIN32 AND EXISTS "${CMAKE_SOURCE_DIR}/WithEXE")
-  add_custom_command(TARGET ${GAME_NAME} POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E echo "Mirroring WithEXE - $<TARGET_FILE_DIR:${GAME_NAME}> ..."
-    COMMAND ${CMAKE_COMMAND} -E env
-      WITHEXE_SRC=${CMAKE_SOURCE_DIR}/WithEXE
-      WITHEXE_DST=$<TARGET_FILE_DIR:${GAME_NAME}>
-      WITHEXE_KEEP=$<TARGET_FILE:${GAME_NAME}>
-      "${CMAKE_SOURCE_DIR}/Tools/WithEXE_Mirror.exe"
-  )
-endif()
+# --- Mirror WithEXE + copy SDL runtime DLLs (Windows only) ---
+if (WIN32)
 
-# --- Copy SDL2 runtime DLLs after build ---
-add_custom_command(TARGET SuperShiny POST_BUILD
-  COMMAND ${CMAKE_COMMAND} -E echo "Copying SDL2 runtime DLLs..."
-  COMMAND ${CMAKE_COMMAND} -E copy_if_different
-    "$<TARGET_FILE:SDL2::SDL2>"
-    "$<TARGET_FILE_DIR:${GAME_NAME}>"
-  COMMAND ${CMAKE_COMMAND} -E copy_if_different
-    "$<TARGET_FILE:SDL2_image::SDL2_image>"
-    "$<TARGET_FILE_DIR:${GAME_NAME}>"
-  COMMAND ${CMAKE_COMMAND} -E copy_if_different
-    "$<TARGET_FILE:SDL2_ttf::SDL2_ttf>"
-    "$<TARGET_FILE_DIR:${GAME_NAME}>"
-  COMMAND ${CMAKE_COMMAND} -E copy_if_different
-    "$<TARGET_FILE:SDL2_mixer::SDL2_mixer>"
-    "$<TARGET_FILE_DIR:${GAME_NAME}>"
-)
+  if (EXISTS "${CMAKE_SOURCE_DIR}/WithEXE")
+    add_custom_target(RunPostBuildStuff ALL
+      # 1) Mirror WithEXE folder
+      COMMAND ${CMAKE_COMMAND} -E echo "Mirroring WithEXE -> $<TARGET_FILE_DIR:${GAME_NAME}> ..."
+      COMMAND ${CMAKE_COMMAND} -E env
+        WITHEXE_SRC=$<SHELL_PATH:${CMAKE_SOURCE_DIR}/WithEXE>
+        WITHEXE_DST=$<SHELL_PATH:$<TARGET_FILE_DIR:${GAME_NAME}>>
+        WITHEXE_KEEP=$<SHELL_PATH:$<TARGET_FILE:${GAME_NAME}>>
+        $<SHELL_PATH:${CMAKE_SOURCE_DIR}/Tools/WithEXE_Mirror.exe>
+
+      # 2) Copy SDL runtime DLLs next to the exe
+      COMMAND ${CMAKE_COMMAND} -E echo "Copying SDL2 runtime DLLs..."
+      COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "$<TARGET_FILE:SDL2::SDL2>"
+        "$<TARGET_FILE_DIR:${GAME_NAME}>"
+      COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "$<TARGET_FILE:SDL2_image::SDL2_image>"
+        "$<TARGET_FILE_DIR:${GAME_NAME}>"
+      COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "$<TARGET_FILE:SDL2_ttf::SDL2_ttf>"
+        "$<TARGET_FILE_DIR:${GAME_NAME}>"
+      COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "$<TARGET_FILE:SDL2_mixer::SDL2_mixer>"
+        "$<TARGET_FILE_DIR:${GAME_NAME}>"
+
+      # Make sure this all runs *after* the exe is built
+      DEPENDS ${GAME_NAME}
+    )
+  endif()
+
+endif()
