@@ -134,8 +134,8 @@ namespace ssge {
         void stopListeningForBinding();
         InputBinding* fetchBinding(int bindingIndex);
         InputBinding* fetchFallbackBinding(int bindingIndex);
-        bool loadFromIniFile(IniFile& iniFile);
-        bool saveToIniFile(IniFile& iniFile);
+        void loadFromIniFile(IniFile& iniFile);
+        void saveToIniFile(IniFile& iniFile);
     };
 
     class DrawingAccess {

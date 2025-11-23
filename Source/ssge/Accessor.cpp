@@ -370,18 +370,16 @@ InputBinding* InputsAccessConfigurable::fetchFallbackBinding(int bindingIndex)
 	return actual->fetchFallbackBinding(bindingIndex);
 }
 
-bool InputsAccessConfigurable::loadFromIniFile(IniFile& iniFile)
+void InputsAccessConfigurable::loadFromIniFile(IniFile& iniFile)
 {
-	if (!actual)return false;
-
-	return actual->loadFromIniFile(iniFile);
+	if (actual)
+		actual->loadFromIniFile(iniFile);
 }
 
-bool InputsAccessConfigurable::saveToIniFile(IniFile& iniFile)
+void InputsAccessConfigurable::saveToIniFile(IniFile& iniFile)
 {
-	if (!actual)return false;
-
-	return actual->saveToIniFile(iniFile);
+	if (actual)
+		actual->saveToIniFile(iniFile);
 }
 
 // CurrentSceneAccess

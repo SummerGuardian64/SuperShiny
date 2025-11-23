@@ -192,7 +192,7 @@ namespace ssge
 			else return -1;
 		}
 
-		Uint8 getJoystickAxis() const
+		Uint8 getJoypadAxis() const
 		{
 			if (deviceType != DeviceType::JoystickAxis
 				&& deviceType != DeviceType::GameControllerAxis)
@@ -200,7 +200,7 @@ namespace ssge
 			else return boundTo.joypadAxis.axis;
 		}
 
-		int getJoystickAxisDirection() const
+		int getJoypadAxisDirection() const
 		{
 			if (deviceType != DeviceType::JoystickAxis
 				&& deviceType != DeviceType::GameControllerAxis)

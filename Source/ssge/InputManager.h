@@ -18,9 +18,9 @@ namespace ssge
 
 		void init(PassKey<Engine> pk);
 	private:
-		bool handleHardwareChange(SDL_Event e);
-		bool handleListeningForBinding(SDL_Event e);
-		bool handleBindings(SDL_Event e, InputBinding* chosenBindings);
+		bool handleHardwareChange(const SDL_Event& e);
+		bool handleListeningForBinding(const SDL_Event& e);
+		bool handleBindings(const SDL_Event& e, InputBinding* chosenBindings);
 		void mouseWheelFix(InputBinding* chosenBindings);
 	public:
 		void handle(SDL_Event e);
@@ -47,7 +47,6 @@ namespace ssge
 		int getJoypadSlotByInstance(SDL_JoystickID id) const; // returns slot or -1
 		Joypad* getJoypadByInstance(SDL_JoystickID id);
 		int getFreeJoypadSlot() const;                    // returns slot or -1
-		Joypad* getFreeJoyPad();
 
 	private:
 		static const int MAX_BINDINGS = 32;
@@ -70,7 +69,7 @@ namespace ssge
 		std::string getBindingString(int bindingIndex) const;
 		int getMaxBindings() const;
 
-		bool loadFromIniFile(IniFile& iniFile);
-		bool saveToIniFile(IniFile& iniFile);
+		void loadFromIniFile(IniFile& iniFile);
+		void saveToIniFile(IniFile& iniFile);
 	};
 }

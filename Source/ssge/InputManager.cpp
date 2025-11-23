@@ -1,5 +1,6 @@
 #include "InputManager.h"
 #include "SDL.h"
+#include <cmath>
 
 using namespace ssge;
 
@@ -15,7 +16,7 @@ void InputManager::init(PassKey<Engine> pk)
     prepareJoypadSlots();
 }
 
-bool ssge::InputManager::handleHardwareChange(SDL_Event e)
+bool ssge::InputManager::handleHardwareChange(const SDL_Event& e)
 {
     // Joypad hardware change
     switch (e.type)
@@ -38,7 +39,7 @@ bool ssge::InputManager::handleHardwareChange(SDL_Event e)
     return false;
 }
 
-bool ssge::InputManager::handleListeningForBinding(SDL_Event e)
+bool ssge::InputManager::handleListeningForBinding(const SDL_Event& e)
 {
     // Do not parse direct inputs if listening for binding
     if (isListeningForBinding())
@@ -65,9 +66,11 @@ bool ssge::InputManager::handleListeningForBinding(SDL_Event e)
             break;
         case SDL_CONTROLLERAXISMOTION:
             if (e.caxis.value > 16000) // Positive direction
-                lastBinding.bindToControllerAxis(e.caxis.which, e.caxis.axis, 1);
+                lastBinding.bindToControllerAxis(
+                    e.caxis.which, e.caxis.axis, 1);
             else if (e.caxis.value < -16000) // Negative direction
-                lastBinding.bindToControllerAxis(e.caxis.which, e.caxis.axis, -1);
+                lastBinding.bindToControllerAxis(
+                    e.caxis.which, e.caxis.axis, -1);
             else return true; // Not enough pushed axis. Irrelevant!
             break;
 
@@ -89,7 +92,7 @@ bool ssge::InputManager::handleListeningForBinding(SDL_Event e)
             break;
         default:
             // Bail out if nothing was pressed
-            return true;
+            return false;
         }
 
         // Check if this binding is used as a fallback already
@@ -129,12 +132,12 @@ bool ssge::InputManager::handleListeningForBinding(SDL_Event e)
     }
 }
 
-bool ssge::InputManager::handleBindings(SDL_Event e, InputBinding* chosenBindings)
+bool ssge::InputManager::handleBindings(const SDL_Event& e, InputBinding* chosenBindings)
 {
     bool eventSwallowed = false;
 
     // See if incoming event matches a binding
-    for (int index = 0; index < 32; index++)
+    for (int index = 0; index < MAX_BINDINGS; index++)
     {
         auto& binding = chosenBindings[index];
         if (binding.matchesEvent(e))
@@ -174,7 +177,7 @@ bool ssge::InputManager::handleBindings(SDL_Event e, InputBinding* chosenBinding
                 || e.type == SDL_JOYAXISMOTION)
             {
                 // We must check the axis direction
-                int wantedDirection = binding.getJoystickAxisDirection();
+                int wantedDirection = binding.getJoypadAxisDirection();
                 Sint16 axisValue = (e.type == SDL_JOYAXISMOTION) ? e.jaxis.value : e.caxis.value;
                 if (std::abs(axisValue) > 8000)
                 {
@@ -212,7 +215,7 @@ void InputManager::mouseWheelFix(InputBinding* chosenBindings)
     // Clear all SDL_MOUSEWHEEL-bound inputs
     // because we don't have a MouseWheelRelease event.
     // Without this, the mousewheel inputs get jammed!
-    for (int index = 0; index < 32; index++)
+    for (int index = 0; index < MAX_BINDINGS; index++)
     {
         if (chosenBindings[index].getDeviceType()
             == InputBinding::DeviceType::MouseWheel)
@@ -352,19 +355,6 @@ int InputManager::getFreeJoypadSlot() const
     return -1;
 }
 
-InputManager::Joypad* ssge::InputManager::getFreeJoyPad()
-{
-    for (int i = 0; i < MAX_JOYPADS; i++)
-    {
-        Joypad* joypad = &joypadSlots[i];
-        if (joypad->ctrl && joypad->joy)
-        {
-            return joypad;
-        }
-    }
-    return nullptr;
-}
-
 const InputPad& InputManager::getPad() const
 {
     return pad;
@@ -425,7 +415,7 @@ int ssge::InputManager::getMaxBindings() const
     return MAX_BINDINGS;
 }
 
-bool ssge::InputManager::loadFromIniFile(IniFile& iniFile)
+void ssge::InputManager::loadFromIniFile(IniFile& iniFile)
 {
     static const char* INI_SECTION = "InputBindings";
 
@@ -518,17 +508,36 @@ bool ssge::InputManager::loadFromIniFile(IniFile& iniFile)
                 ),
                 iniFile.getInt( // Hat side
                     INI_SECTION, // Side
-                    std::string("Direction") + bindingIdxStr, // Key
+                    std::string("Side") + bindingIdxStr, // Key
                     0 // Fallback value
                 )
                 // TODO: Sanitize further!
             );
             break;
         case ssge::InputBinding::DeviceType::GameControllerButton:
-            // TODO: Support GameController when it actually works
+            inputBinding->bindToControllerButton(
+                0, // JoystickID // TODO: Better detection of joystick slots!
+                iniFile.getInt( // Button index
+                    INI_SECTION, // Section
+                    std::string("Button") + bindingIdxStr, // Key
+                    0 // Fallback value
+                )
+            );
             break;
         case ssge::InputBinding::DeviceType::GameControllerAxis:
-            // TODO: Support GameController when it actually works
+            inputBinding->bindToControllerAxis(
+                0, // JoystickID // TODO: Better detection of joystick slots!
+                iniFile.getInt( // Axis index
+                    INI_SECTION, // Section
+                    std::string("Axis") + bindingIdxStr, // Key
+                    0 // Fallback value
+                ),
+                iniFile.getInt( // Axis direction
+                    INI_SECTION, // Section
+                    std::string("Direction") + bindingIdxStr, // Key
+                    0 // Fallback value
+                )
+            );
             break;
         case ssge::InputBinding::DeviceType::TouchFinger:
             // TODO: No touch support yet
@@ -539,11 +548,9 @@ bool ssge::InputManager::loadFromIniFile(IniFile& iniFile)
             break;
         }
     }
-
-    return false;
 }
 
-bool ssge::InputManager::saveToIniFile(IniFile& iniFile)
+void ssge::InputManager::saveToIniFile(IniFile& iniFile)
 {
     static const char* INI_SECTION = "InputBindings";
 
@@ -596,12 +603,12 @@ bool ssge::InputManager::saveToIniFile(IniFile& iniFile)
             iniFile.setInt(
                 INI_SECTION,
                 "Axis" + bindingIdxStr,
-                binding->getJoystickAxis()
+                binding->getJoypadAxis()
             );
             iniFile.setInt(
                 INI_SECTION,
                 "Direction" + bindingIdxStr,
-                binding->getJoystickAxisDirection()
+                binding->getJoypadAxisDirection()
             );
             break;
         case ssge::InputBinding::DeviceType::JoystickHat:
@@ -612,15 +619,28 @@ bool ssge::InputManager::saveToIniFile(IniFile& iniFile)
             );
             iniFile.setInt(
                 INI_SECTION,
-                "Direction" + bindingIdxStr,
+                "Side" + bindingIdxStr,
                 binding->getJoystickHatDirection()
             );
             break;
         case ssge::InputBinding::DeviceType::GameControllerButton:
-            // TODO: Support GameController when it actually works
+            iniFile.setInt(
+                INI_SECTION,
+                "Button" + bindingIdxStr,
+                binding->getJoypadButton()
+            );
             break;
         case ssge::InputBinding::DeviceType::GameControllerAxis:
-            // TODO: Support GameController when it actually works
+            iniFile.setInt(
+                INI_SECTION,
+                "Axis" + bindingIdxStr,
+                binding->getJoypadAxis()
+            );
+            iniFile.setInt(
+                INI_SECTION,
+                "Direction" + bindingIdxStr,
+                binding->getJoypadAxisDirection()
+            );
             break;
         case ssge::InputBinding::DeviceType::TouchFinger:
             // TODO: No touch support yet
@@ -629,5 +649,4 @@ bool ssge::InputManager::saveToIniFile(IniFile& iniFile)
             break;
         }
     }
-    return false;
 }
