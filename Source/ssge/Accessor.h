@@ -5,6 +5,7 @@
 #include "Level.h"
 #include "IGame.h"
 #include "InputBinding.h"
+#include "InputSet.h"
 
 namespace ssge {
 
@@ -115,9 +116,9 @@ namespace ssge {
         InputManager* actual;
     public:
         explicit InputsAccess(InputManager* actual) : actual(actual) {}
-        bool isPressed(int buttonIndex);
-        bool isJustPressed(int buttonIndex);
-        bool isJustReleased(int buttonIndex);
+        bool isPressed(InputSet buttonIndex);
+        bool isJustPressed(InputSet buttonIndex);
+        bool isJustReleased(InputSet buttonIndex);
         uint32_t getCurrentButtonsForPlayer(int playerId);
         InputBinding getBinding(int bindingIndex) const;
         std::string getBindingString(int bindingIndex) const;

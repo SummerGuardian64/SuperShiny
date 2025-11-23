@@ -4,6 +4,7 @@
 #include <iostream>
 #include "Utilities.h"
 #include "Level.h"
+#include "InputSet.h"
 
 using namespace ssge;
 
@@ -51,11 +52,11 @@ void Entity::Physics::step(EntityStepContext& context)
         // Store old velocity
         oldVelocity = velocity;
         // Check direction buttons X
-        side.x = abilities.horzMove() ? pad.isPressed(3) - pad.isPressed(2) : 0;
+        side.x = abilities.horzMove() ? pad.isPressed(InputSet::Right) - pad.isPressed(InputSet::Left) : 0;
         // Check direction buttons Y
-        side.y = abilities.vertMove() ? pad.isPressed(1) - pad.isPressed(0) : 0;
+        side.y = abilities.vertMove() ? pad.isPressed(InputSet::Down) - pad.isPressed(InputSet::Up) : 0;
         // Reset jump timer if jump isn't pressed
-        if (!pad.isPressed(4))//Jump
+        if (!pad.isPressed(InputSet::Jump))//Jump
         {
             jumpTimer = 0;
         }
@@ -173,7 +174,7 @@ void Entity::Physics::step(EntityStepContext& context)
         //}
 
         // Jump button makes a jump on ground and swim in water
-        if (pad.isJustPressed(4))
+        if (pad.isJustPressed(InputSet::Jump))
         {
             // Try swimming in water
             if (inWater && abilities.canSwim())

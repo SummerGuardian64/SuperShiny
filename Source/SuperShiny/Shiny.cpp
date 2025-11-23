@@ -262,7 +262,7 @@ void Shiny::preStep(EntityStepContext& context)
             }
         }*/
 
-        if (pad.isPressed(5))
+        if (pad.isPressed(InputSet::Run))
         {
             // Bubbleshooting
             if (physics->grounded)
@@ -287,10 +287,10 @@ void Shiny::preStep(EntityStepContext& context)
             }
             else
             {
-                bool up = pad.isPressed(0);
-                bool down = pad.isPressed(1);
-                bool left = pad.isPressed(2);
-                bool right = pad.isPressed(3);
+                bool up = pad.isPressed(InputSet::Up);
+                bool down = pad.isPressed(InputSet::Down);
+                bool left = pad.isPressed(InputSet::Left);
+                bool right = pad.isPressed(InputSet::Right);
 
                 if (up) bubbleY = -1;
                 if (down) bubbleY = 1;

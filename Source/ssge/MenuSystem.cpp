@@ -4,6 +4,7 @@
 #include <algorithm>
 #include "SDL.h"
 #include "SDL_ttf.h"
+#include "InputSet.h"
 
 using namespace ssge;
 
@@ -522,22 +523,22 @@ void MenuManager::step(MenuContext& context)
     }
 
     // UP BUTTON
-    bool upPressed = context.inputs.isJustPressed(0);
+    bool upPressed = context.inputs.isJustPressed(InputSet::Up);
     // DOWN BUTTON
-    bool downPressed = context.inputs.isJustPressed(1);
+    bool downPressed = context.inputs.isJustPressed(InputSet::Down);
     // LEFT BUTTON
-    bool leftPressed = context.inputs.isJustPressed(2);
-    bool leftHeld = context.inputs.isPressed(2);
+    bool leftPressed = context.inputs.isJustPressed(InputSet::Left);
+    bool leftHeld = context.inputs.isPressed(InputSet::Left);
     // RIGHT BUTTON
-    bool rightPressed = context.inputs.isJustPressed(3);
-    bool rightHeld = context.inputs.isPressed(3);
+    bool rightPressed = context.inputs.isJustPressed(InputSet::Right);
+    bool rightHeld = context.inputs.isPressed(InputSet::Right);
     // ACCEPT BUTTON || JUMP BUTTON
-    bool acceptPressed = context.inputs.isJustPressed(8)
-        || context.inputs.isJustPressed(4);
+    bool acceptPressed = context.inputs.isJustPressed(InputSet::Jump)
+        || context.inputs.isJustPressed(InputSet::Accept);
     // BACK BUTTON || RUN BUTTON || PAUSE BUTTON
-    bool backPressed = context.inputs.isJustPressed(9)
-        || context.inputs.isJustPressed(5)
-        || context.inputs.isJustPressed(7);
+    bool backPressed = context.inputs.isJustPressed(InputSet::Back)
+        || context.inputs.isJustPressed(InputSet::Run)
+        || context.inputs.isJustPressed(InputSet::Pause);
 
     // Repeat rate counting
     if (leftHeld || rightHeld)
@@ -762,7 +763,7 @@ void MenuManager::step(MenuContext& context)
                 }
                 else if (itemIndex >= nOItems)
                 { // If number of items somehow shrunk
-                    // Select last item
+                    // Accept last item
                     itemIndex = nOItems - 1;
                 }
             }

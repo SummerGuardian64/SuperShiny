@@ -8,6 +8,7 @@
 #include <vector>
 #include <string_view>
 #include "SDL.h"
+#include "../ssge/InputSet.h"
 
 // GAMEDEV: Please include headers of your scenes
 #include "SplashScreen.h"
@@ -139,7 +140,7 @@ void SuperShiny::step(StepContext& context)
 		else if (gameplayRunning) // If gameplay is running
 		{
 			// Offer pause button
-			if (context.inputs.isJustPressed(7))
+			if (context.inputs.isJustPressed(InputSet::Pause))
 			{
 				context.scenes.pause(); // Pause the scene
 				context.menus.setMenu(menus.pauseMenu); // Set pause menu

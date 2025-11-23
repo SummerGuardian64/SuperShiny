@@ -278,21 +278,21 @@ bool AudioAccess::playMusicIfNotPlaying(const std::string& path, int loops)
 
 // InputsAccess
 
-bool InputsAccess::isPressed(int buttonIndex)
+bool InputsAccess::isPressed(InputSet buttonIndex)
 {
 	if (!actual) return false;
 
 	return actual->getPad().isPressed(buttonIndex);
 }
 
-bool InputsAccess::isJustPressed(int buttonIndex)
+bool InputsAccess::isJustPressed(InputSet buttonIndex)
 {
 	if (!actual) return false;
 
 	return actual->getPad().isJustPressed(buttonIndex);
 }
 
-bool InputsAccess::isJustReleased(int buttonIndex)
+bool InputsAccess::isJustReleased(InputSet buttonIndex)
 {
 	if (!actual) return false;
 
