@@ -44,6 +44,8 @@ namespace ssge
 		void disconnect()
 		{
 			deviceType = DeviceType::Disconnected;
+			deviceInstanceID = -1;
+			boundTo = {};
 		}
 
 		void bindToKey(SDL_Scancode key)
@@ -109,23 +111,21 @@ namespace ssge
 
 		std::string getDeviceTypeString() const
 		{
-			static const char* LUT[] = {
-				"Disconnected",
-				"Keyboard",
-				"Mouse Button",
-				"Mouse Wheel",
-				"Joystick Button",
-				"Joystick Axis",
-				"Joystick Hat",
-				"Touch Finger",
-				nullptr
-			};
-
-			int deviceTypeInt = (int)deviceType;
-
-			if (deviceTypeInt < 0 || deviceTypeInt >= (int)DeviceType::TOTAL)
-				return "UNKNOWN";
-			else return LUT[deviceTypeInt];
+			using Dev = DeviceType;
+			switch (deviceType)
+			{
+			case Dev::Disconnected:        return "Disconnected";
+			case Dev::Keyboard:            return "Keyboard";
+			case Dev::MouseButton:         return "Mouse Button";
+			case Dev::MouseWheel:          return "Mouse Wheel";
+			case Dev::JoystickButton:      return "Joystick Button";
+			case Dev::JoystickAxis:        return "Joystick Axis";
+			case Dev::JoystickHat:         return "Joystick Hat";
+			case Dev::GameControllerButton:return "Game Controller Button";
+			case Dev::GameControllerAxis:  return "Game Controller Axis";
+			case Dev::TouchFinger:         return "Touch Finger";
+			default:                       return "UNKNOWN";
+			}
 		}
 
 		SDL_Scancode getScancode() const
@@ -183,7 +183,7 @@ namespace ssge
 			else return "in an unknown direction!";
 		}
 
-		Uint8 getJoypadID() const
+		SDL_JoystickID getJoypadID() const
 		{
 			if (deviceType == DeviceType::JoystickAxis
 				|| deviceType == DeviceType::JoystickButton
@@ -322,11 +322,10 @@ namespace ssge
 				|| deviceType == DeviceType::GameControllerAxis)
 			{
 				auto sdlGameController = SDL_GameControllerFromInstanceID(deviceInstanceID);
-				auto sdlGameControllerName = SDL_GameControllerName(sdlGameController);
-				if (sdlGameControllerName == nullptr)
+				if (sdlGameController == nullptr)
 					return "Unknown controller";
-				else
-					return SDL_GameControllerName(sdlGameController);
+				auto* name = SDL_GameControllerName(sdlGameController);
+				return name ? name : "Unknown controller";
 			}
 			else return std::to_string(getJoypadID());
 		}
@@ -363,9 +362,9 @@ namespace ssge
 		InputBinding() { disconnect(); }
 		explicit InputBinding(SDL_Scancode key) { bindToKey(key); }
 		explicit InputBinding(Uint8 mouseButton) { bindToMouseButton(mouseButton); }
-		InputBinding(int joystickID, Uint8 mouseButton) { bindToJoystickButton(joystickID, mouseButton); }
-		InputBinding(int joystickID, int axis, int direction) { bindToJoystickAxis(joystickID, axis, direction); }
-		InputBinding(int joystickID, Uint8 hat, Uint8 direction) { bindToJoystickHat(joystickID, hat, direction); }
+		explicit InputBinding(SDL_JoystickID joystickID, Uint8 mouseButton) { bindToJoystickButton(joystickID, mouseButton); }
+		explicit InputBinding(SDL_JoystickID joystickID, int axis, int direction) { bindToJoystickAxis(joystickID, axis, direction); }
+		explicit InputBinding(SDL_JoystickID joystickID, Uint8 hat, Uint8 direction) { bindToJoystickHat(joystickID, hat, direction); }
 
 		bool matchesEvent(const SDL_Event& e) const
 		{
@@ -413,7 +412,7 @@ namespace ssge
 					//e.cbutton.which == deviceInstanceID && // this device //FIXME: Implement autorebind!
 					e.cbutton.button == boundTo.joypadButton; // this button
 			case DeviceType::GameControllerAxis:
-				if (e.type == SDL_JOYAXISMOTION
+				if (e.type == SDL_CONTROLLERAXISMOTION
 					/*&& e.caxis.which == deviceInstanceID*/ //FIXME: Implement autorebind!
 					)
 				{
