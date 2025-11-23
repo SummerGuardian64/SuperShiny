@@ -5,6 +5,7 @@
 #include <sstream>
 #include <algorithm>
 #include <cctype>
+#include "Utilities.h"
 
 namespace ssge
 {
@@ -30,44 +31,6 @@ namespace ssge
 
 		std::vector<Section> sections;
 		std::string errorLog;
-
-		// ---------- small helpers ----------
-		// TODO: Create a utility class
-		// or maybe even a common sense library to have functions
-		// like all other normal languages, smh -.-'
-		// (except they're not normal because they have GC and I don't like GC)
-
-		static inline void ltrim(std::string& s)
-		{
-			size_t i = 0u;
-			while (i < s.size() && std::isspace((unsigned char)s[i]))
-				i++;
-
-			s.erase(0, i);
-		}
-		static inline void rtrim(std::string& s)
-		{
-			if (s.empty()) return;
-			size_t i = s.size();
-			while (i > 0 && std::isspace((unsigned char)s[i - 1]))
-				i--;
-			
-			s.erase(i);
-		}
-		static inline std::string trim(std::string s)
-		{
-			ltrim(s);
-			rtrim(s);
-			return s;
-		}
-
-		static inline std::string lower(std::string s)
-		{
-			for (size_t i = 0; i < s.size(); i++)
-				s[i] = (char)std::tolower((unsigned char)s[i]);
-
-			return s;
-		}
 
 		inline void ensureSection(const std::string& caption, size_t& secIdx)
 		{
