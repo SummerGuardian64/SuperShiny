@@ -62,7 +62,7 @@ void Entity::Physics::step(EntityStepContext& context)
         }
         // Set accelleration, deccelleration and maximum speeds
         // And also, offer jump
-        int situation = (grounded ? 1 : 0) | (inWater << 2);
+        int situation = (grounded ? 1 : 0) | (inWater << 1);
         switch (situation)
         {
         case 0: // In air
