@@ -107,7 +107,7 @@ namespace ssge {
     class EntityStepContext : public StepContextBase
     {
     public:
-        EngineAccess engine;
+        EngineAccessRestrained engine;
         GameAccess game;
         ScenesAccess scenes;
         InputsAccess inputs;

@@ -12,6 +12,11 @@
 
 using namespace ssge;
 
+EngineAccessRestrained ssge::EngineAccess::restrainAccess() const
+{
+	return EngineAccessRestrained(actual);
+}
+
 void EngineAccess::finish()
 {
 	if (actual) actual->finish();

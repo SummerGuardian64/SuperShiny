@@ -25,13 +25,26 @@ namespace ssge {
     class MenuContext;
     class MenuHeader;
 
+    class EngineAccessRestrained;
+
     class EngineAccess {
+    protected:
         Engine* actual;
     public:
         explicit EngineAccess(Engine* actual) : actual(actual) {};
+        EngineAccessRestrained restrainAccess() const;
         void finish();
         void wrapUp();
         bool isWrappingUp() const;
+    };
+
+    class EngineAccessRestrained : public EngineAccess
+    {
+    public:
+        explicit EngineAccessRestrained(Engine* actual) : EngineAccess(actual) {}
+        // Don't let these sensitive functions be called!
+        void finish() = delete;
+        void wrapUp() = delete;
     };
 
     class GameAccess {

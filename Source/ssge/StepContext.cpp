@@ -96,7 +96,7 @@ EntityStepContext::EntityStepContext(
     SpritesAccess sprites_
 )
     : StepContextBase(deltaTime),
-    engine(std::move(engine_)),
+    engine(engine_.restrainAccess()),
     game(std::move(game_)),
     scenes(std::move(scenes_)),
     inputs(std::move(inputs_)),
