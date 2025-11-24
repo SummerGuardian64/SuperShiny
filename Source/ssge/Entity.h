@@ -41,6 +41,13 @@ namespace ssge
 		private:
 			InputPad pad;
 		public:
+			void reset()
+			{
+				mode = Mode::None;
+				_ignore = false;
+				playable = false;
+				playerId = -1;
+			};
 			Mode getMode() const { return mode; };
 			void setMode(Mode mode) {
 				if ((int)mode >= 0 && mode < Mode::TOTAL) this->mode = mode;
@@ -184,21 +191,11 @@ namespace ssge
 			// References Entity's hitbox
 			SDL_FRect& hitbox;
 
-			//std::unique_ptr<Collider> collider; //TODO: May be not needed
-			float getLeftEdge() const { return hitbox.x; }
-			float getRightEdge() const { return hitbox.x + hitbox.w; }
-			float getTopEdge() const { return hitbox.y; }
-			float getBottomEdge() const { return hitbox.y + hitbox.h; }
-			float getHorizontalCenter() const { return hitbox.x + hitbox.w / 2.0f; }
-			float getVerticalCenter() const { return hitbox.y + hitbox.h / 2.0f; }
-			SDL_FRect getBounds() const { return hitbox; }
-			SDL_FPoint getSize() const { return SDL_FPoint{ hitbox.w, hitbox.h }; }
-			//std::shared_ptr<Collision> collideWith(Entity& other); //TODO: May be not needed
-
 			// Current abilities
 			Abilities abilities;
 
 			// Current states
+
 			bool running = false;
 			bool inWater = false;
 			bool grounded = false;
@@ -212,6 +209,8 @@ namespace ssge
 			SDL_Point side = { 0,0 };   // Side that's being pushed
 			SDL_FPoint oldVelocity = { 0,0 };
 
+			// TODO: Refactor these as Abilities in air, in water, etc.
+			// Probably v0.1.4+
 			//float gravityInWater = 0;
 
 			//float maxWalkSpeed = 0;
@@ -248,9 +247,11 @@ namespace ssge
 			void step(EntityStepContext& context);
 		};
 
-	public:
-
+	private:
+		// Age of Entity in steps
 		uint32_t lifespan = 0;
+
+		// Internal flag that is set when the entity is scheduled to be destroyed
 		bool scheduledToDestroy{ false };
 
 	protected:
@@ -259,27 +260,68 @@ namespace ssge
 
 	public:
 		Entity();
+
+		// EntityClassID is a string that represents the implementation of the Entity.
 		virtual std::string getEntityClassID() const = 0;
+
+		// Returns the age of Entity in steps
 		uint32_t getLifespan() const { return lifespan; }
+
+		// Returns whether the entity is scheduled to be destroyed at the end of Entity iterations for this frame
+		bool isScheduledToDestroy() const { return scheduledToDestroy; }
+
+		// Entity position in the GameWorld
 		SDL_FPoint position{ 0.0f, 0.0f };
+
+		// Entity's sprite
 		std::unique_ptr<Sprite> sprite;
+
+		// Entity's local hitbox relative to the Entity's position
 		SDL_FRect hitbox{ 0.0f, 0.0f, 0.0f, 0.0f };
 
+		// Gets the object responsible for controlling the Entity
 		Control* getControl();
+
+		// Gets a copy of the current button states of the Entity
 		InputPad getPad();
+
+		// Gets the Entity's Physics controller (if any)
 		Physics* getPhysics();
 
+		// Updates the local InputPad with necessary inputs
 		void latch(EntityStepContext& context);
+
+		// Callback that occurs on the first step
+		// Best for initializing the entity with EntityStepContext data
 		virtual void firstStep(EntityStepContext& context) = 0;
+
+		// Callback that occurs before the standard step code for Entity does
 		virtual void preStep(EntityStepContext& context) = 0;
+
+		// Occurs every step. EntityManager calls this.
 		void step(EntityStepContext& context);
-		bool isScheduledToDestroy() const { return scheduledToDestroy; }
+
+		// Callback that occurs after the standard step code for Entity does
 		virtual void postStep(EntityStepContext& context) = 0;
+
+		// Callback that occurs before the standard draw code for Entity does.
+		// Gamedev may want to do things with DrawContext.
 		virtual void preDraw(DrawContext& context) const = 0;
+
+		// Occurs every drawn frame. EntityManager calls this.
 		void draw(DrawContext context) const;
+
+		// Callback that occurs before the standard draw code for Entity does.
+		// Gamedev may want to do things with DrawContext.
 		virtual void postDraw(DrawContext& context) const = 0;
+
+		// Schedules the entity for destruction.
+		// Gamedev can use this to colloquially "destroy" the "object".
 		void destroy();
+
+		// Callback called by EntityManager after all entities have been stepped
 		virtual void onDestroy(EntityStepContext& context) = 0;
+
 		virtual ~Entity() = default;
 	};
 }

@@ -5,6 +5,7 @@
 #include "Utilities.h"
 #include "Level.h"
 #include "InputSet.h"
+#include <cmath>
 
 using namespace ssge;
 
@@ -257,7 +258,8 @@ void Entity::Physics::step(EntityStepContext& context)
         }
 
         // COLLISION
-
+        // Leftover from 2013's GML code
+        // TODO: Port in v0.1.4
         // Some slope thing
         /*if(Grounded)
         {
@@ -273,8 +275,8 @@ void Entity::Physics::step(EntityStepContext& context)
           }
         }*/
 
-        // After you compute velocity.x, velocity.y for this fixed step:
-        float dx = velocity.x;   // per-step displacement in world units (you�re already stepping at fixed dt)
+        // Step-based displacement
+        float dx = velocity.x;
         float dy = velocity.y;
 
         bool collisionEnabled = !abilities.collisionIgnored();
@@ -452,6 +454,7 @@ void Entity::draw(DrawContext context) const
 
 	if (sprite)
 	{
+        // Pass DrawContext as a COPY
 		sprite->draw(context);
 	}
 
@@ -474,10 +477,10 @@ ssge::Entity::Control* ssge::Entity::getControl()
 ssge::InputPad ssge::Entity::getPad()
 {
     if (auto ctrl = getControl())
-    {
+    { // a COPY will be returned
         return ctrl->getPad();
     }
-    else return InputPad();
+    else return InputPad(); // Fallback to empty pad
 }
 
 ssge::Entity::Physics* ssge::Entity::getPhysics()
@@ -493,28 +496,34 @@ void ssge::Entity::Control::latch(EntityStepContext& context)
     {
         switch (mode)
         {
+        case ssge::Entity::Control::Mode::None:
+            break;
         case ssge::Entity::Control::Mode::Player:
             directButtons = context.inputs.getCurrentButtonsForPlayer(playerId);
             break;
         case ssge::Entity::Control::Mode::AI:
-            //TODO: UNIMPLEMENTED!
+            //TODO: UNIMPLEMENTED! Bring in after v0.2
             break;
         case ssge::Entity::Control::Mode::Replay:
-            //TODO: UNIMPLEMENTED!
+            //TODO: UNIMPLEMENTED! Bring in after v0.2
             break;
         case ssge::Entity::Control::Mode::NPC:
-            //TODO: UNIMPLEMENTED!
+            //TODO: UNIMPLEMENTED! Bring in after v0.2
             break;
         case ssge::Entity::Control::Mode::Cutscene:
-            //TODO: UNIMPLEMENTED!
+            //TODO: UNIMPLEMENTED! Bring in after v0.2
             break;
-            //case ssge::Entity::Control::Mode::None:
-            //case ssge::Entity::Control::Mode::TOTAL:
-            //TODO: Error handling
         default:
+            std::cout << "ssge::Entity::Control::Mode is inconsistent! Autofixing..." << std::endl;
+            reset(); // Autofix
             break;
         }
     }
 
     pad.latchButtons(directButtons);
+}
+
+void ssge::Entity::NPC::step(EntityStepContext& context)
+{
+    // TODO: After v0.2
 }
