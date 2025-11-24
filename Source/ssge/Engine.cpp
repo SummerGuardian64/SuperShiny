@@ -46,7 +46,7 @@ bool Engine::init(PassKey<Program> pk)
 			SDL_INIT_AUDIO | SDL_INIT_JOYSTICK | SDL_INIT_GAMECONTROLLER |
 			SDL_INIT_HAPTIC) != 0)
 		{
-			std::cout << "SDL_Init error: ", SDL_GetError();
+			std::cout << "SDL_Init error: " << SDL_GetError() << std::endl;
 			success = false;
 			break;
 		}
@@ -58,7 +58,7 @@ bool Engine::init(PassKey<Program> pk)
 		int imgFlags = IMG_INIT_PNG;
 		if (!(IMG_Init(imgFlags) & imgFlags))
 		{
-			std::cout << "IMG_Init error: " << IMG_GetError();
+			std::cout << "IMG_Init error: " << IMG_GetError() << std::endl;
 			success = false;
 			break;
 		}

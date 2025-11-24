@@ -11,6 +11,7 @@ int ssge::Program::run(IGame& game, int argc, char* argv[])
     // Prevent running the program twice
     static bool alreadyRunning = false;
     if (alreadyRunning)return -1;
+    alreadyRunning = true;
 
     // Create engine with the game
     auto engine = std::make_unique<Engine>(PassKey<Program>(), game);
