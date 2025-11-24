@@ -118,7 +118,7 @@ namespace ssge
 			Block(Block&&) = default;
 			~Block() = default;
 
-			int getTypeIndex() const; // index in the tileset (0-based) for draw()
+			int getTypeIndex() const; // index in the tilesetTexture (0-based) for draw()
 		};
 
 		class Iterator // (planned) rich iterator � declared for future use
@@ -241,8 +241,8 @@ namespace ssge
 		std::string getMusicPath() const;
 
 	private:
-		SdlTexture tileset;
-		TilesetMeta tilesMeta;
+		SdlTexture tilesetTexture;
+		TilesetMeta tilesetMeta;
 		static const int MAX_BLOCK_DEFINITIONS = 94;
 		Block::Definition blockDefinitions[MAX_BLOCK_DEFINITIONS];
 
@@ -357,8 +357,8 @@ namespace ssge
 			const std::vector<Spawn>& getSpawnList() const;
 			int getHeroIndex() const;
 			std::string getErrorLog() const;
-			Loader(const Loader& toCopy) = default;
-			Loader(Loader&& toMove) = default;
+			Loader(const Loader& toCopy) = delete;
+			Loader(Loader&& toMove) = delete;
 			~Loader() = default;
 		};
 	};

@@ -32,13 +32,13 @@ namespace ssge
 		: columns(cols)
 		, rows(rws)
 		, blockSize(blkSize)
-		, tileset(std::move(tex))
+		, tilesetTexture(std::move(tex))
 		, nextSection(0)
 	{
 		const std::size_t count = static_cast<std::size_t>(columns) * static_cast<std::size_t>(rows);
 		array = (count > 0) ? new Block[count] : nullptr;
-		tilesMeta.tileW = blockSize.w;
-		tilesMeta.tileH = blockSize.h;
+		tilesetMeta.tileW = blockSize.w;
+		tilesetMeta.tileH = blockSize.h;
 
 		for (std::size_t i = 0; i < MAX_BLOCK_DEFINITIONS; i++)
 		{
@@ -56,7 +56,7 @@ namespace ssge
 		: columns(other.columns)
 		, rows(other.rows)
 		, blockSize(other.blockSize)
-		, tileset(std::move(other.tileset))
+		, tilesetTexture(std::move(other.tilesetTexture))
 		, array(other.array)
 		, throughTopLeft(other.throughTopLeft)
 		, throughTop(other.throughTop)
@@ -86,7 +86,7 @@ namespace ssge
 			// we only allow move on a freshly-constructed temporary in practice.
 			// If you truly need assignment, drop the const on these dims.
 			// Here we just adopt the underlying storage and public resources:
-			tileset = std::move(other.tileset);
+			tilesetTexture = std::move(other.tilesetTexture);
 			array = other.array;
 			throughTopLeft = other.throughTopLeft;
 			throughTop = other.throughTop;
@@ -475,24 +475,24 @@ namespace ssge
 
 	const SdlTexture& Level::getTilesetTexture() const
 	{
-		return tileset;
+		return tilesetTexture;
 	}
 
 	const Level::TilesetMeta Level::getTilesetMeta() const
 	{
-		return tilesMeta;
+		return tilesetMeta;
 	}
 
 	void Level::setTileset(SdlTexture SdlTexture)
 	{
-		this->tileset = std::move(SdlTexture);
-		tilesMeta.inferColumnsFromTexture(tileset);
+		this->tilesetTexture = std::move(SdlTexture);
+		tilesetMeta.inferColumnsFromTexture(tilesetTexture);
 	}
 
 	bool Level::loadTileset(SDL_Renderer* renderer)
 	{
 		setTileset(SdlTexture(tilesetTexturePath.c_str(), renderer));
-		return tileset.isValid();
+		return tilesetTexture.isValid();
 	}
 
 	bool Level::loadBackgrounds(SDL_Renderer* renderer)
@@ -521,12 +521,12 @@ namespace ssge
 		SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 
 		// Mitigate division by zero
-		if (!tilesMeta.isValid())
+		if (!tilesetMeta.isValid())
 			return;
 
 		auto viewport = context.getBounds();
 		auto scroll = context.getScrollOffset();
-		SDL_Rect tile{ 0,0,tilesMeta.tileW,tilesMeta.tileW };
+		SDL_Rect tile{ 0,0,tilesetMeta.tileW,tilesetMeta.tileH };
 		int leftOffset = scroll.x;
 		int topOffset = scroll.y;
 		int leftExtent = std::clamp(scroll.x / tile.w, 0, columns);
@@ -578,7 +578,7 @@ namespace ssge
 			}
 		}
 
-		if (tileset)
+		if (tilesetTexture)
 		{
 			for (int r = topExtent; r < bottomExtent; ++r)
 			{
@@ -597,7 +597,7 @@ namespace ssge
 					// Get index of the tile that we should draw
 					auto blockTileIndex = blockDefinitions[blockTypeIndex].tileIndex;
 
-					SDL_Rect src = tilesMeta.makeRectForTile(blockTileIndex);
+					SDL_Rect src = tilesetMeta.makeRectForTile(blockTileIndex);
 
 					SDL_Rect dst{
 						c * blockSize.w - leftOffset,
@@ -606,7 +606,7 @@ namespace ssge
 						blockSize.h
 					};
 
-					SDL_RenderCopy(renderer, tileset, &src, &dst);
+					SDL_RenderCopy(renderer, tilesetTexture, &src, &dst);
 				}
 			}
 		}
