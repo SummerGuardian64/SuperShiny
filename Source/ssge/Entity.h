@@ -43,7 +43,7 @@ namespace ssge
 		public:
 			Mode getMode() const { return mode; };
 			void setMode(Mode mode) {
-				if ((int)mode >= 0 || mode < Mode::TOTAL) this->mode = mode;
+				if ((int)mode >= 0 && mode < Mode::TOTAL) this->mode = mode;
 			};
 			bool isIgnored() const { return _ignore; };
 			bool ignored() const { return _ignore; };
