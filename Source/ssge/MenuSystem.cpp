@@ -56,7 +56,7 @@ std::string MenuSettingInt::printSetting() const
 {
     // If setting not initialized, say N/A
 	if (!integer)return " N/A";
-	
+
     // Otherwise, print space and then the integer as a string
 	return std::string(" ") + std::to_string(*integer);
 }
@@ -124,7 +124,7 @@ void MenuSettingBool::change(int direction)
 
     bool& theSetting = *boolean;
 
-    // If we press RIGHT while setting is OFF 
+    // If we press RIGHT while setting is OFF
     if (direction > 0 && theSetting == false)
     { // We turn it ON
         theSetting = true;
@@ -564,7 +564,7 @@ void MenuManager::step(MenuContext& context)
     { // UP BUTTON
         if (currentMenuItem) // Check if an item has been selected
         {
-            int oldIndex = itemIndex; // Remember the previous index to prevent infinite loop
+            unsigned int oldIndex = itemIndex; // Remember the previous index to prevent infinite loop
             do { // Seek a selectable item while making sure to not go out of bounds
                 if (itemIndex-- == 0)itemIndex = (unsigned int)currentMenu->items.size() - 1;
                 currentMenuItem = currentMenu->items[itemIndex]; // Update current menu item pointer!
@@ -576,7 +576,7 @@ void MenuManager::step(MenuContext& context)
     { // DOWN BUTTON
         if (currentMenuItem) // Check if an item has been selected
         {
-            int oldIndex = itemIndex; // Remember the previous index to prevent infinite loop
+            unsigned int oldIndex = itemIndex; // Remember the previous index to prevent infinite loop
             do { // Seek a selectable item while making sure to not go out of bounds
                 if (++itemIndex == currentMenu->items.size())itemIndex = 0;
                 currentMenuItem = currentMenu->items[itemIndex]; // Update current menu item pointer!
