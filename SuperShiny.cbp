@@ -58,10 +58,10 @@
 			<Add library="SDL2_image.dll" />
 			<Add library="SDL2_ttf.dll" />
 			<Add library="SDL2_mixer.dll" />
-			<Add directory="E:/Dev/SDL2-devel-2.32.10-mingw/SDL2-2.32.10/i686-w64-mingw32/lib" />
-			<Add directory="E:/Dev/SDL2_image-devel-2.8.8-mingw/SDL2_image-2.8.8/i686-w64-mingw32/lib" />
-			<Add directory="E:/Dev/SDL2_ttf-devel-2.24.0-mingw/SDL2_ttf-2.24.0/i686-w64-mingw32/lib" />
-			<Add directory="E:/Dev/SDL2_mixer-devel-2.8.1-mingw/SDL2_mixer-2.8.1/i686-w64-mingw32/lib" />
+			<Add directory="$(#sdl2)/lib" />
+			<Add directory="$(#sdl2_image)/lib" />
+			<Add directory="$(#sdl2_ttf)/lib" />
+			<Add directory="$(#sdl2_mixer)/lib" />
 		</Linker>
 		<ExtraCommands>
 			<Add after='CMD /C SET &quot;WITHEXE_SRC=$(PROJECT_DIR)\WithEXE&quot; &amp;&amp; SET &quot;WITHEXE_DST=$(TARGET_OUTPUT_DIR)&quot; &amp;&amp; SET &quot;WITHEXE_KEEP=$(TARGET_OUTPUT_FILE)&quot; &amp;&amp; &quot;$(PROJECT_DIR)\Tools\WithEXE_Mirror.exe&quot;' />
