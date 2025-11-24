@@ -9,8 +9,8 @@ namespace ssge
 		Left = 2,
 		Right = 3,
 		Jump = 4,
-		Run = 5,
-		Dash = 6,
+		Dash1 = 5,
+		Dash2 = 6,
 		Pause = 7,
 		Accept = 8,
 		Back = 9
