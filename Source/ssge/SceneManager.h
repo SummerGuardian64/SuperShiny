@@ -23,7 +23,7 @@ namespace ssge
 		bool wannaWrapUp = false;
 
 	public:
-		SceneManager(PassKey<Engine> pk);
+		SceneManager(PassKey<Engine> pk) {};
 		SceneManager(const SceneManager& toCopy) = delete;
 		SceneManager(SceneManager&& toMove) = delete;
 

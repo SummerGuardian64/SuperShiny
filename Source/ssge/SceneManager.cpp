@@ -8,14 +8,8 @@
 
 using namespace ssge;
 
-SceneManager::SceneManager(PassKey<Engine> pk)
-{
-}
-
 void SceneManager::step(StepContext& context)
 {
-	//std::cout << "SceneManager::step()" << std::endl;
-
 	paused = wannaPause;
 
 	if (auto scene = getCurrentScene())
@@ -85,7 +79,7 @@ void SceneManager::step(StepContext& context)
 		else
 		{ // Then switch to the new scene
 			currentScene = std::move(queuedScene);
-			queuedScene = NULL;
+			queuedScene = nullptr;
 			sceneInitialized = false;
 			paused = false; // New scenes shouldn't start paused!
 			wannaPause = false;
@@ -99,7 +93,6 @@ void SceneManager::step(StepContext& context)
 
 void SceneManager::draw(DrawContext& context) const
 {
-	//std::cout << "SceneManager::draw()" << std::endl;
 	// Draw current scene
 	if (auto scene = getCurrentScene())
 	{
@@ -120,14 +113,6 @@ void SceneManager::draw(DrawContext& context) const
 
 	SDL_Rect bounds = context.getBounds();
 	SDL_RenderFillRect(renderer, &bounds);
-
-	// Draw fader
-	//TODO: Port to SDL2
-	/*
-	auto faderRect = sf::RectangleShape(game.getWindowSizeFloat());
-	faderRect.setFillColor(sf::Color(0, 0, 0, fadeVal));
-	renderTarget.draw(faderRect);
-	*/
 }
 
 void SceneManager::wrapUp()
@@ -205,6 +190,6 @@ void SceneManager::setPause(bool pause)
 
 void SceneManager::shutdown()
 {
-	currentScene = NULL;
-	queuedScene = NULL;
+	currentScene = nullptr;
+	queuedScene = nullptr;
 }
