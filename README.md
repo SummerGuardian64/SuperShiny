@@ -38,7 +38,7 @@ Currently supported operating systems:
 - Windows XP 32-bit
 - Windows 11 64-bit
 
-Engine features (as of v0.1.0):
+Engine features (as of v0.1.0 and v0.1.2):
 
 - Decoupled engine components
 - Communication between components via Contexts
@@ -61,7 +61,9 @@ Engine features (as of v0.1.0):
 - Parallax scrolling
 - Sprite animation system
 
-The first alpha version is very limited to accommodate for the deadline of Zagreb Games Week 2025.
+The first alpha version was very limited to accommodate for the deadline of Zagreb Games Week 2025.
+
+The post-con alpha version is a mini-overhaul over the engine's frozen features and is intended for hiring purposes.
 
 ## Acknowledgements
 
