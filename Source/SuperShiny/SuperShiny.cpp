@@ -92,7 +92,7 @@ bool SuperShiny::init(StepContext& context)
 
 	// Change scene
 	context.scenes.changeScene("SplashScreen");
-	
+
 	// Load settings
 	IniFile configIni;
 
@@ -193,7 +193,7 @@ void SuperShiny::step(StepContext& context)
     { // Victory screen
 
 		// Show the victory menu and overlay it with a credits menu.
-        
+
 		if(processingGameVictory)
         {
 			// Wait for the fade to finish
@@ -445,7 +445,6 @@ std::shared_ptr<Entity> SuperShiny::Entities::createEntity(PassKey<EntitiesAcces
 SuperShiny::Sprites::Sprites(PassKey<SuperShiny> pk)
 { // GAMEDEV: Define your sprites here
 	using Image = Sprite::Image;
-	using Sequence = Sprite::Animation::Sequence;
 
 
 	///////////

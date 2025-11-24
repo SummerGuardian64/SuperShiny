@@ -6,12 +6,6 @@
 
 using namespace ssge;
 
-class ssge::Scene;
-class ssge::ScenesAccess;
-class ssge::Entity;
-class ssge::EntitiesAccess;
-class ssge::MenuHeader;
-
 // GAMEDEV: Please forward-declare your scenes here
 
 class SplashScreen;
