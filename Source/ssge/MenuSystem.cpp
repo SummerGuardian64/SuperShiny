@@ -542,7 +542,7 @@ void MenuManager::step(MenuContext& context)
         || context.inputs.isJustPressed(InputSet::Accept);
     // BACK BUTTON || RUN BUTTON || PAUSE BUTTON
     bool backPressed = context.inputs.isJustPressed(InputSet::Back)
-        || context.inputs.isJustPressed(InputSet::Run)
+        || context.inputs.isJustPressed(InputSet::Dash1)
         || context.inputs.isJustPressed(InputSet::Pause);
 
     // Repeat rate counting
