@@ -98,7 +98,7 @@ void Bubble::postStep(EntityStepContext& context)
                 // Overal collisions
                 {
                     SDL_Rect bounds = context.level.calculateLevelSize();
-                    
+
                     SDL_FRect collider{
                         position.x + hitbox.x - /*(goingLeft ? 1 : 0)*/1,
                         position.y + hitbox.y - /*(goingUp ? 1 : 0)*/1,
@@ -141,14 +141,12 @@ void Bubble::postStep(EntityStepContext& context)
 
                         std::string callback = collision.callback;
 
+                        // Handle blocks with Bubblable callback
                         if (callback.substr(0, 9) == "Bubblable")
                         {
                             auto rightArrowIndex = callback.find('>');
 
-                            // Coordinates of the block under Shiny's clawbs
-                            auto colSpot = collision.coords;
-
-                            // Terraform current block (Terraform->X or Terraform^Y->X)
+                            // Bubblable>x
                             if (rightArrowIndex != std::string::npos)
                             {
                                 std::size_t start = rightArrowIndex + 1;
@@ -159,7 +157,7 @@ void Bubble::postStep(EntityStepContext& context)
                                     std::string numberSubstring = callback.substr(start, end - start);
                                     int newType = std::stoi(numberSubstring);
                                     if (block)
-                                    {
+                                    { // Bubble the block
                                         block->type = newType;
                                     }
                                 }
