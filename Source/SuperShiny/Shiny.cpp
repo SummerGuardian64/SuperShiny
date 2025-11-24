@@ -24,7 +24,8 @@ void Shiny::quitBubbling()
     if (bubbling)
     {
         bubbling = false;
-        physics->abilities = makeRegularAbilities();
+        if(!dying) // Don't restore abilities if dying
+            physics->abilities = makeRegularAbilities();
     }
 }
 
@@ -237,18 +238,18 @@ std::string Shiny::getEntityClassID() const
 
 void Shiny::firstStep(EntityStepContext& context)
 {
+    // Create a sprite for Shiny
     sprite = context.sprites.create("Shiny");
-	//std::cout << "Helloy!" << std::endl;
 }
 
 void Shiny::preStep(EntityStepContext& context)
 {
-	//std::cout << "scale.. ";
-
     if (auto ctrl = control.get())
     {
         InputPad pad = ctrl->getPad();
 
+        // Orb throwing. Old powerup.
+        // TODO: Revive in v0.1.3+
         /*if (pad.isJustPressed(6))
         {
             if (auto orbRef = context.entities.addEntity("Orb"))
@@ -262,7 +263,8 @@ void Shiny::preStep(EntityStepContext& context)
             }
         }*/
 
-        if (pad.isPressed(InputSet::Run))
+        // If "Dash1" is held, Shiny will stop and shoot bubbles
+        if (pad.isPressed(InputSet::Dash1))
         {
             // Bubbleshooting
             if (physics->grounded)
@@ -279,14 +281,15 @@ void Shiny::preStep(EntityStepContext& context)
             }
         }
 
+        // Bubbleshooting mechanic
         if (bubbling)
         {
             if (physics->velocity.y != 0)
-            {
+            { // Shiny cannot bubbleshoot if he skids off of the ground
                 quitBubbling();
             }
             else
-            {
+            { // Lucky Luke PS1 kinda shooting mechanic
                 bool up = pad.isPressed(InputSet::Up);
                 bool down = pad.isPressed(InputSet::Down);
                 bool left = pad.isPressed(InputSet::Left);
@@ -316,10 +319,12 @@ void Shiny::preStep(EntityStepContext& context)
                     }
                 }
 
+                // Speed of the bubble being shot
                 float bubbleSpeed = 10;
 
                 if (bubbleX * bubbleY != 0)
                 { // Diagonal
+                    // TODO: In-house Vector math library (v0.1.3)
                     bubbleSpeed *= sqrtf(2)/2.f;
                 }
 
@@ -344,32 +349,36 @@ void Shiny::preStep(EntityStepContext& context)
                     bubbleAnim = (int)Sequences::BubblingForwardDown;
                 }
 
+                // Prepare to actually spawn bubbles
                 if (bubbleX != 0 || bubbleY != 0)
                 {
+                    // Velocity vector for the bubble
                     SDL_FPoint bubbleVector{
                         (float)bubbleX * bubbleSpeed,
                         (float)bubbleY * bubbleSpeed
                     };
 
+                    // Shoot at bubbleDelay rate
                     if (bubbleTimer > 0)
                     {
                         bubbleTimer--;
                     }
                     else
                     {
+                        // Reset delay
                         bubbleTimer = bubbleDelay;
+                        
+                        // Create Bubble entity
                         auto bubble = context.entities.addEntity("Bubble");
+                        
+                        // Place the bubble on Shiny's mouth
                         bubble->position.x = position.x + (7 * sign(sprite->xscale));
-                        if(bubbleAux)
-                        {
-                            bubble->position.y = position.y - 60 - bubbleAuxOffset;
-                            bubbleAux=false;
-                        }
-                        else{
-                                bubble->position.y = position.y - 60;
-                            bubbleAux=true;
-                        }
 
+                        // Have Shiny shoot at an offset every other time
+                        bubble->position.y = position.y - 60 - (bubbleAux ? bubbleAuxOffset : 0);
+                        bubbleAux = !bubbleAux;
+
+                        // Set bubble vector
                         auto bubblePhysics = bubble->getPhysics();
                         bubblePhysics->velocity = bubbleVector;
                     }
@@ -378,6 +387,7 @@ void Shiny::preStep(EntityStepContext& context)
         }
     }
 
+    // Report hero deadth if Shiny dies off of the screen
     if (isDying())
     {
         SDL_Rect levelBounds = context.level.calculateLevelSize();
@@ -391,10 +401,15 @@ void Shiny::preStep(EntityStepContext& context)
 
 void Shiny::postStep(EntityStepContext& context)
 {
+    // Used to check against deadth
     bool amIDeadYet = false;
+
+    // TODO: Implement a Rect class with helper functions
+
     float tipOfTheHead = position.y + hitbox.y;
     float clawbHeight = tipOfTheHead + hitbox.h;
 
+    // Handle collisions against blocks
     if (physics)
     {
         if (!physics->abilities.collisionIgnored())
@@ -417,11 +432,12 @@ void Shiny::postStep(EntityStepContext& context)
                     auto* block = context.level.getBlockAt(collision.coords);
                     std::string callback = collision.callback;
 
+                    // Collision with hazards
                     if (collision.coll == Level::Block::Collision::Hazard
                         || collision.coll == Level::Block::Collision::DeathOnTouch
                         || collision.coll == Level::Block::Collision::DeathIfFullyOutside)
-                    {
-                        // Eliminate ugly edge case
+                    { // Deadth
+                        // Eliminate edge cases
                         SDL_FPoint bottomLeft{
                             position.x + hitbox.x,
                             position.y + hitbox.y + hitbox.h
@@ -441,19 +457,22 @@ void Shiny::postStep(EntityStepContext& context)
 
                         if (block != context.level.getBlockAt(bottomLeft)
                             && block == context.level.getBlockAt(bottomLeftOut))
-                        { } // Ugly edge case
+                        { } // Don't die through the left edge
                         else if (block != context.level.getBlockAt(bottomRight)
                             && block == context.level.getBlockAt(bottomRightOut))
-                        { } // Another ugly edge case
+                        { } // Don't die through the right edge
                         else
-                        {
+                        { // Deadth ensured
                             amIDeadYet = true;
                         }
                     }
+
+                    // Handling blocks with Collectable callback
                     if (callback == "Collectable")
-                    {
+                    { // Leave empty
                         block->type = 0;
                     }
+
                     // Callback: DestroyBlock>x,y<replaceCurrent
                     if (callback.substr(0, 12) == "DestroyBlock")
                     {
@@ -528,12 +547,12 @@ void Shiny::postStep(EntityStepContext& context)
                         Level::Block::Coords destroyBlockCoords{destroyBlockX,destroyBlockY};
                         Level::Block* destroyBlockPtr = context.level.getBlockAt(destroyBlockCoords);
 
-                        if(destroyBlockPtr)
+                        if(destroyBlockPtr) // Making sure the block is inside of the bounds
                         {
                             destroyBlockPtr->type = 0;
                         }
 
-                        if(replaceCurrentBlock>=0)
+                        if(replaceCurrentBlock>=0) // Optional replacement of the current block
                         {
                             block->type = replaceCurrentBlock;
                         }
@@ -553,15 +572,26 @@ void Shiny::postStep(EntityStepContext& context)
                 {
                     auto* block = context.level.getBlockAt(collision.coords);
                     std::string callback = collision.callback;
+
+                    // Shiny can jump on blocks
                     if (callback.substr(0, 3) == "Box")
                     {
+                        // Stepping is not enough. Falling onto must be happening
                         if (physics->oldVelocity.y > 0)
                         {
+                            // Make Shiny jump
                             physics->velocity.y = -physics->abilities.jumpSpeed;
+
+                            // Allow for holding the jump button to jump higher
                             physics->jumpTimer = physics->abilities.jumpStrength;
+
+                            // Replace the box with what there is inside
                             block->type = makeBoxNumber(collision.callback);
                         }
                     }
+
+                    // Shiny can terraform blocks he steps on
+
                     if (callback.substr(0, 9) == "Terraform")
                     {
                         auto rightArrowIndex = callback.find('>');
@@ -595,7 +625,7 @@ void Shiny::postStep(EntityStepContext& context)
                                 std::string numberSubstring = callback.substr(start, end - start);
                                 int newType = std::stoi(numberSubstring);
                                 if (block)
-                                {
+                                { // Terraform!
                                     block->type = newType;
                                 }
                             }
@@ -622,7 +652,7 @@ void Shiny::postStep(EntityStepContext& context)
                                 std::string numberSubstring = callback.substr(start, end - start);
                                 int newType = std::stoi(numberSubstring);
                                 if (upperBlock)
-                                {
+                                { // Terraform!
                                     upperBlock->type = newType;
                                 }
                             }
@@ -646,11 +676,17 @@ void Shiny::postStep(EntityStepContext& context)
                 for (auto& collision : headCollisions)
                 {
                     auto* block = context.level.getBlockAt(collision.coords);
+
+                    // Shiny can break blocks with his head
                     if (collision.callback.substr(0, 3) == "Box")
                     {
+                        // Only if actually going up, not scratching the box with his head
                         if (physics->oldVelocity.y < 0)
                         {
-                            physics->velocity.y = -physics->oldVelocity.y;
+                            // Headbonk
+                            physics->velocity.y = abs(physics->oldVelocity.y);
+
+                            // Replace the box with what there is inside
                             block->type = makeBoxNumber(collision.callback);
                         }
                     }
@@ -662,6 +698,7 @@ void Shiny::postStep(EntityStepContext& context)
     if(amIDeadYet)
         die();
 
+    // Animate Shiny
     animate(context);
 }
 

@@ -42,7 +42,11 @@ public:
 	Shiny();
 
 	bool isDying() const;
+
+	// Called when Shiny starts dying
 	void die();
+
+	// Helper function to read Box block callbacks
 	int makeBoxNumber(std::string callback) const;
 
 	// Inherited via Entity
