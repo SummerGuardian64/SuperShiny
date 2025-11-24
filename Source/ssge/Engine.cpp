@@ -36,70 +36,99 @@ bool Engine::init(PassKey<Program> pk)
 	bool success = true;
 	
 	// Handy tweak so joysticks don't fail at the con
+	// TODO: May need to be parametrized in the future if it causes problems
 	SDL_SetHint(SDL_HINT_JOYSTICK_ALLOW_BACKGROUND_EVENTS, "1");
 
-	// Initialize SDL
-	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_EVENTS | SDL_INIT_AUDIO |
-		SDL_INIT_JOYSTICK | SDL_INIT_GAMECONTROLLER | SDL_INIT_HAPTIC) != 0)
+	do // Gotophobia
 	{
-		std::cout << "SDL_Init error: ", SDL_GetError();
-		success = false;
-	}
+		// Initialize SDL
+		if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_EVENTS |
+			SDL_INIT_AUDIO | SDL_INIT_JOYSTICK | SDL_INIT_GAMECONTROLLER |
+			SDL_INIT_HAPTIC) != 0)
+		{
+			std::cout << "SDL_Init error: ", SDL_GetError();
+			success = false;
+			break;
+		}
 
-	// Initialize input stuff via InputManager
-	inputs->init(PassKey<Engine>());
+		// Initialize input stuff via InputManager
+		inputs->init(PassKey<Engine>());
 
-	// Initialize SDL_image for PNG support
-	int imgFlags = IMG_INIT_PNG;
-	if (!(IMG_Init(imgFlags) & imgFlags))
-	{
-		std::cout << "SDL_image could not initialize! SDL_image Error: " << IMG_GetError();
-		return false;
-	}
+		// Initialize SDL_image for PNG support
+		int imgFlags = IMG_INIT_PNG;
+		if (!(IMG_Init(imgFlags) & imgFlags))
+		{
+			std::cout << "IMG_Init error: " << IMG_GetError();
+			success = false;
+			break;
+		}
 
-	// Initialize program window
-	if (auto error = window->init(game.getApplicationTitle(), game.getVirtualWidth(), game.getVirtualHeight()))
-	{
-		std::cout << error << std::endl;
-		return false;
-	}
+		// Initialize program window using game's parameters
+		if (auto error = window->init(
+			game.getApplicationTitle(),
+			game.getVirtualWidth(),
+			game.getVirtualHeight())
+			)
+		{
+			std::cout << "WindowManager init error: " << error << std::endl;
+			success = false;
+			break;
+		}
 
-	if (TTF_Init() != 0)
-	{
-		std::cout << TTF_GetError() << std::endl;
-	}
+		// Initialize font
+		if (TTF_Init() != 0)
+		{
+			std::cout << "TTF_Init error: " << TTF_GetError() << std::endl;
+			success = false;
+			break;
+		}
 
-	if (!audio->init(PassKey<Engine>()))
-	{
-		/* handle error or continue with no audio */
-	}
+		// Initialize audio
+		if (!audio->init(PassKey<Engine>()))
+		{
+			std::cout << "AudioManager init failed. Continuing without sound..."
+				<< std::endl;
+		}
 
-	//TODO: Better error handling
-	loadInitialResources(window->getRenderer());
+		// Load initial resources
+		if (!loadInitialResources(window->getRenderer()))
+		{
+			std::cout << "Loading initial resources failed." << std::endl;
+			success = false;
+			break;
+		}
 
-	if (!prepareInitialState()) return false;
+		// Initialize the actual game
+		if (!initGame())
+		{
+			std::cout << "IGame init failed" << std::endl;
+			success = false;
+			break;
+		}
+	} while (0);
 	
-	return true;
+	return success;
 }
 
 bool Engine::loadInitialResources(SDL_Renderer* renderer)
 {
-	//Game::init(renderer);
+	bool success = true;
 
 	// load fonts once (SDL_ttf already initialized by Program)
 	menuFont = TTF_OpenFont("Fonts/VCR_OSD_MONO.ttf", 28);
 	if (menuFont == nullptr)
 	{
 		std::cout << TTF_GetError() << std::endl;
+		success = false;
 	}
 
-	return true;
+	return success;
 }
 
-bool Engine::prepareInitialState()
+bool Engine::initGame()
 {
 	auto stepContext = StepContext(PassKey<Engine>(),
-		0,
+		0, // Zero delta-time
 		EngineAccess(this),
 		GameAccess(game),
 		WindowAccess(window),
@@ -109,9 +138,7 @@ bool Engine::prepareInitialState()
 		DrawingAccess(window->getRenderer()),
 		MenusAccess(menus));
 
-	game.init(stepContext);
-
-	return true;
+	return game.init(stepContext);
 }
 
 bool Engine::mainLoop(PassKey<Program> pk)
@@ -136,8 +163,9 @@ bool Engine::mainLoop(PassKey<Program> pk)
 
 	bool done = false;
 
-	// TODO: After the con, let this be MainLoop to please Emscripten.
-	//       Place the surrounding code into something like beforeMainLoop and afterMainLoop.
+	// TODO: For Emscripten:
+	//       Place the surrounding code into something like beforeMainLoop
+	//       and afterMainLoop.
 	while (!done)
 	{
 		handleEvents();
@@ -160,7 +188,7 @@ bool Engine::mainLoop(PassKey<Program> pk)
 			// Additional responsiveness
 			handleEvents();
 			// Update the engine and see if it's done (wants to quit)
-			done |= !update(deltaTime);
+			done |= !tick(deltaTime);
 			accumulatorMS -= deltaTimeMS;
 			steps++;
 		}
@@ -188,6 +216,7 @@ void Engine::handleEvents()
 		switch (event.type)
 		{
 		case SDL_QUIT:
+			// Game implementation handles quit requests!
 			game.queryQuit();
 			break;
 		// Keyboard events
@@ -211,19 +240,25 @@ void Engine::handleEvents()
 		case SDL_EventType::SDL_CONTROLLERBUTTONDOWN:
 		case SDL_EventType::SDL_CONTROLLERBUTTONUP:
 		case SDL_EventType::SDL_CONTROLLERAXISMOTION:
+			// InputManager handles all of these
 			inputs->handle(event);
 			break;
 		default:
 			break;
 		}
-		if (event.type == SDL_EventType::SDL_JOYDEVICEREMOVED)
+
+		// Game implementation handles things too!
+
+		if (event.type == SDL_EventType::SDL_JOYDEVICEREMOVED
+			|| event.type == SDL_EventType::SDL_CONTROLLERDEVICEREMOVED)
 		{
+			// Game implementation handles joypad unplugging
 			game.joypadGotUnplugged();
 		}
 	}
 }
 
-bool Engine::update(double deltaTime)
+bool Engine::tick(double deltaTime)
 {
 	// Stop updating the engine if it's finished
 	if (wannaFinish)
@@ -252,7 +287,10 @@ bool Engine::update(double deltaTime)
 
 	scenes->step(stepContext);
 
+	// Step the game implementation
 	game.step(stepContext);
+
+	// Step the menu system via MenuManager
 
 	{ // Prepare MenuContext
 		Scene* currentScene = scenes->getCurrentScene();
@@ -279,7 +317,7 @@ bool Engine::update(double deltaTime)
 		menus->step(menuContext);
 	}
 
-	// Let this be the final update if we're finished
+	// Let this be the final tick if we're finished
 	return !wannaFinish;
 }
 
@@ -310,37 +348,46 @@ void Engine::shutdown()
 	);
 	game.saveSettings(context);
 
+	// Let the game implementation clean itself up
 	game.cleanUp(PassKey<Engine>());
 
 	if (menuFont)
-	{
+	{ // Close menu font
 		TTF_CloseFont(menuFont);
 		menuFont = nullptr;
 	}
 
 	if (inputs)
-	{
+	{ // Delete InputManager
 		delete inputs;
 		inputs = nullptr;
 	}
+
 	if (audio)
-	{
+	{ // Delete AudioManager
 		delete audio;
 		audio = nullptr;
 	}
+
 	if (scenes)
-	{
+	{ // Delete SceneManager
 		delete scenes;
 		scenes = nullptr;
 	}
+
 	if (window)
-	{
+	{ // Delete WindowManager
 		delete window;
 		window = nullptr;
 	}
 
+	// Quit SDL_ttf
 	TTF_Quit();
+
+	// Quit SDL_image
 	IMG_Quit();
+
+	// Quit SDL2
 	SDL_Quit();
 }
 

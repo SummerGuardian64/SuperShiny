@@ -29,7 +29,7 @@ namespace ssge
 		virtual ~IGame() = default;
 
         // Called once after SDL + engine subsystems are up.
-        virtual void init(StepContext& context) = 0;
+        virtual bool init(StepContext& context) = 0;
 
         // Called every frame before SceneManager step
         virtual void step(StepContext& context) = 0;

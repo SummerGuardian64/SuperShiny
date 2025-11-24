@@ -46,7 +46,7 @@ private:
 
 public: //TODO: Encapsulate
     // Called once after SDL + engine subsystems are up.
-    void init(StepContext& context) override;
+    bool init(StepContext& context) override;
 
     // Called every frame before SceneManager step
     void step(StepContext& context) override;

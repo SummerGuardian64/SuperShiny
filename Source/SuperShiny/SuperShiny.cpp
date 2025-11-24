@@ -61,14 +61,16 @@ void SuperShiny::_queryQuit(StepContext& context)
 	}
 }
 
-void SuperShiny::init(StepContext& context)
+bool SuperShiny::init(StepContext& context)
 {
 	SDL_Renderer* renderer = context.drawing.getRenderer();
+
+	// Load sprites
 	sprites.load("Shiny", renderer);
 	sprites.load("Orb", renderer);
 	sprites.load("Bubble", renderer);
-	context.scenes.changeScene("SplashScreen");
 
+	// Set default inputs
 	auto& inputs = context.inputs;
 	inputs.fetchBinding(0)->bindToKey(SDL_Scancode::SDL_SCANCODE_UP);
 	inputs.fetchFallbackBinding(0)->bindToKey(SDL_Scancode::SDL_SCANCODE_UP);
@@ -88,8 +90,10 @@ void SuperShiny::init(StepContext& context)
 	inputs.fetchBinding(9)->bindToKey(SDL_Scancode::SDL_SCANCODE_ESCAPE);
 	inputs.fetchFallbackBinding(9)->bindToKey(SDL_Scancode::SDL_SCANCODE_ESCAPE);
 
+	// Change scene
+	context.scenes.changeScene("SplashScreen");
+	
 	// Load settings
-
 	IniFile configIni;
 
 	if (configIni.loadIni("config.ini"))
@@ -98,33 +102,46 @@ void SuperShiny::init(StepContext& context)
 		context.inputs.loadFromIniFile(configIni);
 	}
 
+	// Initialize menus
 	menus.init(config);
+
+	// Nothing can go wrong for now
+	return true;
 }
 
 void SuperShiny::step(StepContext& context)
 {
 	if (queriedToQuit)
-	{
+	{ // Handle request to quit
 		_queryQuit(context);
 		queriedToQuit = false;
 	}
 
+	// What Scene are we on?
 	std::string currentScene = context.scenes.getCurrentSceneClassID();
 
 	if (currentScene == scenes.getMainMenuSceneClassID())
-	{
+	{ // Main menu scene
+
+		// Play title screen music
 		context.audio.playMusicIfNotPlaying("Music/ShinyTheme.ogg");
 
+		// Show the main menu when the scene fades in fully
 		if (!context.menus.isOpen()
 			&& context.scenes.isFadeFinished()
 			&& !context.engine.isWrappingUp())
 		{
 			context.menus.setMenu(menus.mainMenu);
 		}
+
+		// Disregard unplugged joypads
 		_joypadGotUnplugged = false;
 	}
 	else if (currentScene == "GameWorld")
-	{
+	{ // GameWorld
+
+		// Assess the current situation
+
 		bool isPaused = context.scenes.isPaused();
 		bool fading = !context.scenes.isFadeFinished();
 		bool isWrappingUp = context.engine.isWrappingUp();
@@ -167,64 +184,90 @@ void SuperShiny::step(StepContext& context)
 		{
 			_joypadGotUnplugged = false;
 			context.scenes.pause(); // Pause the scene
+			// Open an abrupt menu for telling the user
+			// that a joypad got unplugged!
 			context.menus.abruptMenu(menus.joypadUnpluggedMenu);
 		}
 	}
 	else if (currentScene=="VictoryScreen")
-    {
-        if(processingGameVictory)
+    { // Victory screen
+
+		// Show the victory menu and overlay it with a credits menu.
+        
+		if(processingGameVictory)
         {
-            context.menus.setMenu(menus.victoryMenu);
-            context.menus.abruptMenu(menus.creditsMenu);
+			// Wait for the fade to finish
+			if (context.scenes.isFadeFinished())
+			{
+				context.menus.setMenu(menus.victoryMenu);
+				context.menus.abruptMenu(menus.creditsMenu);
+				// Do this only once!
+				processingGameVictory = false;
+			}
         }
-        processingGameVictory=false;
     }
 
+	// Handle victory "event"
 	if (gameWasWon)
     {
         gameWasWon=false;
-        if(!processingGameVictory)
-        {
+        if(!processingGameVictory && currentScene != "VictoryScreen")
+        { // Start processing the game victory
+			 // Pause game
             context.scenes.pause();
-            context.scenes.changeScene("VictoryScreen");
+			// Queue VictoryScreen
+			context.scenes.changeScene("VictoryScreen");
+			// Game victory processing begins now
             processingGameVictory=true;
+			// It will end when the VictoryScreen shows up with its menus.
         }
     }
 
+	// Handle "event" for saving settings
 	if (wannaSaveSettings)
 	{
+		// Actually save the settings with the given context
 		saveSettings(context);
+		// "event" handled successfully
 		wannaSaveSettings = false;
 	}
 
+	// Handle graceful Engine shutdown
 	if (context.engine.isWrappingUp())
 	{
 		// Fade out on wrapping up
 		context.audio.setMasterVolume(context.audio.getMasterVolume() - 5);
 	}
-	else if (!context.scenes.isFadeFinished())
+	else if (!context.scenes.isFadeFinished()) // Wrapupless fade handling
 	{
 		// Linearly interpolate between 0 and the configured volume
 		const Uint8 fadeVal = context.scenes.getFadeVal(); // 0..255
-		const int  target = config.masterVolume;           // or master/music, 0..100
+		const int  target = config.masterVolume;           // 0..100
 
 		// volume = target * (255 - fadeVal) / 255
-		const int fadeVolume = (target * (255 - fadeVal) + 127) / 255; // +127 for rounding
+		// +127 for rounding
+		const int fadeVolume = (target * (255 - fadeVal) + 127) / 255;
 
+		// Apply this volume
+		// TODO: context.audio.setFadeVal(fadeVolume) instead of all of this!
 		context.audio.setMasterVolume(fadeVolume);
 	}
 	else // Avoid synchronizing settings while wrapping up
 	{
+		// TODO: Once context.audio.setFadeVal is implemented, we won't need
+		// to worry about running syncSettings aside
 		syncSettings(context);
 	}
 }
 
 void SuperShiny::draw(DrawContext& context)
 {
+	// Nothing additional to draw as of now
 }
 
 void SuperShiny::cleanUp(PassKey<Engine> pk)
 {
+	// Unload all sprites
 	sprites.unload("Shiny");
 	sprites.unload("Orb");
 	sprites.unload("Bubble");
@@ -252,41 +295,42 @@ bool SuperShiny::saveSettings(StepContext& context)
 }
 
 void SuperShiny::saveSettings()
-{
+{ // Raise "event"
 	wannaSaveSettings = true;
 }
 
 void SuperShiny::declareVictory()
-{
+{ // Raise "event"
     gameWasWon = true;
 }
 
 void SuperShiny::queryQuit()
-{
+{ // Raise "event"
 	queriedToQuit = true;
 }
 
 void SuperShiny::joypadGotUnplugged()
-{
+{ // Raise "event"
 	_joypadGotUnplugged = true;
 }
 
 const char* SuperShiny::getApplicationTitle()
-{
+{ // GAMEDEV: Your caption here
 	return "Super Shiny";
 }
 
 int SuperShiny::getVirtualWidth()
-{
+{ // GAMEDEV: Your game's virtual width here
 	return 1024;
 }
 
 int SuperShiny::getVirtualHeight()
-{
+{ // GAMEDEV: Your game's virtual height here
 	return 768;
 }
 
-MenuCommandEx SuperShiny::onHavingBackedOutOfMenus(PassKey<GameAccess> pk, MenuContext& context)
+MenuCommandEx SuperShiny::onHavingBackedOutOfMenus(PassKey<GameAccess> pk,
+	MenuContext& context)
 {
 	MenuCommandEx cmdEx;
 
@@ -301,6 +345,7 @@ MenuCommandEx SuperShiny::onHavingBackedOutOfMenus(PassKey<GameAccess> pk, MenuC
     {
         // IGNORE!!!
         cmdEx.smallCmd = MenuCommand::NOTHING;
+		// Don't let the user back out of victory that easily!
     }
 	else
 	{ // Otherwise just close the menu
@@ -325,8 +370,9 @@ IGameSprites& SuperShiny::getSprites()
 	return sprites;
 }
 
-std::unique_ptr<Scene> SuperShiny::Scenes::createScene(PassKey<ScenesAccess> pk, std::string id)
-{
+std::unique_ptr<Scene> SuperShiny::Scenes::createScene(
+	PassKey<ScenesAccess> pk, std::string id)
+{ // GAMEDEV: Please register all your scenes here
 	if (id == "SplashScreen")
 		return splashScreen();
 
@@ -340,11 +386,13 @@ std::unique_ptr<Scene> SuperShiny::Scenes::createScene(PassKey<ScenesAccess> pk,
 }
 
 std::string SuperShiny::Scenes::getMainMenuSceneClassID() const
-{
+{ // GAMEDEV: Your main menu scene class ID here
 	return "TitleScreen";
 }
 
 SuperShiny::Scenes::Scenes(PassKey<SuperShiny> pk) {}
+
+// Simple Scene factory
 
 std::unique_ptr<SplashScreen> SuperShiny::Scenes::splashScreen()
 {
@@ -360,6 +408,8 @@ std::unique_ptr<VictoryScreen> SuperShiny::Scenes::victoryScreen()
 {
     return std::make_unique<VictoryScreen>();
 }
+
+// Simple Entity factory
 
 std::shared_ptr<Shiny> SuperShiny::Entities::shiny()
 {
@@ -393,12 +443,18 @@ std::shared_ptr<Entity> SuperShiny::Entities::createEntity(PassKey<EntitiesAcces
 }
 
 SuperShiny::Sprites::Sprites(PassKey<SuperShiny> pk)
-{
+{ // GAMEDEV: Define your sprites here
 	using Image = Sprite::Image;
 	using Sequence = Sprite::Animation::Sequence;
 
+
+	///////////
+	// Shiny //
+	///////////
+
 	sprdefShiny.spritesheetPath = "Sprites/Shiny.png";
 
+	// Automagic assignment of canvases just because
 	for (int y = 0; y < 1024 - 102; y += 102)
 	{
 		for (int x = 0; x <= 1024 - 77; x += 77)
@@ -468,6 +524,11 @@ SuperShiny::Sprites::Sprites(PassKey<SuperShiny> pk)
 		seq.imageIndexes.push_back(24);
 	}
 
+
+	/////////
+	// Orb //
+	/////////
+
 	sprdefOrb.spritesheetPath = "Sprites/Orb.png";
 
 	sprdefOrb.images.push_back(Image(0, 0, 64, 64, 32, 32));
@@ -475,6 +536,11 @@ SuperShiny::Sprites::Sprites(PassKey<SuperShiny> pk)
 		auto& seq = sprdefOrb.addSequence(20, 20, 0);
 		seq.imageIndexes.push_back(0);
 	}
+
+
+	////////////
+	// Bubble //
+	////////////
 
 	sprdefBubble.spritesheetPath = "Sprites/Bubble.png";
 
@@ -510,13 +576,15 @@ void SuperShiny::Sprites::unload(std::string sprdefId)
 		sprdef->unload();
 }
 
-const Sprite::Definition* SuperShiny::Sprites::fetchDefinition(const std::string& sprdefId)
+const Sprite::Definition* SuperShiny::Sprites::fetchDefinition(
+	const std::string& sprdefId)
 {
 	return fetchDefinitionNonConst(sprdefId);
 }
 
-Sprite::Definition* SuperShiny::Sprites::fetchDefinitionNonConst(const std::string& sprdefId)
-{
+Sprite::Definition* SuperShiny::Sprites::fetchDefinitionNonConst(
+	const std::string& sprdefId)
+{ // GAMEDEV: Register your sprite definitions here
 	if (sprdefId == "Shiny")
 		return &sprdefShiny;
 
@@ -530,7 +598,8 @@ Sprite::Definition* SuperShiny::Sprites::fetchDefinitionNonConst(const std::stri
 }
 
 void SuperShiny::Menus::init(SuperShiny::Config& config)
-{
+{ // GAMEDEV: Define your menus here
+
 	// Compose other menus
 	optionsMenu.setTitle("Options");
 	confirmRestart.setTitle("Caution!");
@@ -633,7 +702,7 @@ void SuperShiny::Menus::init(SuperShiny::Config& config)
 		inputConfigMenu.newItem_InputBinding("Right", 3);
 		inputConfigMenu.newItem_InputBinding("Jump", 4);
 		inputConfigMenu.newItem_InputBinding("Shoot", 5);
-		//inputConfigMenu.newItem_InputBinding("Pounce", 6);
+		//inputConfigMenu.newItem_InputBinding("Pounce", 6); // TODO: When Shiny gets to pounce
 		inputConfigMenu.newItem_InputBinding("Pause Game", 7);
 		inputConfigMenu.newItem_InputBinding("Menu Accept", 8);
 		inputConfigMenu.newItem_InputBinding("Menu Back", 9);
