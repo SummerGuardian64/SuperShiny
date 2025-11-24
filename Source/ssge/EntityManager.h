@@ -5,6 +5,7 @@
 #include <memory>
 #include <vector>
 #include <iterator>
+#include <stdexcept>
 
 namespace ssge
 {
