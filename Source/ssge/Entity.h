@@ -184,7 +184,6 @@ namespace ssge
 			// References Entity's hitbox
 			SDL_FRect& hitbox;
 
-			SDL_FPoint setVelocityMagnitude(const SDL_FPoint& v, float speed);
 			//std::unique_ptr<Collider> collider; //TODO: May be not needed
 			float getLeftEdge() const { return hitbox.x; }
 			float getRightEdge() const { return hitbox.x + hitbox.w; }

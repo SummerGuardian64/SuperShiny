@@ -12,11 +12,6 @@ Entity::Entity()
 {
 }
 
-SDL_FPoint Entity::Physics::setVelocityMagnitude(const SDL_FPoint& v, float speed)
-{
-	return SDL_FPoint();
-}
-
 Entity::Physics::Physics(Entity& entity)
 	: entity(entity),
 	  position(entity.position),
